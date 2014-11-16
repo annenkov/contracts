@@ -20,16 +20,30 @@ data CLCode = DeclareVar String String CLCode
               | Var String
                 deriving Show
 
--- transfroming contracts to CLCode
+-- transforming contracts to CLCode
 genCLContr (Scale e c) = DeclareVar "REAL" "amount" (genCLExpr e) : genCLContr c
 genCLContr (Transl _ c) = genCLContr c
-genCLContr (TransfOne _ _ _) = FunCall "trajectory_inner"
-                               [Var "num_cash_flows", Var "model_num",
-                                Lit "0", Var "amount", Var "md_discts",
-                                Var "vhat"] : []
+genCLContr (TransfOne _ _ _) = trajInnerCall : []
+
+collectScalings (Scale e c)  = e : collectScalings c
+collectScalings (Transl _ c) = collectScalings c
+collectScalings (TransfOne _ _ _) = r 1 : []
+
+calcScale :: NumE a => [Expr a] -> Expr a
+calcScale = foldl1 (*)
+
+genCLContr' c = amount : trajInnerCall : []
+              where
+                amount = DeclareVar "REAL" "amount" (genCLExpr $ calcScale $ collectScalings c)
+
+trajInnerCall = FunCall "trajectory_inner"
+                        [Var "num_cash_flows", Var "model_num",
+                         Lit "0", Var "amount", Var "md_discts",
+                         Var "vhat"]
 
 genCLExpr (Arith Max e1 e2) = FunCall "fmax" [genCLExpr e1, genCLExpr e2]
 genCLExpr (Arith Minus e1 e2) = BinOp "-" (genCLExpr e1) (genCLExpr e2)
+genCLExpr (Arith Times e1 e2) = BinOp "*" (genCLExpr e1) (genCLExpr e2)
 genCLExpr (R rLit) = Lit $ show rLit
 genCLExpr (Obs _) = FunCall "underlyings" [Lit "0", Lit "0"]
 
@@ -42,9 +56,9 @@ ppCLCode (BinOp op e1 e2) = ppCLCode e1 ++ surroundBy " " op ++ ppCLCode e2
 ppCLCode (Lit s) = s
 ppCLCode (Var v) = v
 
---templates
-replace this toThat = intercalate toThat . splitOn this
-replaceLabel label toThat = replace ("{|" ++ label ++ "|}") toThat
+-- templates-like replacing
+replace this that = intercalate that . splitOn this
+replaceLabel label that = replace ("{|" ++ label ++ "|}") that
 
 -- some helpers for pretty-printing
 inParens s = "(" ++ s ++ ")"
@@ -57,3 +71,6 @@ writeOpenCL p fileName=
   do
     template <- readFile "ContractTemplate.cl"
     writeFile (fileName ++ ".cl") (replaceLabel "CODE" p template)
+
+ex1 = scale 200 $ flow 1 (r 100) EUR "you" "me"
+

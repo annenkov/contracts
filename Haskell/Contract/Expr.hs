@@ -13,7 +13,7 @@ module Contract.Expr
     , ppExp, ppReal
     -- evaluation
     , eval -- for internal use only
-    , evalI, evalR, evalB, simplifyExp
+    , evalI, evalR, evalB, simplifyExp, NumE
     ) where
 
 -- to define the exception
