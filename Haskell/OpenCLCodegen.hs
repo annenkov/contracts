@@ -35,15 +35,16 @@ genCLCode acc Nothing = acc
 genCLCode acc (Just (If cond b1 b2)) =
   acc ++ [IfStmt (genCLExpr cond) (genCLCode [] (Just b1)) (genCLCode [] (Just b2))]
 genCLCode acc (Just c) =
-  acc ++ [e] ++ genCLCode acc rest
+  acc ++ [MulAssign "amount" $ genCLExpr $ calcScale e] ++ genCLCode acc rest
     where
       (e, rest) = collectScalings [] c
 
-collectScalings acc (Scale e c) = collectScalings(acc ++ [e]) c
+-- collecting scalings till first "if" or elementary contract such as TransfOne or Zero
+collectScalings acc (Scale e c) = collectScalings(e : acc) c
 collectScalings acc (Transl _ c) = collectScalings acc c
-collectScalings acc (TransfOne _ _ _) = (MulAssign "amount" $ genCLExpr $ calcScale acc, Nothing)                
-collectScalings acc Zero = (MulAssign "amount" $ genCLExpr $ calcScale (acc ++ [r 0]), Nothing)
-collectScalings acc rest@(If _ _ _) = (MulAssign "amount" $ genCLExpr $ calcScale acc, Just rest)
+collectScalings acc (TransfOne _ _ _) = (acc, Nothing)                
+collectScalings acc Zero = (r 0 : acc, Nothing)
+collectScalings acc rest@(If _ _ _) = (acc, Just rest)
 
 calcScale [] = (r 1)
 calcScale xs = foldl1 (*) xs                
@@ -63,7 +64,7 @@ genCLExpr (Less e1 e2) = BoolExpr2 "<" (genCLExpr e1) (genCLExpr e2)
 genCLExpr (Or e1 e2) = BoolExpr2 "||" (genCLExpr e1) (genCLExpr e2)
 genCLExpr (Not e) = BoolNot $ genCLExpr e
 genCLExpr (R rLit) = Lit $ show rLit
-genCLExpr (Obs _) = FunCall "underlyings" [Lit "0", Lit "0"]
+genCLExpr (Obs _) = FunCall "underlyings" [Lit "0", Lit "0"] -- only one uderlying for now
 
 -- pretty-printing OpenCL-like code
 
@@ -117,7 +118,7 @@ ex2 =
                                  (transfOne EUR "you" "me"))
                          zero))
 
--- contract with additional condition. My
+-- like ex2 but with additional condition (just to test nested "if"s)
 ex3 =
     let strike = 4000.0
         theobs = obs ("Carlsberg",0)
@@ -129,3 +130,7 @@ ex3 =
                             (scale (theobs - r strike)
                                  (transfOne EUR "you" "me")))
                          zero))
+
+-- usage examples
+-- putStr $ ppCLSeq $ genPayoffFunc ex2 -- pretty-printing in console
+-- writeOpenCL (ppCLSeq $ genPayoffFunc ex2) "SmallContract" -- to generate SmallContract.cl in current directory
