@@ -38,7 +38,7 @@ void payoffFunction( // SIMPLE
         __local    REAL*    vhat        // [model_num] Accumulated per-model price        
 ) {
 
-    {|CODE|}
+{|CODE|}
 
 }
 

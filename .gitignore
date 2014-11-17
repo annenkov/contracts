@@ -1,3 +1,4 @@
 *.ui
 *.uo
 *~
+Haskell/*.cl
