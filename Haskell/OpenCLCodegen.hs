@@ -25,23 +25,27 @@ data CLCode = DeclareVar String String CLCode
             | Var String
             deriving Show
 
+accAssign op name expr = Assign name $ BinOp op (Var name) expr
+mulAssign = accAssign "*" 
+
 -- transforming contracts to CLCode
 genPayoffFunc c = [amountDecl] ++ body ++ [trajInnerCall]
               where
-                (MulAssign "amount" initialAmount : body) = genCLCode [] (Just c)
-                amountDecl = DeclareVar "REAL" "amount" initialAmount
+                amountDecl = DeclareVar "REAL" "amount" $ Lit "1"
+                body = genCLCode' (-1) (Just c)
 
-genCLCode acc Nothing = acc
-genCLCode acc (Just (If cond b1 b2)) =
-  acc ++ [IfStmt (genCLExpr cond) (genCLCode [] (Just b1)) (genCLCode [] (Just b2))]
-genCLCode acc (Just c) =
-  acc ++ [MulAssign "amount" $ genCLExpr $ calcScale e] ++ genCLCode acc rest
-    where
-      (e, rest) = collectScalings [] c
+genCLCode' n Nothing = []
+genCLCode' n (Just (If cond b1 b2)) =
+          IfStmt (genCLExpr n cond) (genCLCode' n (Just b1)) (genCLCode' n (Just b2)) : []
+genCLCode' n (Just (Transl _ c)) = genCLCode' (n+1) (Just c)
+genCLCode' n (Just c) =
+          (MulAssign "amount" $ genCLExpr n (calcScale e)) : genCLCode' n rest
+          where
+            (e, rest) = collectScalings [] c
 
 -- collecting scalings till first "if" or elementary contract such as TransfOne or Zero
 collectScalings acc (Scale e c) = collectScalings(e : acc) c
-collectScalings acc (Transl _ c) = collectScalings acc c
+collectScalings acc rest@(Transl _ _) = (acc, Just rest)
 collectScalings acc (TransfOne _ _ _) = (acc, Nothing)                
 collectScalings acc Zero = (r 0 : acc, Nothing)
 collectScalings acc rest@(If _ _ _) = (acc, Just rest)
@@ -54,17 +58,17 @@ trajInnerCall = FunCall "trajectory_inner"
                          Lit "0", Var "amount", Var "md_discts",
                          Var "vhat"]
 
-genCLExpr :: Expr a -> CLCode
-genCLExpr (Arith Max e1 e2) = FunCall "fmax" [genCLExpr e1, genCLExpr e2]
-genCLExpr (Arith Min e1 e2) = FunCall "fmin" [genCLExpr e1, genCLExpr e2]
-genCLExpr (Arith Minus e1 e2) = BinOp "-" (genCLExpr e1) (genCLExpr e2)
-genCLExpr (Arith Times e1 e2) = BinOp "*" (genCLExpr e1) (genCLExpr e2)
-genCLExpr (Arith Div e1 e2) = BinOp "/" (genCLExpr e1) (genCLExpr e2)
-genCLExpr (Less e1 e2) = BoolExpr2 "<" (genCLExpr e1) (genCLExpr e2)
-genCLExpr (Or e1 e2) = BoolExpr2 "||" (genCLExpr e1) (genCLExpr e2)
-genCLExpr (Not e) = BoolNot $ genCLExpr e
-genCLExpr (R rLit) = Lit $ show rLit
-genCLExpr (Obs _) = FunCall "underlyings" [Lit "0", Lit "0"] -- only one uderlying for now
+genCLExpr :: Int -> Expr a -> CLCode
+genCLExpr n (Arith Max e1 e2) = FunCall "fmax" [genCLExpr n e1, genCLExpr n e2]
+genCLExpr n (Arith Min e1 e2) = FunCall "fmin" [genCLExpr n e1, genCLExpr n e2]
+genCLExpr n (Arith Minus e1 e2) = BinOp "-" (genCLExpr n e1) (genCLExpr n e2)
+genCLExpr n (Arith Times e1 e2) = BinOp "*" (genCLExpr n e1) (genCLExpr n e2)
+genCLExpr n (Arith Div e1 e2) = BinOp "/" (genCLExpr n e1) (genCLExpr n e2)
+genCLExpr n (Less e1 e2) = BoolExpr2 "<" (genCLExpr n e1) (genCLExpr n e2)
+genCLExpr n (Or e1 e2) = BoolExpr2 "||" (genCLExpr n e1) (genCLExpr n e2)
+genCLExpr n (Not e) = BoolNot $ genCLExpr n e
+genCLExpr n (R rLit) = Lit $ show rLit
+genCLExpr n (Obs _) = FunCall "underlyings" [Lit $ show n, Lit "0"] -- only one uderlying for now
 
 -- pretty-printing OpenCL-like code
 
@@ -130,6 +134,27 @@ ex3 =
                             (scale (theobs - r strike)
                                  (transfOne EUR "you" "me")))
                          zero))
+
+ex4 =
+    let strike = 4000.0
+        theobs = obs ("Carlsberg",0)
+    in scale (r 0.9997817434496459)
+             (transl 360
+                    (iff (r strike !<! theobs)
+                          (transl 360 $
+                           iff (r strike !<! theobs * 2)
+                               (scale (theobs*2 - r strike) (transfOne EUR "you" "me"))
+                               (scale (theobs - r strike)
+                                      (transfOne EUR "you" "me")))
+                           zero))
+
+
+getTranslations (Scale e c) = getTranslations c
+getTranslations tr@(Transl d c) = d : getTranslations c 
+getTranslations (TransfOne _ _ _) = []               
+getTranslations Zero = []
+getTranslations (If _ b1 b2) = getTranslations b1 ++ getTranslations b2
+getTranslations (Both c1 c2) = getTranslations c1 ++ getTranslations c2
 
 -- usage examples
 -- putStr $ ppCLSeq $ genPayoffFunc ex2 -- pretty-printing in console
