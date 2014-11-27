@@ -26,52 +26,65 @@ data CLCode = DeclareVar String String CLCode
             | BoolNot CLCode  
             | Lit String
             | Var String
+            | Skip  
             deriving Show
 
 accAssign op name expr = Assign name $ BinOp op (Var name) expr
 mulAssign = accAssign "*" 
 
 -- transforming contracts to CLCode
-genPayoffFunc c = [amountDecl] ++ body ++ [trajInnerCall]
+genPayoffFunc c = amountDecl : body
               where
                 amountDecl = DeclareVar "REAL" "amount" $ Lit "1"
-                body = genCLCode (Just c) (obsDays c) 0
-genCLCode Nothing ds t = []
-genCLCode (Just (If cond b1 b2)) ds t =
-          IfStmt (genCLExpr cond ds t) (genCLCode (Just b1) ds t) (genCLCode (Just b2) ds t) : []
-genCLCode (Just (Transl t' c)) ds t = genCLCode (Just c) ds (t' + t)
-genCLCode (Just c) ds t =
-          (mulAssign "amount" $ genCLExpr (calcScale e) ds t) : genCLCode rest ds t
+                body = genCLCode (Just c) (obsDays c) (transfDays c) 0 0
+
+genCLCode Nothing ods tds t ot = []
+genCLCode (Just (TransfOne _ _ _)) ods tds t ot
+          | (Just i) <- findIndex (== t) tds = [trajInner i]
+          | otherwise = error $ "no day for " ++ show t
+genCLCode (Just (If cond b1 b2)) ods tds t ot  =
+          IfStmt (genCLExpr cond ods ot) (genCLCode (Just b1) ods tds t ot) (genCLCode (Just b2) ods tds t ot) : []
+genCLCode (Just (Transl t' c)) ods tds t ot = genCLCode (Just c) ods tds (t' + t) (t' + ot)
+genCLCode (Just (CheckWithin e t' c1 c2)) ods tds t ot=
+          map genIf [t .. t'+t]
+          where
+            genIf t'' = IfStmt (genCLExpr e ods t'')
+                        (genCLCode (Just c1) ods tds t (t'' + ot))
+                        (genCLCode (Just c2) ods tds t (t'' + ot))
+genCLCode (Just c) ods tds t ot
+          | null e = Skip : genCLCode rest ods tds t ot
+          | otherwise =  (mulAssign "amount" $ genCLExpr (calcScale e) ods ot) : genCLCode rest ods tds t ot
           where
             (e, rest) = collectScalings [] c
 
--- collecting scalings till first "if" or elementary contract such as TransfOne or Zero
+-- collecting scalings till first "if", "checkWithin" or elementary contract such as TransfOne or Zero
 collectScalings acc (Scale e c) = collectScalings(e : acc) c
 collectScalings acc rest@(Transl _ _) = (acc, Just rest)
-collectScalings acc (TransfOne _ _ _) = (acc, Nothing)                
-collectScalings acc Zero = (r 0 : acc, Nothing)
+collectScalings acc transf@(TransfOne _ _ _) = (acc, Just transf)                
+collectScalings acc Zero = (acc, Nothing)
 collectScalings acc rest@(If _ _ _) = (acc, Just rest)
+collectScalings acc rest@(CheckWithin _ _ _ _) = (acc, Just rest)
 
 calcScale [] = (r 1)
 calcScale xs = foldl1 (*) xs                
 
-trajInnerCall = FunCall "trajectory_inner"
+trajInner day = FunCall "trajectory_inner"
                         [Var "num_cash_flows", Var "model_num",
-                         Lit "0", Var "amount", Var "md_discts",
+                         Lit $ show day, Var "amount", Var "md_discts",
                          Var "vhat"]
                         
 genCLExpr :: Expr a -> [Int] -> Int -> CLCode
-genCLExpr (Arith Max e1 e2) ds t = FunCall "fmax" [genCLExpr e1 ds t, genCLExpr e2 ds t]
-genCLExpr (Arith Min e1 e2) ds t = FunCall "fmin" [genCLExpr e1 ds t, genCLExpr e2 ds t]
-genCLExpr (Arith Minus e1 e2) ds t = BinOp "-" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
-genCLExpr (Arith Times e1 e2) ds t = BinOp "*" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
-genCLExpr (Arith Div e1 e2) ds t = BinOp "/" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
-genCLExpr (Less e1 e2) ds t = BoolExpr2 "<" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
-genCLExpr (Or e1 e2) ds t = BoolExpr2 "||" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
-genCLExpr (Not e) ds t = BoolNot $ genCLExpr e ds t
-genCLExpr (R rLit) ds t = Lit $ show rLit
-genCLExpr (Obs (_, t')) ds t
-           | (Just i) <- findIndex (== (t' + t)) ds = underlyings (i, 0)
+genCLExpr (Arith Max e1 e2) ods t = FunCall "fmax" [genCLExpr e1 ods t, genCLExpr e2 ods t]
+genCLExpr (Arith Min e1 e2) ods t = FunCall "fmin" [genCLExpr e1 ods t, genCLExpr e2 ods t]
+genCLExpr (Arith Minus e1 e2) ods t = BinOp "-" (genCLExpr e1 ods t) (genCLExpr e2 ods t)
+genCLExpr (Arith Times e1 e2) ods t = BinOp "*" (genCLExpr e1 ods t) (genCLExpr e2 ods t)
+genCLExpr (Arith Div e1 e2) ods t = BinOp "/" (genCLExpr e1 ods t) (genCLExpr e2 ods t)
+genCLExpr (Less e1 e2) ods t = BoolExpr2 "<" (genCLExpr e1 ods t) (genCLExpr e2 ods t)
+genCLExpr (Or e1 e2) ods t = BoolExpr2 "||" (genCLExpr e1 ods t) (genCLExpr e2 ods t)
+genCLExpr (Not e) ods t = BoolNot $ genCLExpr e ods t
+genCLExpr (R rLit) ods t = Lit $ show rLit
+genCLExpr (Obs (_, t')) ods t
+           | (Just i) <- findIndex (== (t' + t)) ods = underlyings (i, 0)
            | otherwise = error $ "no day for " ++ show (t' + t)
            where
                  underlyings (i,j) = FunCall "underlyings" [Lit $ show i, Lit $ show j]
@@ -89,6 +102,7 @@ ppCLCode (BoolNot e) = "!" ++ (inParens $ ppCLCode e)
 ppCLCode (IfStmt cond tB fB) = "if" ++ spaced (inParens $ ppCLCode cond) ++
                                (inBlock $ ppCLSeq tB) ++
                                spaced "else" ++ (inBlock $ ppCLSeq fB)
+ppCLCode Skip = ""
 ppCLCode (Lit s) = s
 ppCLCode (Var v) = v
 
@@ -154,10 +168,14 @@ ex4 =
                                       (transfOne EUR "you" "me")))
                            (transl 180 $ (iff (r strike !<! theobs - 10)
                                               (transl 185 $ scale theobs $ transfOne EUR "you" "me")
-                                         zero))))
-
--- alternative approach (should be simplier :) )
-
+                                          zero))))
+equity = "Carlsberg"
+maturity = 30
+ex5 = checkWithin (strike !<! theobs) maturity
+                    (scale (theobs - strike) (transfOne EUR "you" "me")) zero
+    where strike = r 50.0
+          theobs = obs (equity,0)
+       
 --extracting transfer days
 
 transfDays c = sort $ nub $ tDays c 0
@@ -165,19 +183,23 @@ daysToDates startDate = map ((flip addDays) startDate)
 mTransfDates (startDate, c) = daysToDates startDate $ transfDays c 
 
 tDays (Scale e c) t = tDays c t
-tDays (Transl t' c) t = t' + t : tDays c (t' + t) 
-tDays (TransfOne _ _ _) t = []                
+tDays (Transl t' c) t = t' + t : tDays c (t' + t)
+tDays (CheckWithin _ _ c1 c2) t = tDays c1 t ++ tDays c2 t
+tDays (TransfOne _ _ _) t = [t]                
 tDays Zero _ = []
 tDays (If _ c1 c2) t = tDays c1 t ++ tDays c2 t
 
+
+--extracting observable days
 obsDays c = sort $ nub $ oDays c 0
 mObsDates (startDate, c) = daysToDates startDate $ obsDays c
 
 oDays (Scale e c) t = oDaysE e t ++ oDays c t
-oDays (Transl t' c) t = oDays c (t' + t) 
+oDays (Transl t' c) t = oDays c (t' + t)
+oDays (If e c1 c2) t = oDaysE e t ++ oDays c1 t ++ oDays c2 t
+oDays (CheckWithin e t' c1 c2) t = concat (map (oDaysE e) [t .. t+t']) ++ oDays c1 t ++ oDays c2 t
 oDays (TransfOne _ _ _) t = []                
 oDays Zero _ = []
-oDays (If e c1 c2) t = oDaysE e t ++ oDays c1 t ++ oDays c2 t 
 
 oDaysE :: Expr a -> Int -> [Int]
 oDaysE (Arith _ e1 e2) t = oDaysE e1 t ++ oDaysE e2 t  
