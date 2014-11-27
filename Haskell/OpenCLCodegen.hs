@@ -35,14 +35,13 @@ mulAssign = accAssign "*"
 genPayoffFunc c = [amountDecl] ++ body ++ [trajInnerCall]
               where
                 amountDecl = DeclareVar "REAL" "amount" $ Lit "1"
-                body = genCLCode (0, 0) (daysEnv c) (Just c)
-
-genCLCode _ dEnv Nothing = []
-genCLCode tr@(n, cTran) dEnv (Just (If cond b1 b2)) =ppCLCode (MulAssign name val) = name ++ spaced "*=" ++ ppCLCode val
-          IfStmt (genCLExpr (tr, dEnv) cond) (genCLCode tr dEnv (Just b1)) (genCLCode tr dEnv (Just b2)) : []
-genCLCode (n, cTran) dEnv (Just (Transl d c)) = genCLCode (n+1, d) dEnv (Just c)
-genCLCode tr@(n, cTran) dEnv (Just c) =
-          (mulAssign "amount" $ genCLExpr (tr, dEnv) (calcScale e)) : genCLCode tr dEnv rest
+                body = genCLCode (Just c) (obsDays c) 0
+genCLCode Nothing ds t = []
+genCLCode (Just (If cond b1 b2)) ds t =
+          IfStmt (genCLExpr cond ds t) (genCLCode (Just b1) ds t) (genCLCode (Just b2) ds t) : []
+genCLCode (Just (Transl t' c)) ds t = genCLCode (Just c) ds (t' + t)
+genCLCode (Just c) ds t =
+          (mulAssign "amount" $ genCLExpr (calcScale e) ds t) : genCLCode rest ds t
           where
             (e, rest) = collectScalings [] c
 
@@ -60,25 +59,22 @@ trajInnerCall = FunCall "trajectory_inner"
                         [Var "num_cash_flows", Var "model_num",
                          Lit "0", Var "amount", Var "md_discts",
                          Var "vhat"]
-
-genCLExpr :: ((Int, Int), [(Int,S.Set (Int, Int))]) -> Expr a -> CLCode
-genCLExpr n (Arith Max e1 e2) = FunCall "fmax" [genCLExpr n e1, genCLExpr n e2]
-genCLExpr n (Arith Min e1 e2) = FunCall "fmin" [genCLExpr n e1, genCLExpr n e2]
-genCLExpr n (Arith Minus e1 e2) = BinOp "-" (genCLExpr n e1) (genCLExpr n e2)
-genCLExpr n (Arith Times e1 e2) = BinOp "*" (genCLExpr n e1) (genCLExpr n e2)
-genCLExpr n (Arith Div e1 e2) = BinOp "/" (genCLExpr n e1) (genCLExpr n e2)
-genCLExpr n (Less e1 e2) = BoolExpr2 "<" (genCLExpr n e1) (genCLExpr n e2)
-genCLExpr n (Or e1 e2) = BoolExpr2 "||" (genCLExpr n e1) (genCLExpr n e2)
-genCLExpr n (Not e) = BoolNot $ genCLExpr n e
-genCLExpr n (R rLit) = Lit $ show rLit
-genCLExpr ((l, days), dEnv) (Obs (_, d))
-          | (Just i) <- dayIndex (chooseDay d, l) dEnv  = underlyings (i, 0)
-          | otherwise = error $ "No day for " ++ show (chooseDay d, l)
-          where
-            chooseDay d | d /= 0 = d
-                        | otherwise = days
-            underlyings (i,j) = FunCall "underlyings" [Lit $ show i, Lit $ show j]
                         
+genCLExpr :: Expr a -> [Int] -> Int -> CLCode
+genCLExpr (Arith Max e1 e2) ds t = FunCall "fmax" [genCLExpr e1 ds t, genCLExpr e2 ds t]
+genCLExpr (Arith Min e1 e2) ds t = FunCall "fmin" [genCLExpr e1 ds t, genCLExpr e2 ds t]
+genCLExpr (Arith Minus e1 e2) ds t = BinOp "-" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
+genCLExpr (Arith Times e1 e2) ds t = BinOp "*" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
+genCLExpr (Arith Div e1 e2) ds t = BinOp "/" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
+genCLExpr (Less e1 e2) ds t = BoolExpr2 "<" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
+genCLExpr (Or e1 e2) ds t = BoolExpr2 "||" (genCLExpr e1 ds t) (genCLExpr e2 ds t)
+genCLExpr (Not e) ds t = BoolNot $ genCLExpr e ds t
+genCLExpr (R rLit) ds t = Lit $ show rLit
+genCLExpr (Obs (_, t')) ds t
+           | (Just i) <- findIndex (== (t' + t)) ds = underlyings (i, 0)
+           | otherwise = error $ "no day for " ++ show (t' + t)
+           where
+                 underlyings (i,j) = FunCall "underlyings" [Lit $ show i, Lit $ show j]
 
 -- pretty-printing OpenCL-like code
 
@@ -160,71 +156,38 @@ ex4 =
                                               (transl 185 $ scale theobs $ transfOne EUR "you" "me")
                                          zero))))
 
-getTranslations (Scale e c) = getTranslations c
-getTranslations tr@(Transl d c) = d : getTranslations c 
-getTranslations (TransfOne _ _ _) = []               
-getTranslations Zero = []
-getTranslations (If _ b1 b2) = getTranslations b1 ++ getTranslations b2
-getTranslations (Both c1 c2) = getTranslations c1 ++ getTranslations c2
+-- alternative approach (should be simplier :) )
 
-data BranchingSeq a = Seq a (BranchingSeq a)
-                    | Split (BranchingSeq a) (BranchingSeq a)
-                    | Leaf
-                    deriving Show
+--extracting transfer days
 
-getDays :: Bool -> Contract -> BranchingSeq Int
-getDays all (Scale e c) = listToBrSeq (nonZeroShifts $ getObs e) $ getDays all c
-getDays all tr@(Transl d c) = Seq d (getDays all c)
-getDays all (TransfOne _ _ _) = Leaf           
-getDays all Zero = Leaf
-getDays all (If e b1 b2) | all = listToBrSeq (nonZeroShifts $ getObs e) $ Split (getDays all b1) (getDays all b2)
-                         | otherwise = Split (getDays all b1) (getDays all b2)
-getDays all (Both c1 c2) = Split (getDays all c1) (getDays all c2)
+transfDays c = sort $ nub $ tDays c 0
+daysToDates startDate = map ((flip addDays) startDate)
+mTransfDates (startDate, c) = daysToDates startDate $ transfDays c 
 
-getAllDays = getDays True
-getTransfDays = getDays False
+tDays (Scale e c) t = tDays c t
+tDays (Transl t' c) t = t' + t : tDays c (t' + t) 
+tDays (TransfOne _ _ _) t = []                
+tDays Zero _ = []
+tDays (If _ c1 c2) t = tDays c1 t ++ tDays c2 t
 
-listToBrSeq [] end = end
-listToBrSeq (x:[]) end = Seq x end
-listToBrSeq (x:xs) end = Seq x (listToBrSeq xs end)
+obsDays c = sort $ nub $ oDays c 0
+mObsDates (startDate, c) = daysToDates startDate $ obsDays c
 
-getObs :: Expr a -> [(String, Int)]
-getObs (Arith _ e1 e2) = getObs e1 ++ getObs e2   
-getObs (Less e1 e2) = getObs e1 ++ getObs e2
-getObs (Or e1 e2) = getObs e1 ++ getObs e2
-getObs (Not e) = getObs e
-getObs (R rLit) = []
-getObs (Obs (name, days)) = [(name, days)]
+oDays (Scale e c) t = oDaysE e t ++ oDays c t
+oDays (Transl t' c) t = oDays c (t' + t) 
+oDays (TransfOne _ _ _) t = []                
+oDays Zero _ = []
+oDays (If e c1 c2) t = oDaysE e t ++ oDays c1 t ++ oDays c2 t 
 
--- finding non-zero day shifts for observables represented as pairs (name, days)
-nonZeroShifts xs = [d | (_, d) <- xs, d > 0]
-
-paths Leaf = [[]]
-paths (Split Leaf Leaf) = [[]]
-paths (Seq d (Split Leaf Leaf)) = [[d]]
-paths (Seq d (Split b1 b2)) = do
-  b <- [b1, b2]
-  map (d :) (paths b)
-paths (Seq d c) = map (d :) $ paths c 
+oDaysE :: Expr a -> Int -> [Int]
+oDaysE (Arith _ e1 e2) t = oDaysE e1 t ++ oDaysE e2 t  
+oDaysE (Less e1 e2) t = oDaysE e1 t ++ oDaysE e2 t
+oDaysE (Or e1 e2) t = oDaysE e1 t ++ oDaysE e2 t
+oDaysE (Not e) t = oDaysE e t
+oDaysE (R rLit) t = []
+oDaysE (Obs (_, t')) t = [t' + t]
 
 
-accDates dss = map accD dss
-             where
-               accD = scanl1 (+)
--- returns [(<accumulated_shift_in_days>, <set of tuples (<translation_days, <level_in_branching_seq>>)>)]
--- we should have discount values for every day listed in returned list
-daysEnv c = M.toList $ M.fromListWith (S.union) $ map valToSet $ concat $
-             zipWith3 (zipWith3 toKeyVal) (accDates ps) ps levelNums
-           where
-             levelNums = replicate (length ps) [1..]
-             toKeyVal accD d i = (accD, [(d, i)])
-             ps = paths $ getAllDays c
-             valToSet (accD, val) = (accD, S.fromList val)
-
-dayIndex at dEnv = findIndex (S.member at) (map snd dEnv)
-
-daysToDates startDate dEnv = map ((flip addDays) startDate . fst ) dEnv
-mDaysToDates (startDate, c) = daysToDates startDate $ daysEnv c 
 
 -- usage examples
 -- putStr $ ppCLSeq $ genPayoffFunc ex2 -- pretty-printing in console
