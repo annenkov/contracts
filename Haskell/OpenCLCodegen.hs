@@ -209,7 +209,10 @@ oDaysE (Not e) t = oDaysE e t
 oDaysE (R rLit) t = []
 oDaysE (Obs (_, t')) t = [t' + t]
 
-
+discount :: Double -> Int -> Double
+discount r t = exp (-r * yearFraction)
+               where
+                 yearFraction = fromIntegral t/360
 
 -- usage examples
 -- putStr $ ppCLSeq $ genPayoffFunc ex2 -- pretty-printing in console
