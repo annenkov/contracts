@@ -183,7 +183,7 @@ daysToDates startDate = map ((flip addDays) startDate)
 mTransfDates (startDate, c) = daysToDates startDate $ transfDays c 
 
 tDays (Scale e c) t = tDays c t
-tDays (Transl t' c) t = t' + t : tDays c (t' + t)
+tDays (Transl t' c) t = tDays c (t' + t)
 tDays (CheckWithin _ _ c1 c2) t = tDays c1 t ++ tDays c2 t
 tDays (TransfOne _ _ _) t = [t]                
 tDays Zero _ = []
