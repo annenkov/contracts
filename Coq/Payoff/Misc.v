@@ -1,9 +1,15 @@
-Require Import List ZArith Arith Sorting Orders Bool.
+Require Import List ZArith Arith Sorting Orders Bool Arith.
 
 Import ListNotations.
 
+Fixpoint concat {X : Type} (ll : list (list X)) : list X :=
+  match ll with
+    | [] => []
+    | h :: t => h ++ concat t
+  end.
+
 Definition concatMap {X Y : Type} (f : X -> list Y) (l : list X) : list Y := 
-  fold_left (fun x y => app x y) (map f l) [].
+  concat (map f l).
 
 Example concatMap_singleton_list : (concatMap (fun x => [x]) [1;2;3;4]) = [1;2;3;4].
 Proof.
@@ -35,9 +41,31 @@ Fixpoint scan_left {X : Type} (f : X -> X -> X) (a0 : X) (l : list X) : list X :
     | h :: t => a0 :: scan_left f (f a0 h) t
   end.
 
-Definition listFromTo (n : Z) (m : Z) : list Z := scan_left Zplus n (repeat_n 1%Z (Z.to_nat (Zminus m n))).
+Definition listFromTo (n : nat) (m : nat) : list nat := scan_left plus n (repeat_n 1 (m-n)).
 
-Example list_from_1_to_5 : listFromTo 2 5 = [2%Z;3%Z;4%Z;5%Z].
+Fixpoint listFromNdesc (n : nat) (count : nat) : list nat := 
+  match count with
+    | O => [n]
+    | S n' => n + S n' :: listFromNdesc n n'
+end.
+
+Fixpoint listFromNasc (n count : nat) : list nat := 
+  match count with
+    | O => []
+    | S n' => n :: listFromNasc (S n) n'
+end.
+
+Example list_from_2_to_5 : listFromTo 2 5 = [2;3;4;5].
+Proof.
+  compute. reflexivity.
+Qed.
+
+Example list_from_N_desc : listFromNdesc 2 2 = [4;3;2].
+Proof.
+  compute. reflexivity.
+Qed.
+
+Example list_from_N_asc : listFromNasc 2 3 = [2;3;4].
 Proof.
   compute. reflexivity.
 Qed.
@@ -150,4 +178,55 @@ Proof.
     - apply IHl'.
     - apply nr_head. unfold not. intros. apply inb_false_not_In in Hinb. 
       contradict Hinb. apply In_undup_list_In_list_iff. apply H. apply IHl'.
+Qed.
+
+Fixpoint max_nat_l (m : nat) (l : list nat) :=
+  match l with
+    | []     => m
+    | h :: t => max h (max_nat_l m t)
+  end.
+
+Definition maximum_nat (l : list nat) := max_nat_l 0 l.
+
+Lemma maximum_le : forall (l : list nat) (x n : nat),
+  In x l -> x <= max_nat_l n l.
+Proof.
+  intros l.
+  induction l as [| h l'].
+  + contradiction.
+  + intros. unfold maximum_nat. simpl. simpl in H. apply NPeano.Nat.max_le_iff. inversion_clear H.
+    - left. rewrite H0. apply le_refl.
+    - right. apply IHl'. apply H0.
+Qed.
+
+Lemma max_eq_snd : forall n m p,
+  m = p -> max n m = max n p.
+Proof.
+  intros. rewrite H. reflexivity.
+Qed.
+
+Lemma max_lt_compat : forall n m p q,
+  n < p -> m < q -> max n m < max p q.
+Proof.
+  intros. apply NPeano.Nat.max_lub_lt_iff. split.
+  + apply NPeano.Nat.max_lt_iff. left. apply H.
+  + apply NPeano.Nat.max_lt_iff. right. apply H0.
+Qed.
+
+Lemma maximum_n_le : forall l n,
+  n <= max_nat_l n l.
+Proof.
+  intros l.
+  induction l as [| h l'].
+  + intros. apply le_refl.
+  + intros. simpl. apply NPeano.Nat.max_le_iff. right. apply IHl'.
+Qed.
+
+Lemma maximum_app : forall (l1 l2 : list nat) (n : nat),
+  max_nat_l n (l1 ++ l2) = max (max_nat_l n l1) (max_nat_l n l2).
+Proof.
+  intros l1.
+  induction l1 as [| h l'].
+  + intros. simpl. symmetry. apply Max.max_r. apply maximum_n_le.
+  + intros. unfold maximum_nat. simpl. rewrite <- Max.max_assoc. apply max_eq_snd. apply IHl'.
 Qed.
