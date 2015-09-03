@@ -376,7 +376,6 @@ Proof.
     - right. apply IHc2. apply H0.
     - apply In_tDays_non_zero_horizon in H. simpl in H. apply plus0_n_not_zero in H. apply H.
 Qed.
-  
 
 Axiom some_obs : RealObs.
 Axiom P1 : Party.
@@ -393,7 +392,7 @@ Definition optionApp (tr : option Trace) (n : nat) :=
     | None => None
   end.
 
-Eval compute in (optionApp (Csem sampleContr [] (fun some_obs t => (RVal 20))) 12%nat).
+Eval compute in (optionApp (Csem sampleContr [] (fun some_obs t => RVal 20)) 5).
 
 Eval compute in (horizon sampleContr).
 

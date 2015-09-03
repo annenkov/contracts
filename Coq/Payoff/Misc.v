@@ -230,3 +230,4 @@ Proof.
   + intros. simpl. symmetry. apply Max.max_r. apply maximum_n_le.
   + intros. unfold maximum_nat. simpl. rewrite <- Max.max_assoc. apply max_eq_snd. apply IHl'.
 Qed.
+
