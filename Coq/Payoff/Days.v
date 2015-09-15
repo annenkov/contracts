@@ -396,7 +396,7 @@ Eval compute in (optionApp (Csem sampleContr [] (fun some_obs t => RVal 20)) 5).
 
 Eval compute in (horizon sampleContr).
 
-Example empty_trans :  (optionApp (Csem sampleContr [] (fun some_obs t => (RVal 20))) 4%nat = Some empty_trans).
+Example empty_trans_example :  (optionApp (Csem sampleContr [] (fun some_obs t => (RVal 20))) 4%nat = Some empty_trans).
 Proof.
 reflexivity.
 Qed.

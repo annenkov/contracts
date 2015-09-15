@@ -231,3 +231,4 @@ Proof.
   + intros. unfold maximum_nat. simpl. rewrite <- Max.max_assoc. apply max_eq_snd. apply IHl'.
 Qed.
 
+Definition sum_nat_list xs := fold_left plus xs 0.
