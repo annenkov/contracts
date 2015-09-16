@@ -98,8 +98,8 @@ Fixpoint ILsem (e : ILExpr) (env : Env' ILVal) (ext : ExtEnv' ILVal) p1 p2 : opt
                             fun v1 => IL[|e2|] env ext p1 p2 >>=
                                         fun v2 => ILBinOpSem op v1 v2
     | ILIf b e1 e2 => match (IL[|b|] env ext p1 p2),(IL[|e1|] env ext p1 p2),(IL[|e2|] env ext p1 p2) with
-                        | Some (ILBVal b'), Some (ILRVal e1'), Some (ILRVal e2') =>
-                            Some (ILRVal (if b' then e1' else e2'))
+                        | Some (ILBVal true), Some (ILRVal e1'), _ => Some (ILRVal e1')
+                        | Some (ILBVal false), _,  Some (ILRVal e2') => Some (ILRVal e2')
                         | _, _, _ => None
                       end
     | FloatV v => Some (ILRVal v)
@@ -165,10 +165,10 @@ Fixpoint pushForward (t : nat) (e : ILExpr) : ILExpr :=
     | Payoff t' p1 p2 => Payoff (t + t') p1 p2
   end.
 
-Fixpoint nestedIfs (env : Env' ILExpr) (cond : Exp) (t' : nat) (t0 : Z)
+Fixpoint nestedIfs (env : Env' ILExpr) (cond : Exp) (t' : nat) (t0 : nat)
                    (c1 : ILExpr) (c2 : ILExpr) : option ILExpr :=
   match t' with
-    | 0 => match (fromExp env t0 cond) with
+    | 0 => match (fromExp env (Z.of_nat t0) cond) with
              | Some v => Some (ILIf v c1 c2)
              | None => None
            end
@@ -186,7 +186,7 @@ Fixpoint fromContr (env : Env' ILExpr) (c : Contr) (t0 : nat) : option ILExpr:=
     | Translate t' c => fromContr env c (t' + t0)
     | If e t' c1 c2  => (fromContr env c1 t0)
                           >>= fun v1 => (fromContr env c2 (t0 + t'))
-                                          >>= fun v2 => nestedIfs env e t' (Z.of_nat t0) v1 v2
+                                          >>= fun v2 => nestedIfs env e t' t0 v1 v2
     | Zero           => Some (FloatV 0)
     | Let e c        => (fromExp env (Z.of_nat t0) e)
                           >>= fun v => fromContr (v :: env) c t0                          
@@ -597,6 +597,12 @@ Ltac destruct_option_vals := repeat (match goal with
                         | [x : match ?X : option ILVal with _ => _ end = _ |- _]  => destruct X; tryfalse
                       end).
 
+Ltac destruct_option_vals_in H := match H with
+                        | [match ?X : option Val with _ => _ end = _ ] => destruct X; tryfalse
+                        | [match ?X : option ILVal with _ => _ end = _ ]  => destruct X; tryfalse
+                      end.
+
+
 
 Theorem Contr_translation_sound: forall (c : Contr) (il_e : ILExpr) (envC : Env' Val) (extC : ExtEnv' Val)
                                         (envIL : Env' ILVal) (extIL : ExtEnv' ILVal) (envILtrans : Env' ILExpr)
@@ -655,14 +661,64 @@ Proof.
         rewrite Hh2eq. erewrite sum_before_after_horizon. reflexivity. eassumption.
       * rewrite Hmax_h2. reflexivity.
   + (* If *)
-    intros. simpl in *. option_inv_auto. induction n.
-    - simpl in *. destruct (fromExp envILtrans (Z.of_nat t0) e) eqn:Hexp; tryfalse.
-      destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn:Hsemexp; tryfalse.
+    intros. simpl in *. option_inv_auto.
+    generalize dependent t0.
+    induction n.
+    - intros. simpl in *. destruct (fromExp envILtrans (Z.of_nat t0) e) eqn:Hfromexp; tryfalse. some_inv. subst. simpl in H4.
+      destruct (IL[|i|] envIL extIL p1 p2) eqn:Hil_bool; tryfalse.
+      (* Condition evaluates to true *)
+      destruct i0; tryfalse. destruct b. destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
+      replace v with (translateILVal (ILBVal true)) in H6. simpl in H6.
+      destruct (IL[|x0|] envIL extIL p1 p2) eqn: Hil_r; tryfalse. destruct i0; tryfalse.
       destruct_option_vals; some_inv.
-      subst. simpl in *. destruct_option_vals. some_inv. subst.
-      erewrite Exp_translation_sound. eapply IHc1 with (envC:=envC); try eassumption. unfold liftM, compose, bind. rewrite H6.
+      eapply IHc1 with (envC:=envC); try eassumption. unfold liftM, compose, bind. rewrite H6.
+      reflexivity. rewrite plus0_0_n.
+      destruct (Max.max_dec (horizon c1) (horizon c2)) as [Hmax_h1 | Hmax_h2].
+        rewrite Hmax_h1. reflexivity.
+        rewrite Hmax_h2. apply NPeano.Nat.max_r_iff in Hmax_h2. assert (Hh2eq: horizon c2 = horizon c1 + (horizon c2 - horizon c1)). omega.
+        rewrite Hh2eq. erewrite sum_before_after_horizon. reflexivity. eassumption.
+      symmetry. eapply Exp_translation_sound; try eassumption.
+
+      (* Condition evaluates to false *)
+      rewrite plus_0_r in H2.
+      destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
+      replace v with (translateILVal (ILBVal false)) in H6. simpl in H6.
+      destruct (IL[|x1|] envIL extIL p1 p2) eqn: Hil_r; tryfalse. destruct i0; tryfalse.
+      destruct_option_vals; some_inv.
+      eapply IHc2 with (envC:=envC); try eassumption. unfold liftM, compose, bind. rewrite H6.
+      reflexivity. rewrite plus0_0_n.
+      destruct (Max.max_dec (horizon c1) (horizon c2)) as [Hmax_h1 | Hmax_h2].
+        rewrite Hmax_h1. apply NPeano.Nat.max_l_iff in Hmax_h1. assert (Hh2eq: horizon c1 = horizon c2 + (horizon c1 - horizon c2)). omega.
+        rewrite Hh2eq. erewrite sum_before_after_horizon. reflexivity. eassumption.
+        rewrite Hmax_h2. reflexivity.
+     symmetry. eapply Exp_translation_sound; try eassumption.
+    - intros. simpl in *. destruct (fromExp envILtrans (Z.pos (Pos.of_succ_nat n)) e) eqn:Hfromexp; tryfalse.
+      some_inv. subst. simpl in H4.
+      destruct (IL[|i|] envIL extIL p1 p2) eqn:Hil_bool; tryfalse.
+      (* Condition evaluates to true *)
+      destruct i0; tryfalse. destruct b. destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
+      replace v with (translateILVal (ILBVal true)) in H6. simpl in H6.
+      destruct (IL[|x0|] envIL extIL p1 p2) eqn: Hil_r; tryfalse. destruct i0; tryfalse.
+      destruct_option_vals; some_inv.
+      eapply IHc1 with (envC:=envC); try eassumption. unfold liftM, compose, bind. rewrite H6.
       reflexivity.
+      destruct (Max.max_dec (horizon c1) (horizon c2)) as [Hmax_h1 | Hmax_h2].
+      rewrite Hmax_h1. destruct (horizon c1) eqn:Hhor1.
+        reflexivity.
+        unfold plus0. rewrite <- Hhor1. rewrite plus_comm. erewrite sum_before_after_horizon; try reflexivity; try eassumption.
+      rewrite Hmax_h2. apply NPeano.Nat.max_r_iff in Hmax_h2.
+      destruct (horizon c2) eqn:Hhor2.
+        simpl. eapply sum_list_zero_horizon with (c:=c1). omega. erewrite zero_horizon_delay_trace with (c:=c1). eassumption. omega.
+        eassumption.
+
+        unfold plus0. rewrite <- Hhor2. assert (Hh2eq: S n + horizon c2 = horizon c1 + ((horizon c2 - horizon c1)) + S n). omega.
+        rewrite Hh2eq. rewrite <- plus_assoc.
+        erewrite sum_before_after_horizon. reflexivity. eassumption. tryfalse.
+        
+      symmetry. eapply Exp_translation_sound; try eassumption.
+        
       
+        
 (* Bunch of other attempts *)
 (*
  Theorem Contr_translation_sound: forall (c : Contr) (il_e : ILExpr) (envC : Env' Val) (extC : ExtEnv' Val)
