@@ -1,6 +1,9 @@
-Require Import List ZArith Arith Sorting Orders Bool Arith.
+Add LoadPath "..".
+Require Import Reals Arith List Sorting Orders Tactics.
 
 Import ListNotations.
+
+Open Scope nat.
 
 Fixpoint concat {X : Type} (ll : list (list X)) : list X :=
   match ll with
@@ -231,4 +234,130 @@ Proof.
   + intros. unfold maximum_nat. simpl. rewrite <- Max.max_assoc. apply max_eq_snd. apply IHl'.
 Qed.
 
-Definition sum_nat_list xs := fold_left plus xs 0.
+(* Properties of sum of list's elements *)
+
+Definition sum_list xs := fold_right Rplus 0%R xs.
+
+Lemma sum_split : forall l1 l2,
+  sum_list (l1 ++ l2) = ((sum_list l1) + (sum_list l2))%R.
+Proof.
+  induction l1.
+  + intros. destruct l2.
+    - simpl. rewrite Rplus_0_l. reflexivity.
+    - simpl. rewrite Rplus_0_l. reflexivity.
+  + intros. simpl. rewrite IHl1. rewrite Rplus_assoc. reflexivity.
+Qed.
+
+Lemma seq_split : forall n t0 t,
+  seq t0 (n + t) = seq t0 n ++ seq (t0 + n) t.
+Proof.
+  intro n. induction n.
+  + intros. rewrite plus_0_l. rewrite plus_0_r. reflexivity.
+  + intros. simpl. apply f_equal. rewrite IHn. replace (t0 + S n) with (S t0 + n). reflexivity.
+    omega.
+Qed.
+
+Lemma summ_list_common_factor: forall n f x t0 g,
+  sum_list (map (fun t : nat => (g t * (f t * x)))%R (seq t0 n)) =
+  (x * sum_list (map (fun t : nat => (g t * f t))%R  (seq t0 n)))%R.
+Proof.
+  induction n.
+  + intros. simpl. ring.
+  + intros. simpl. rewrite IHn. ring.
+Qed.
+
+Lemma summ_list_plus: forall n f g t0 q,
+  sum_list (map (fun t : nat => (q t * (f t + g t)))%R (seq t0 n)) =
+  (sum_list (map (fun t : nat => (q t * f t)) (seq t0 n)) + sum_list (map (fun t : nat => (q t * g t)) (seq t0 n)))%R.
+Proof.
+  induction n.
+  + intros. simpl. ring.
+  + intros. simpl. rewrite IHn. rewrite <- Rplus_assoc. ring. 
+Qed.
+
+(* Some lemmas about boolean less-or-equal *)
+
+Lemma plus_leb_compat_l n m p:
+  leb m n = true ->
+  leb (p + m) (p + n) = true.
+Proof.
+  intro. apply leb_iff. apply plus_le_compat. apply le_refl. apply leb_iff. assumption.
+Qed.
+
+Lemma leb_plus_l n m:
+  leb n (n + m) = true.
+Proof.
+  intros. apply leb_iff. apply le_plus_l.
+Qed.
+
+Lemma leb_plus_r n m:
+  leb n (m + n) = true.
+Proof.
+  intros. apply leb_iff. apply le_plus_r.
+Qed.
+
+Lemma leb_refl n :
+  leb n n = true.
+Proof.
+  intros. apply leb_iff. apply NPeano.Nat.le_refl.
+Qed.
+
+Lemma beq_nat_leb n m:
+  beq_nat m n = true ->
+  leb n m = true.
+Proof.
+  intros. apply beq_nat_true in H. subst. apply leb_refl.
+Qed.
+
+Lemma leb_true_beq_false_minus n m:
+  beq_nat n m = false ->
+  leb n m = true ->
+  (0 < (m - n))%nat.
+Proof.
+  intros. apply beq_nat_false in H. apply leb_iff in H0.
+  apply lt_minus_O_lt. apply le_lt_eq_dec in H0. inversion H0. assumption. tryfalse.
+Qed.
+
+Open Scope nat.
+Lemma le_not_eq_lt: forall (n m : nat),
+  n <> m ->
+  n <= m ->
+  n < m.
+Proof.
+  intros. apply le_lt_eq_dec in H0. inversion H0. assumption. tryfalse.
+Qed.
+
+Lemma leb_n_m_0 n m:
+  leb n 0 = true ->
+  leb n m = true.
+Proof.
+  intros. rewrite leb_iff. rewrite leb_iff in H.  apply le_n_0_eq in H. subst. apply le_0_n.
+Qed.  
+
+Lemma leb_n_plus_m_true n m:
+  leb n (n+m) = true.
+Proof.
+  apply leb_iff. omega.
+Qed.
+
+(* Some Z <-> nat conversion properties *)
+
+Lemma of_nat_succ n :
+  Z.of_nat (S n) = (Z.of_nat n + 1)%Z.
+Proof.
+  rewrite Nat2Z.inj_succ. replace (Z.of_nat n + 1)%Z with (Z.succ (Z.of_nat n))%Z.
+  omega. omega.
+Qed.
+
+Lemma of_nat_plus x y:
+  Z.add (Z.of_nat x) (Z.of_nat y) = Z.of_nat (x + y)%nat.
+Proof.
+  generalize dependent y.
+  induction x as [| x'].
+  - intros. reflexivity.
+  - intros.
+    replace (Z.of_nat (S x') + Z.of_nat y)%Z with (Z.of_nat x' + Z.of_nat (S y))%Z.
+    replace (S x' + y)%nat with (x' + S y)%nat.
+    apply IHx'. omega. rewrite of_nat_succ. replace (Z.of_nat x' + (Z.of_nat y + 1))%Z with (Z.of_nat x' + 1 + Z.of_nat y)%Z.
+    rewrite of_nat_succ. reflexivity. omega.
+Qed.
