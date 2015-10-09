@@ -10,8 +10,7 @@ Import ListNotations.
 
 Inductive ILVal : Set :=
 | ILBVal : bool -> ILVal
-| ILRVal : R -> ILVal
-| ILAVal : list R -> ILVal.
+| ILRVal : R -> ILVal.
 
 
 Definition fromRVal (v : ILVal) :=
@@ -23,12 +22,6 @@ Definition fromRVal (v : ILVal) :=
 Definition fromBVal (v : ILVal) :=
   match v with
     | ILBVal v' => Some v'
-    | _ => None
-  end.
-
-Definition fromAVal (v : ILVal) :=
-  match v with
-    | ILAVal v' => Some v'
     | _ => None
   end.
 
@@ -76,11 +69,14 @@ Fixpoint ILsem (e : ILExpr) (env : Env' ILVal) (ext : ExtEnv' ILVal) disc p1 p2 
     | ILBinExpr op e1 e2 => IL[|e1|] env ext disc p1 p2 >>=
                             fun v1 => IL[|e2|] env ext disc p1 p2 >>=
                                         fun v2 => ILBinOpSem op v1 v2
-    | ILIf b e1 e2 => match (IL[|b|] env ext disc p1 p2),(IL[|e1|] env ext disc p1 p2),(IL[|e2|] env ext disc p1 p2) with
-                        | Some (ILBVal true), Some (ILRVal e1'), _ => Some (ILRVal e1')
-                        | Some (ILBVal false), _,  Some (ILRVal e2') => Some (ILRVal e2')
-                        | _, _, _ => None
-                      end
+    | ILIf b e1 e2 => IL[|b|] env ext disc p1 p2 >>=
+                        fun b' => IL[|e1|] env ext disc p1 p2 >>=
+                                    fun e1' => IL[|e2|] env ext disc p1 p2 >>=
+                                                 fun e2' => match b', e1', e2' with
+                                                              | ILBVal true, ILRVal v1, _ => pure (ILRVal v1)
+                                                              | ILBVal false, _, ILRVal v2 => pure (ILRVal v2)
+                                                              | _ , _, _ => None
+                                                            end
     | FloatV v => Some (ILRVal v)
     | Model lab t => Some (ext lab t)
     | Payoff t p1' p2' => Some (eval_payoff (disc t) p1' p2' p1 p2)

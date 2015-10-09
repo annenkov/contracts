@@ -43,8 +43,16 @@ Fixpoint fromExp (t0 : Z) (e : Exp) :=
                            (fromExp t0 a2) >>= (fun v2 =>
                              pure (ILBinExpr ILLeq v1 v2)))
     | OpE Equal [a1;a2] => (fromExp t0 a1) >>= (fun v1 =>
-                           (fromExp t0 a2) >>= (fun v2 =>
-                             pure (ILBinExpr ILEqual v1 v2)))
+                             (fromExp t0 a2) >>= (fun v2 =>
+                               pure (ILBinExpr ILEqual v1 v2)))
+    | OpE Not [a] => fromExp t0 a >>=
+                             fun v1 => pure (ILUnExpr ILNot v1)
+    | OpE Neg [a] => fromExp t0 a >>=
+                             fun v1 => pure (ILUnExpr ILNeg v1)
+    | OpE Cond [b;a1;a2] => (fromExp t0 b) >>= (fun b_il =>
+                             (fromExp t0 a1) >>= (fun v1 =>
+                                (fromExp t0 a2) >>= (fun v2 =>
+                                  pure (ILIf b_il v1 v2))))
     | OpE (RLit v) _ => Some (FloatV v)
     | OpE _ _ => None
     | Obs lab t => Some (Model lab (t0 + t))
@@ -92,7 +100,6 @@ Definition translateILVal v :=
   match v with
     | ILRVal r => RVal r
     | ILBVal b => BVal b
-    | ILAVal xs => RVal (fold_left Rplus xs 0%R) 
   end.
 
 Lemma all_to_forall1 {A} P (x : A) :
@@ -107,6 +114,14 @@ Proof.
   intros. inversion H. subst. split.
   - assumption.
   - apply all_to_forall1 in H3. assumption.
+Qed.
+
+Lemma all_to_forall3 {A} P (x1 x2 x3 : A) :
+  all P [x1;x2;x3] -> P x1 /\ P x2 /\ P x3.
+Proof.
+  intros. inversion H. subst. split.
+  - assumption.
+  - apply all_to_forall2 in H3. assumption.
 Qed.
 
 
@@ -134,6 +149,25 @@ Proof.
   intros. simpl in *. inversion H. inversion H0. subst. reflexivity.
 Qed.
 
+Lemma translateILVal_BVal_f_eq_un f x1 y1:
+  BVal x1 = translateILVal (ILBVal y1) ->
+  BVal (f x1) = translateILVal (ILBVal (f y1)).
+Proof.
+  intros. simpl in *. inversion H. reflexivity.
+Qed.
+
+Lemma translateILVal_RVal_minus_eq x1 y1:
+  RVal x1 = translateILVal (ILRVal y1) ->
+  RVal ( - x1) = translateILVal (ILRVal ( - y1)).
+Proof.
+  intros. simpl in *. inversion H. reflexivity.
+Qed.
+
+Hint Resolve of_nat_succ translateILVal_RVal_f_eq translateILVal_BVal_f_eq translateILVal_BVal_f_eq'.
+Hint Resolve translateILVal_BVal_f_eq_un translateILVal_RVal_minus_eq.
+Hint Unfold liftM compose bind pure.
+Hint Rewrite Nat2Z.inj_succ Rminus_0_l.
+
 
 Ltac destruct_vals := repeat (match goal with
                         | [x : Val |- _] => destruct x; tryfalse
@@ -142,7 +176,13 @@ Ltac destruct_vals := repeat (match goal with
 
 Ltac some_inv := repeat (unfold pure in *; match goal with
                    | [H: Some _ = Some _ |- _] => inversion H; clear H
-                 end).
+                                           end).
+Check ILsem.
+Ltac destruct_ILsem := repeat (match goal with
+                                  | [_ : match IL[|?e|] ?env ?ext ?d ?p1 ?p2  : _ with _ => _ end = _ |- _] =>
+                                    let newH := fresh "H" in destruct (IL[|e|] env ext d p1 p2) eqn: newH; tryfalse
+                                end).
+
 
 Theorem Exp_translation_sound : forall (e : Exp) (il_e : ILExpr) (envC : Env' Val) (extC : ExtEnv' Val)
                                           (envIL : Env' ILVal) (extIL : ExtEnv' ILVal)
@@ -158,18 +198,39 @@ Proof.
   generalize dependent il_e. generalize dependent v. generalize dependent v'.
 
   induction e using Exp_ind'.
-
   + (* OpE *)
-    (* Binary*)
-    intros; destruct op;
-    simpl in *; do 3 try (destruct args; tryfalse); tryfalse; simpl in *;
-                option_inv_auto; subst; simpl in *; try (some_inv); subst; simpl in *; subst;
-                option_inv_auto; subst; simpl in *; destruct_vals;
-                subst; option_inv_auto;
-      try (apply all_to_forall2 in H; inversion_clear H as [IHe IHe0]);
-      try (apply translateILVal_RVal_f_eq); try (apply translateILVal_BVal_f_eq); try (apply translateILVal_BVal_f_eq');
-      try (eapply IHe; eassumption); try (eapply IHe0; eassumption).
-    reflexivity.
+    intros v' v il_e Htrans extIL envIL Hilsem extC Heqext envC Hesem; destruct op;
+    (* Binary operations *)
+    try (simpl in *; do 3 try (destruct args; tryfalse); tryfalse; simpl in *;
+         option_inv_auto; subst; simpl in *; try (some_inv); subst; simpl in *; subst;
+         option_inv_auto; subst; simpl in *; destruct_vals;
+         subst; option_inv_auto;
+         apply all_to_forall2 in H; inversion_clear H;
+         eauto);
+    (* Unary operations*)
+    try (simpl in *; do 2 try (destruct args; tryfalse); tryfalse; simpl in *;
+    option_inv_auto; subst; simpl in *; some_inv; subst; simpl in *; subst;
+    option_inv_auto; subst; simpl in *; destruct_vals; some_inv; subst; simpl in H6; some_inv; subst;
+    apply all_to_forall1 in H; some_inv; autorewrite with core; eauto).
+    
+    (* Lit *)
+    simpl in *. destruct args; tryfalse; simpl in *; option_inv_auto; tryfalse; subst; simpl in *; some_inv; subst. reflexivity.
+    
+    (* cond *)
+    simpl in *. do 4 try (destruct args; tryfalse); tryfalse; simpl in *;
+    eapply all_to_forall3 in H; inversion_clear H as [IHe1 IHe']; inversion_clear IHe' as [IHe2 IHe3];
+    option_inv_auto; subst; simpl in *; try (some_inv); subst. simpl in *; subst;
+    option_inv_auto; subst; simpl in *. destruct x3; tryfalse; destruct b.
+    destruct x6; tryfalse. some_inv.
+    replace x0 with (translateILVal (ILBVal true)) in H1; simpl in H1.
+    replace x with (translateILVal (ILRVal r)) in H1. simpl in H1. subst; destruct x1; tryfalse; some_inv; subst. reflexivity.
+    symmetry; eauto. symmetry; eauto.
+   
+    destruct x7; tryfalse. some_inv.
+    replace x0 with (translateILVal (ILBVal false)) in H1. simpl in H1.
+    replace x1 with (translateILVal (ILRVal r)) in H1. simpl in H1. destruct x; tryfalse. some_inv. subst. reflexivity.
+    symmetry; eauto. symmetry; eauto.
+    
   + (* Obs *)
     intros. simpl in *. some_inv. subst. simpl in *. some_inv. subst. eapply H0.
   + (* Var *)
@@ -322,6 +383,10 @@ Qed.
 Ltac destruct_option_vals := repeat (match goal with
                         | [x : match ?X : option Val with _ => _ end = _ |- _] => destruct X; tryfalse
                         | [x : match ?X : option ILVal with _ => _ end = _ |- _]  => destruct X; tryfalse
+                                     end).
+
+Ltac rewrite_option := repeat (match goal with
+                        | [H : _ : option ?X  |- match _ : option ?X with _ => _ end = _] => rewrite H
                       end).
 
 Definition translation_sound c envC extC t0 := forall (il_e : ILExpr)
@@ -335,24 +400,20 @@ Definition translation_sound c envC extC t0 := forall (il_e : ILExpr)
   (IL[|il_e|] envIL extIL) disc p1 p2 = Some v'->
   RVal v = translateILVal v'.
 
-Fixpoint unrollIfWithin e :=
-  match e with
-    | If b O c1 c2 as If0 => If0
-    | If b (S n) c1 c2 => If b 0 c1 (If b n c1 c2)
-    | e' => e'
-  end.
-
-Check fromExp.
-
 Lemma push_forward_expr : forall e t0,
   liftM (pushForward 1) (fromExp t0 e) = fromExp (Z.succ t0) e.
 Proof.  
   induction e using Exp_ind'; intros; try reflexivity.
    - intros. simpl.
     destruct op; repeat (destruct args; try reflexivity);
-    unfold liftM, compose, bind; apply all_to_forall2 in H; inversion_clear H;
-    erewrite <- H0; erewrite <- H1; destruct (fromExp t0 e);  destruct (fromExp t0 e0); try reflexivity.
-   - unfold liftM, compose, bind. unfold fromExp. apply f_equal. unfold pushForward. apply f_equal. ring.
+    try (autounfold; apply all_to_forall2 in H; inversion_clear H;
+         erewrite <- H0; erewrite <- H1; destruct (fromExp t0 e);  destruct (fromExp t0 e0); try reflexivity).
+    autounfold; apply all_to_forall1 in H. rewrite <- H. destruct (fromExp t0 e); reflexivity.
+    autounfold; apply all_to_forall1 in H. rewrite <- H. destruct (fromExp t0 e); reflexivity.
+    autounfold; apply all_to_forall3 in H as [H0 H']. inversion_clear H' as [H1 H2].
+    erewrite <- H0; erewrite <- H1; erewrite <- H2.
+    destruct (fromExp t0 e);  destruct (fromExp t0 e0); destruct (fromExp t0 e1); try reflexivity.
+   - autounfold. unfold fromExp. apply f_equal. unfold pushForward. apply f_equal. ring.
 Qed.
 
 Lemma push_forward_distr : forall n b e1 e2,
@@ -367,21 +428,28 @@ Qed.
 Lemma push_forward_contr : forall c t0,
   liftM (pushForward 1) (fromContr c t0) = fromContr c (S t0).
 Proof.
-  induction c; intros; try reflexivity.
-  - simpl. unfold compose. apply f_equal. destruct (Party.eqb p p0); try reflexivity.
-  - simpl. unfold liftM, compose, bind. replace (Z.pos (Pos.of_succ_nat t0)) with (Z.succ (Z.of_nat t0)). rewrite <- push_forward_expr.
-    destruct (fromExp (Z.of_nat t0) e). simpl. rewrite <- IHc. destruct (fromContr c t0); try reflexivity. unfold liftM, compose, bind.
+  induction c; intros; simpl; autounfold; try reflexivity.
+  - apply f_equal. destruct (Party.eqb p p0); try reflexivity.
+  - replace (Z.pos (Pos.of_succ_nat t0)) with (Z.succ (Z.of_nat t0)). rewrite <- push_forward_expr.
+    destruct (fromExp (Z.of_nat t0) e). simpl. rewrite <- IHc. destruct (fromContr c t0); try reflexivity. autounfold.
     reflexivity. rewrite Zpos_P_of_succ_nat. reflexivity.
-  - simpl. unfold liftM, compose, bind. replace (n + S t0) with (S (n + t0)). apply IHc. omega.
-  - simpl. unfold liftM, compose, bind. rewrite <- IHc1. rewrite <- IHc2.
+  - replace (n + S t0) with (S (n + t0)). apply IHc. omega.
+  - rewrite <- IHc1. rewrite <- IHc2.
     destruct (fromContr c1 t0). destruct (fromContr c2 t0); try reflexivity.
-    unfold liftM, compose, bind. reflexivity.
-  - simpl. unfold liftM, compose, bind. rewrite <- IHc1. rewrite <- IHc2. unfold liftM, compose, bind, pure.
+    autounfold. reflexivity.
+  - rewrite <- IHc1. rewrite <- IHc2. autounfold.
     destruct (fromContr c1 t0). destruct (fromContr c2 t0); try reflexivity.
     replace (Z.pos (Pos.of_succ_nat t0)) with (Z.succ (Z.of_nat t0)). rewrite <- push_forward_expr.
-    unfold liftM, compose, bind. destruct (fromExp (Z.of_nat t0) e). simpl. apply f_equal. apply push_forward_distr. reflexivity.
+    autounfold. destruct (fromExp (Z.of_nat t0) e). simpl. apply f_equal. apply push_forward_distr. reflexivity.
     symmetry. apply Zpos_P_of_succ_nat. reflexivity.
 Qed.
+
+Ltac destruct_ilexpr := repeat (match goal with
+                                  | [x : match ?X : option ILExpr with _ => _ end = _ |- _] =>
+                                    let newH := fresh "H" in destruct X eqn: newH; tryfalse
+                                end).
+
+Hint Rewrite <- push_forward_contr push_forward_expr : ILDB.
 
 Theorem Contr_translation_sound: forall c envC extC t0,
   translation_sound c envC extC t0.
@@ -391,8 +459,8 @@ Proof.
     intros. simpl in *.
     option_inv_auto. rewrite adv_ext_iter in H3. rewrite of_nat_plus in H3. rewrite delay_trace_iter.
     eapply IHc with (envC := envC); try eassumption.
-    unfold liftM, compose, bind. simpl.
-    rewrite plus_comm. rewrite H3. reflexivity. rewrite plus_comm.
+    autounfold. simpl. rewrite plus_comm. rewrite H3. reflexivity.
+    rewrite plus_comm.
     assert (Hseq:(seq (n + t0)) = (seq (t0 + n))). rewrite plus_comm. reflexivity. rewrite Hseq.
     rewrite <- sum_delay. destruct (horizon c) eqn:Hhor.
     - simpl. eapply sum_list_zero_horizon with (c:=c). assumption.
@@ -416,18 +484,18 @@ Proof.
     destruct_vals. some_inv. subst. rewrite <- delay_scale_trace. unfold scale_trace, compose, scale_trans.
     rewrite summ_list_common_factor.  apply translateILVal_RVal_f_eq.
     - eapply Exp_translation_sound; try (simpl in *; some_inv; subst); try eassumption.
-    - eapply IHc with (envC := envC) (curr := curr); try eassumption. unfold liftM, compose, bind. simpl.
+    - eapply IHc with (envC := envC) (curr := curr); try eassumption. autounfold. simpl.
       rewrite H3. reflexivity. reflexivity.
   + (* Both *)
-    intros. simpl in *. option_inv_auto. unfold pure in H8. some_inv. subst. simpl in *. option_inv_auto. destruct_vals. some_inv.
+    intros. simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto. destruct_vals. some_inv.
     rewrite <- delay_add_trace. unfold add_trace, add_trans. rewrite summ_list_plus.
     apply translateILVal_RVal_f_eq.
-    - eapply IHc1 with (envC:=envC); try eassumption. unfold liftM, compose, bind. simpl. rewrite H2. reflexivity.
+    - eapply IHc1 with (envC:=envC); try eassumption. autounfold. simpl. rewrite H2. reflexivity.
       destruct (Max.max_dec (horizon c1) (horizon c2)) as [Hmax_h1 | Hmax_h2].
       * rewrite Hmax_h1. reflexivity.
       * rewrite Hmax_h2. apply NPeano.Nat.max_r_iff in Hmax_h2. assert (Hh2eq: horizon c2 = horizon c1 + (horizon c2 - horizon c1)). omega.
         rewrite Hh2eq. erewrite sum_before_after_horizon. reflexivity. eassumption.
-    - eapply IHc2 with (envC:=envC); try eassumption. unfold liftM, compose, bind. simpl. rewrite H3. reflexivity.
+    - eapply IHc2 with (envC:=envC); try eassumption. autounfold. simpl. rewrite H3. reflexivity.
       destruct (Max.max_dec (horizon c1) (horizon c2)) as [Hmax_h1 | Hmax_h2].
       * rewrite Hmax_h1. apply NPeano.Nat.max_l_iff in Hmax_h1. assert (Hh2eq: horizon c1 = horizon c2 + (horizon c1 - horizon c2)). omega.
         rewrite Hh2eq. erewrite sum_before_after_horizon. reflexivity. eassumption.
@@ -441,13 +509,11 @@ Proof.
     - (* n = 0 *)
       intros. simpl in *. destruct (fromExp (Z.of_nat t0) e) eqn:Hfromexp; tryfalse.
       option_inv_auto. simpl in *.
-      destruct (IL[|x2|] envIL extIL disc p1 p2) eqn:Hil_bool; tryfalse.
       (* Condition evaluates to true *)
-      destruct i; tryfalse. destruct b. destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
+      destruct x3; tryfalse. destruct b. destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
       replace v with (translateILVal (ILBVal true)) in H6. simpl in H6.
-      destruct (IL[|x0|] envIL extIL disc p1 p2) eqn: Hil_r; tryfalse.
       destruct_option_vals; some_inv.
-      eapply IHc1 with (envC:=envC); try eassumption. unfold liftM, compose, bind. simpl. rewrite H6.
+      eapply IHc1 with (envC:=envC); try eassumption. autounfold. simpl. rewrite H6.
       reflexivity. rewrite plus0_0_n.
       destruct (Max.max_dec (horizon c1) (horizon c2)) as [Hmax_h1 | Hmax_h2].
         rewrite Hmax_h1. reflexivity.
@@ -458,9 +524,8 @@ Proof.
       (* Condition evaluates to false *)
       destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
       replace v with (translateILVal (ILBVal false)) in H6. simpl in H6.
-      destruct (IL[|x1|] envIL extIL disc p1 p2) eqn: Hil_r; tryfalse.
       destruct_option_vals; some_inv.
-      eapply IHc2 with (envC:=envC); try eassumption. unfold liftM, compose, bind. simpl. rewrite H6.
+      eapply IHc2 with (envC:=envC); try eassumption. autounfold. simpl. rewrite H6.
       reflexivity. rewrite plus0_0_n.
       destruct (Max.max_dec (horizon c1) (horizon c2)) as [Hmax_h1 | Hmax_h2].
         rewrite Hmax_h1. apply NPeano.Nat.max_l_iff in Hmax_h1. assert (Hh2eq: horizon c1 = horizon c2 + (horizon c1 - horizon c2)). omega.
@@ -468,14 +533,13 @@ Proof.
         rewrite Hmax_h2. reflexivity.
       symmetry. eapply Exp_translation_sound; try eassumption.
     - (* n = S n' *) 
-      intros. simpl in *. tryfalse.
-      destruct (IL[|x2|] envIL extIL disc p1 p2) eqn:Hil_bool; tryfalse.
+      intros. simpl in *. tryfalse. option_inv_auto.
       (* Condition evaluates to true *)
-      destruct i; tryfalse. destruct b. destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
-      replace v with (translateILVal (ILBVal true)) in H6. simpl in H6.
-      destruct (IL[|x0|] envIL extIL disc p1 p2) eqn: Hil_r; tryfalse. destruct i; tryfalse.
+      destruct x3; tryfalse. destruct b. destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
+      replace v with (translateILVal (ILBVal true)) in H6. simpl in H6.     
+      destruct x4; tryfalse.
       destruct_option_vals; some_inv.
-      eapply IHc1 with (envC:=envC); try eassumption. unfold liftM, compose, bind. simpl. rewrite H6.
+      eapply IHc1 with (envC:=envC); try eassumption. autounfold. simpl. rewrite H6.
       reflexivity.
       destruct (Max.max_dec (horizon c1) (horizon c2)) as [Hmax_h1 | Hmax_h2].
       (* max = horizon c1 *)
@@ -502,56 +566,36 @@ Proof.
      rewrite Hmax_h1. rewrite Hmax_h1 in IHn. 
      destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
      replace v with (translateILVal (ILBVal false)) in H6. simpl in H6.
-     unfold liftM, bind, compose in H6. rewrite adv_ext_iter in H6.
-     destruct (IL[|nestedIfs (pushForward 1 x2) n
-                             (pushForward 1 x0) (pushForward 1 x1)|] envIL extIL disc p1 p2) eqn:Hil_if; tryfalse. destruct i; tryfalse.
-     some_inv. 
-     
+     autounfold in H6. rewrite adv_ext_iter in H6.
+     destruct x5; tryfalse.
      destruct (within_sem C[|c1|] C[|c2|] e n envC (adv_ext (Z.of_nat t0 + 1) extC)) eqn:Hwithin; tryfalse. some_inv. subst.
      rewrite Equivalence.delay_trace_at. rewrite delay_trace_empty_before_n. unfold empty_trans. rewrite Rmult_0_r. rewrite Rplus_0_l.
-     rewrite delay_trace_iter. replace (1 + t0) with (S t0).
-     eapply IHn.
-     replace (Z.of_nat t0 + 1)%Z with (Z.of_nat(S t0)) in Hwithin. eassumption. rewrite of_nat_succ. reflexivity.
-     rewrite of_nat_succ. eassumption.
-     rewrite <- push_forward_contr. rewrite H3. unfold liftM, compose, bind. reflexivity.
-     rewrite <- push_forward_contr. rewrite H2. unfold liftM, compose, bind. reflexivity.
-     rewrite Nat2Z.inj_succ. rewrite <- push_forward_expr. rewrite H5. unfold liftM, compose, bind. reflexivity. omega. omega.
+     rewrite delay_trace_iter. rewrite plus_Sn_m. rewrite plus_0_l.
+     rewrite <- of_nat_succ in Hwithin.
+     eapply IHn; try eassumption; autorewrite with core; autorewrite with ILDB; autounfold; rewrite_option; try reflexivity. auto.
      symmetry. eapply Exp_translation_sound; try eassumption.
 
      (* max = horizon c2 *)
      rewrite Hmax_h2. rewrite Hmax_h2 in IHn. simpl.
      destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
      replace v with (translateILVal (ILBVal false)) in H6. simpl in H6.
-     unfold liftM, bind, compose in H6. rewrite adv_ext_iter in H6.
-     destruct (IL[|nestedIfs (pushForward 1 x2) n
-                             (pushForward 1 x0) (pushForward 1 x1)|] envIL extIL disc p1 p2) eqn:Hil_if; tryfalse. destruct i; tryfalse.
-     some_inv.
+     autounfold in H6. rewrite adv_ext_iter in H6.
+     destruct x5; tryfalse. some_inv.
      destruct (within_sem C[|c1|] C[|c2|] e n envC (adv_ext (Z.of_nat t0 + 1) extC)) eqn:Hwithin; tryfalse. some_inv. subst.
      rewrite Equivalence.delay_trace_at. rewrite delay_trace_empty_before_n. unfold empty_trans. rewrite Rmult_0_r. rewrite Rplus_0_l.
-     rewrite delay_trace_iter. replace (1 + t0) with (S t0).
-     eapply IHn.
-     replace (Z.of_nat t0 + 1)%Z with (Z.of_nat(S t0)) in Hwithin. eassumption. rewrite of_nat_succ. reflexivity.
-     rewrite of_nat_succ. eassumption.
-     rewrite <- push_forward_contr. rewrite H3. unfold liftM, compose, bind. reflexivity.
-     rewrite <- push_forward_contr. rewrite H2. unfold liftM, compose, bind. reflexivity.
-     rewrite Nat2Z.inj_succ. rewrite <- push_forward_expr. rewrite H5. unfold liftM, compose, bind. reflexivity. omega. omega.
+     rewrite delay_trace_iter. rewrite plus_Sn_m. rewrite plus_0_l.
+     rewrite <- of_nat_succ in Hwithin.
+     eapply IHn; try eassumption; autorewrite with core; autorewrite with ILDB; autounfold; rewrite_option; try reflexivity. auto.
      symmetry. eapply Exp_translation_sound; try eassumption.
-
 
      (* max = 0*)
      destruct (E[|e|] envC (adv_ext (Z.of_nat t0) extC)) eqn: Hexp; tryfalse.
      replace v with (translateILVal (ILBVal false)) in H6. simpl in H6.
-     unfold liftM, bind, compose in H6. rewrite adv_ext_iter in H6.
-     destruct (IL[|nestedIfs (pushForward 1 x2) n
-                             (pushForward 1 x0) (pushForward 1 x1)|] envIL extIL disc p1 p2) eqn:Hil_if; tryfalse. destruct i; tryfalse.
+     autounfold in H6. rewrite adv_ext_iter in H6.
+     destruct x5; tryfalse.
      some_inv. 
-     
      destruct (within_sem C[|c1|] C[|c2|] e n envC (adv_ext (Z.of_nat t0 + 1) extC)) eqn:Hwithin; tryfalse. some_inv. subst.     
-     eapply IHn.
-     replace (Z.of_nat t0 + 1)%Z with (Z.of_nat(S t0)) in Hwithin. eassumption. rewrite of_nat_succ. reflexivity.
-     rewrite of_nat_succ. eassumption.
-     rewrite <- push_forward_contr. rewrite H3. unfold liftM, compose, bind. reflexivity.
-     rewrite <- push_forward_contr. rewrite H2. unfold liftM, compose, bind. reflexivity.
-     rewrite Nat2Z.inj_succ. rewrite <- push_forward_expr. rewrite H5. unfold liftM, compose, bind. reflexivity.
+     rewrite <- of_nat_succ in Hwithin.
+     eapply IHn; try eassumption; autorewrite with core; autorewrite with ILDB; autounfold; rewrite_option; try reflexivity. auto.
      symmetry. eapply Exp_translation_sound; try eassumption.
 Qed.
