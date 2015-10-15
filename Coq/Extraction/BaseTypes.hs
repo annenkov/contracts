@@ -8,6 +8,7 @@ data BoolObs = Decision Party String
                deriving (Show, Ord, Eq)
 
 data RealObs = FX Asset Asset
+             | Stock String
              | Clock
                deriving (Show, Ord, Eq)
 

@@ -1,10 +1,12 @@
 Add LoadPath "..".
+Add LoadPath "../Payoff".
 
 Require Import Denotational.
 Require Import Reduction.
 Require Import Horizon.
 Require Import Specialise.
 Require Import TimedTyping.
+Require Import ILTranslation.
 
 
 
@@ -112,3 +114,7 @@ Extraction "ContractExtracted.hs"
   redfun
   specialise
   has_type.
+
+Extraction "ContractTranslationExtracted.hs"
+           fromExp
+           fromContr.

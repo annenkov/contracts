@@ -1,21 +1,35 @@
-TARGET = Contract.hs
-EXTRACTED = ContractExtracted.hs
-HEADER = Header.hs
+# Contract extraction
+CONTRACT_TARGET = Contract.hs
+CONTRACT_EXTRACTED = ContractExtracted.hs
+CONTRACT_HEADER = Header.hs
+CONTRACT_SED_SCRIPT = '/^data Var =/,$$'p
+
+# Contract translation extraction
+TRANSLATION_TARGET = ContractTranslation.hs
+TRANSLATION_EXTRACTED = ContractTranslationExtracted.hs
+TRANSLATION_HEADER = TranslationHeader.hs
+TRANSLATION_SED_SCRIPT = '/^data ILBinOp =/,$$'p
+
 COQ_FILE = Extraction.v
-SED_SCRIPT = '/^data Var =/,$$'p
 
-default: $(TARGET)
+default: $(CONTRACT_TARGET) $(TRANSLATION_TARGET)
 
-Contract.hs: $(EXTRACTED) $(HEADER)
-	cp $(HEADER) $(TARGET)
-	sed -n $(SED_SCRIPT) $(EXTRACTED) >> $(TARGET)
+Contract.hs: extract
+	cp $(CONTRACT_HEADER) $(CONTRACT_TARGET)
+	sed -n $(CONTRACT_SED_SCRIPT) $(CONTRACT_EXTRACTED) >> $(CONTRACT_TARGET)
 
-$(EXTRACTED): $(COQ_FILE)
+ContractTranslation.hs: extract
+	cp $(TRANSLATION_HEADER) $(TRANSLATION_TARGET)
+	sed -n $(TRANSLATION_SED_SCRIPT) $(TRANSLATION_EXTRACTED) >> $(TRANSLATION_TARGET)
+
+
+extract : $(COQ_FILE)
 	coqc $(COQ_FILE)
 
 clean:
 	rm -rf *~
-	rm -f $(TARGET) $(EXTRACTED)
+	rm -f $(CONTRACT_TARGET) $(CONTRACT_EXTRACTED)
+	rm -f $(TRANSLATION_TARGET) $(TRANSLATION_EXTRACTED)
 	rm -rf $(COQ_FILE:.v=.vo) $(COQ_FILE:.v=.glob)
 
 test: default

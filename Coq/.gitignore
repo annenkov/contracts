@@ -3,3 +3,5 @@
 *.vo
 Extraction/Contract.hs
 Extraction/ContractExtracted.hs
+Extraction/ContractTranslation.hs
+Extraction/ContractTranslationExtracted.hs
