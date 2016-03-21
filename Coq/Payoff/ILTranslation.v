@@ -96,12 +96,6 @@ Fixpoint fromContr (c : Contr) (t0 : nat) : option ILExpr:=
                                           >>= fun v2 => pure (ILBinExpr ILAdd v1 v2)
   end.
 
-Definition translateILVal v :=
-  match v with
-    | ILRVal r => RVal r
-    | ILBVal b => BVal b
-  end.
-
 Lemma all_to_forall1 {A} P (x : A) :
   all P [x] -> P x.
 Proof.

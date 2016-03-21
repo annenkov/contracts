@@ -7,6 +7,11 @@ import qualified Prelude as P
 import Data.Time (Day, diffDays)
 import Data.Time.Format (parseTimeOrError, formatTime, defaultTimeLocale)
 
+simple :: Contr
+simple = 100 # (transfer X Y EUR)
+
+twoCF :: Contr
+twoCF = both (10 # (transfer X Y EUR)) (translate 1 (100 # (transfer X Y EUR)))
 
 european :: Contr
 european = translate 365 
@@ -22,6 +27,9 @@ european' = translate 365
             where
               theObs = rObs (Stock "DJ_Eurostoxx_50") 0
               strike   = 4000
+
+composite :: Contr
+composite = european' & (366 ! simple)
 
 -- worst-off contract on five fixed dates (chain of iff)
 worstOff :: Contr

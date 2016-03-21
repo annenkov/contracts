@@ -7,6 +7,7 @@ Require Import Horizon.
 Require Import Specialise.
 Require Import TimedTyping.
 Require Import ILTranslation.
+Require Import ILSemantics.
 
 
 
@@ -53,6 +54,8 @@ Extract Inlined Constant R0 => "0".
 Extract Inlined Constant negb => "not".
 Extract Inlined Constant Z.eqb => "(==)".
 
+Extract Inlined Constant NPeano.leb => "(<=)".
+Extract Inlined Constant NPeano.ltb => "(<)".
 
 Extract Inductive prod => "(,)" [ "(,)" ].
 Extract Inlined Constant fst => "fst".
@@ -117,4 +120,7 @@ Extraction "ContractExtracted.hs"
 
 Extraction "ContractTranslationExtracted.hs"
            fromExp
-           fromContr.
+           fromContr
+           fromExtEnv
+           ILsem
+           ILsem_k.
