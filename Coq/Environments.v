@@ -8,7 +8,7 @@ parametrised over the type of values so that we can instantiate it
 later to partial environments. *)
 
 Definition ExtEnv' A := ObsLabel -> Z -> A.
-
+Definition TEnv' A := A -> nat.
 
 
 Open Scope Z.

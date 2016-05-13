@@ -1,9 +1,12 @@
 Add LoadPath "..".
 
 Require Import ZArith Arith Syntax Misc Sorting Orders List Utils Denotational Horizon.
+Require Import Environments.
 
 Import ListNotations.
 Local Coercion is_true : bool >-> Sortclass.
+
+Local Open Scope nat.
 
 Fixpoint oDaysE (e : Exp) (t : nat) : list nat :=
   match e with 
@@ -13,15 +16,15 @@ Fixpoint oDaysE (e : Exp) (t : nat) : list nat :=
       | Acc e1 _ e2 => oDaysE e1 t ++ oDaysE e2 t
   end.
 
-Fixpoint oDays (c : Contr) (t : nat) : list nat :=
+Fixpoint oDays (c : Contr) (t : nat) (tenv : TEnv) : list nat :=
   match c with
-    | Scale e c      => oDaysE e t ++ oDays c t
+    | Scale e c      => oDaysE e t ++ oDays c t tenv
     | Zero           => []
-    | Let e c        => oDaysE e t ++ oDays c t
+    | Let e c        => oDaysE e t ++ oDays c t tenv
     | Transfer _ _ _ => []
-    | Translate _ c  => oDays c t
-    | Both c1 c2     => oDays c1 t ++ oDays c2 t
-    | If e i c1 c2   => concatMap (oDaysE e) (listFromTo t (t+i)) ++ oDays c1 t ++ oDays c2 (t + i)
+    | Translate _ c  => oDays c t tenv
+    | Both c1 c2     => oDays c1 t tenv ++ oDays c2 t tenv
+    | If e i c1 c2   => concatMap (oDaysE e) (listFromTo t (t + TexprSem i tenv)) ++ oDays c1 t tenv ++ oDays c2 (t + TexprSem i tenv) tenv
   end.
 
 Fixpoint ifDays (count : nat) (l : list nat) :=
@@ -30,15 +33,15 @@ Fixpoint ifDays (count : nat) (l : list nat) :=
     | S n => map (plus (S n)) l :: (ifDays n l)
   end.
 
-Fixpoint tDays (c : Contr) (t : nat) : list nat :=
+Fixpoint tDays (c : Contr) (tenv : TEnv) (t : nat) : list nat :=
   match c with
-    | Scale e c      => tDays c t
-    | Translate t' c => tDays c (t + t')
-    | If e t' c1 c2  => flat_map (tDays c1) (listFromNdesc t t') ++ tDays c2 (t + t')
+    | Scale e c      => tDays c tenv t
+    | Translate t' c => tDays c tenv (t + TexprSem t' tenv)
+    | If e t' c1 c2  => flat_map (tDays c1 tenv) (listFromNdesc t (TexprSem t' tenv)) ++ tDays c2 tenv (t + TexprSem t' tenv)
     | Zero           => []
-    | Let _ c        => tDays c t
+    | Let _ c        => tDays c tenv t
     | Transfer _ _ _ => [t]
-    | Both c1 c2     => tDays c1 t ++ tDays c2 t
+    | Both c1 c2     => tDays c1 tenv t ++ tDays c2 tenv t
   end.
 
 Module NatOrder <: TotalLeBool.
@@ -56,9 +59,9 @@ End NatOrder.
 
 Module Import NatSort := Sort NatOrder.
 
-Definition obsDays (c : Contr) : list nat := undup_nat (sort (oDays c 0)).
+Definition obsDays (c : Contr) (tenv : TEnv) : list nat := undup_nat (sort (oDays c 0 tenv)).
 
-Definition transfDays (c : Contr) : list nat := undup_nat (sort (tDays c 0)).
+Definition transfDays (c : Contr) (tenv : TEnv) : list nat := undup_nat (sort (tDays c tenv 0)).
 
 Lemma leb_transitive : forall x y z, 
   leb x y -> leb y z -> leb x z.
@@ -122,15 +125,15 @@ Proof.
     unfold Transitive. intros. apply leb_transitive with y. apply H. apply H0.
 Qed.
 
-Theorem obsDays_no_repeat_sorted : forall (c : Contr),
-  NoRepeat (obsDays c) /\ StronglySorted leb (obsDays c).
+Theorem obsDays_no_repeat_sorted : forall (c : Contr) (tenv : TEnv),
+  NoRepeat (obsDays c tenv) /\ StronglySorted leb (obsDays c tenv).
 Proof.
   intros.
   apply undup_sort_composition.
 Qed.
 
-Theorem transDays_no_repeat_sorted : forall (c : Contr),
-  NoRepeat (transfDays c) /\ StronglySorted leb (transfDays c).
+Theorem transDays_no_repeat_sorted : forall (c : Contr) (tenv : TEnv),
+  NoRepeat (transfDays c tenv) /\ StronglySorted leb (transfDays c tenv).
 Proof.
   intros.
   apply undup_sort_composition.
@@ -184,7 +187,7 @@ Qed.
 
 Print Contr_rect.
 
-Definition tDays' c := tDays c 0.
+Definition tDays' c tenv := tDays c tenv 0.
 
 Notation "x +? y" := (plus0 x y) (at level 50, left associativity).
 
@@ -197,8 +200,8 @@ Proof.
   + simpl. reflexivity.
 Qed.
 
-Lemma horison_translate_gt_0 : forall c n,
-  0 < horizon (Translate n c) -> 0 < horizon c.
+Lemma horison_translate_gt_0 : forall c n tenv,
+  0 < horizon (Translate n c) tenv -> 0 < horizon c tenv.
 Proof.
   intros.
   simpl in H. destruct (horizon c).
@@ -214,8 +217,8 @@ Proof.
   + intros. unfold not. intros. rewrite H0 in H. contradict H. apply lt_irrefl.
 Qed.
 
-Lemma horison_translate_not_0 : forall c n,
-  horizon (Translate n c) <> 0 -> horizon c <> 0.
+Lemma horison_translate_not_0 : forall c n tenv,
+  horizon (Translate n c) tenv <> 0 -> horizon c tenv <> 0.
 Proof.
   intros. 
   apply not_0_gt_0 in H. apply not_0_gt_0. eapply horison_translate_gt_0. apply H.
@@ -258,17 +261,17 @@ Proof.
   intros. inversion_clear H. rewrite H0. rewrite H1. reflexivity.
 Qed.
 
-Lemma flat_map_tDays_empty : forall  (l : list nat) (c : Contr),
- (forall n, tDays c n = []) -> flat_map (tDays c) l = [].
+Lemma flat_map_tDays_empty : forall  (l : list nat) (c : Contr) (tenv : TEnv),
+ (forall n, tDays c tenv n = []) -> flat_map (tDays c tenv) l = [].
 Proof.
   intros.
   induction l as [| h l'].
   + reflexivity.
   + intros. simpl. apply app_nils_is_nil. split. apply H. apply IHl'.
-Qed.  
+Qed.
 
-Lemma horizon_zero_empty_days : forall (c : Contr) (n : nat),
-  0 = horizon c -> tDays c n = [].
+Lemma horizon_zero_empty_days : forall (c : Contr) (n : nat) (tenv : TEnv),
+  0 = horizon c tenv -> tDays c tenv n = [].
 Proof.
   intros c.
   induction c.
@@ -279,7 +282,7 @@ Proof.
   + intros. simpl. apply IHc. simpl in H. destruct (horizon c).
     - reflexivity.
     - simpl. simpl in H. rewrite <- plus_n_Sm in H. inversion H.
-  + intros. simpl. simpl in H. symmetry in H.  apply max0 in H. apply app_nils_is_nil. 
+  + intros. simpl. simpl in H. symmetry in H. apply max0 in H. apply app_nils_is_nil. 
     inversion_clear H as [H1 H2]. split.
     - apply IHc1. symmetry. apply H1.
     - apply IHc2. symmetry. apply H2.
@@ -294,27 +297,27 @@ Proof.
   intros. unfold not. intros. contradict H. rewrite H0. simpl. unfold not. intros. inversion H.
 Qed.
 
-Lemma In_tDays_non_zero_horizon : forall (c : Contr) (x n : nat),
-  In x (tDays c n) -> horizon c <> 0.
+Lemma In_tDays_non_zero_horizon : forall (c : Contr) (x n : nat) (tenv : TEnv),
+  In x (tDays c tenv n) -> horizon c tenv <> 0.
 Proof.
   intros.
   apply In_list_not_empty in H. unfold not. intros. apply H. apply horizon_zero_empty_days. symmetry. apply H0.
 Qed.
 
-Lemma non_empty_tDays_non_zero_horizon : forall (c : Contr) (n : nat),
-  tDays c n <> [] -> horizon c <> 0.
+Lemma non_empty_tDays_non_zero_horizon : forall (c : Contr) (n : nat) (tenv : TEnv),
+  tDays c tenv n <> [] -> horizon c tenv <> 0.
 Proof.
   intros. unfold not. intros. apply H. apply horizon_zero_empty_days. symmetry. apply H0.
 Qed.
 
-Lemma non_zero_max_non_zero_horizon : forall (c : Contr) (n : nat),
- max_nat_l 0 (tDays c n) <> 0 -> horizon c <> 0.
+Lemma non_zero_max_non_zero_horizon : forall (c : Contr) (n : nat) (tenv : TEnv),
+ max_nat_l 0 (tDays c tenv n) <> 0 -> horizon c tenv <> 0.
 Proof.
   intros. eapply non_empty_tDays_non_zero_horizon. unfold not. intros. apply H. rewrite H0. reflexivity.
-Qed.   
+Qed.
   
-Lemma maximum_tDays_n_Sn : forall (c : Contr) (n : nat),
-  max_nat_l 0 (tDays c n) <= max_nat_l 0 (tDays c (S n)).
+Lemma maximum_tDays_n_Sn : forall (c : Contr) (n : nat) (tenv : TEnv),
+  max_nat_l 0 (tDays c tenv n) <= max_nat_l 0 (tDays c tenv (S n)).
 Proof.
   intros.
   generalize dependent n.
@@ -323,14 +326,14 @@ Proof.
   + rewrite Max.max_0_r. apply le_n_Sn.
   + rewrite maximum_app. rewrite maximum_app. apply NPeano.Nat.max_le_compat. apply IHc1. apply IHc2.
   + rewrite maximum_app. rewrite maximum_app. apply NPeano.Nat.max_le_compat.
-    - induction n as [| n']. 
+    - induction (TexprSem t tenv) as [| n'].
       * simpl. rewrite app_nil_r. rewrite app_nil_r. apply IHc1.
       * simpl. rewrite maximum_app. rewrite maximum_app. apply NPeano.Nat.max_le_compat. apply IHc1. apply IHn'.
     - apply IHc2.
 Qed.
 
-Lemma maximum_flat_map_tDays : forall (c : Contr) (t t' : nat),
-  max_nat_l 0 (flat_map (tDays c) (listFromNdesc t t')) = max_nat_l 0 (tDays c (t+t')).
+Lemma maximum_flat_map_tDays : forall (c : Contr) (t t' : nat) (tenv : TEnv),
+  max_nat_l 0 (flat_map (tDays c tenv) (listFromNdesc t t')) = max_nat_l 0 (tDays c tenv (t+t')).
 Proof.
   intros.
   generalize dependent t.
@@ -348,8 +351,8 @@ Proof.
   + unfold not. intros. inversion H0.
 Qed.
 
-Theorem tDays_lt_horizon : forall (c : Contr) (x n : nat),
-  In x (tDays c n) -> x < n + (horizon c).
+Theorem tDays_lt_horizon : forall (c : Contr) (x n : nat) (tenv : TEnv),
+  In x (tDays c tenv n) -> x < n + (horizon c tenv).
 Proof.
   intros.
   generalize dependent x.
@@ -362,17 +365,17 @@ Proof.
     - inversion H2.
   + (* Scale *) simpl. intros. apply IHc. apply H.
   + (* Translate *) simpl. intros. rewrite plus0_to_plus. rewrite plus_assoc.
-    apply (IHc (n0 + n) x). apply H. apply In_tDays_non_zero_horizon in H. apply H.
+    apply (IHc (n + TexprSem t tenv) x). apply H. apply In_tDays_non_zero_horizon in H. apply H.
   + (* Both *) intros. simpl. simpl in *. rewrite <- Max.plus_max_distr_l. apply NPeano.Nat.max_lt_iff.
      apply in_app_iff in H. inversion H as [H1 | H2].
     - left. apply IHc1. apply H1.
     - right. apply IHc2. apply H2.
   + (* If *) intros. simpl. rewrite plus0_to_plus. rewrite plus_assoc. rewrite <- Max.plus_max_distr_l. apply NPeano.Nat.max_lt_iff.
-    simpl in H. apply in_app_iff in H. inversion_clear H. left. induction n as [| n'].
+    simpl in H. apply in_app_iff in H. inversion_clear H. left. induction (TexprSem t tenv) as [| n'].
     - simpl in H0. rewrite app_nil_r in H0. rewrite plus_0_r. apply IHc1. apply H0.
     - simpl in H0. apply in_app_iff in H0. inversion_clear H0.
       * apply IHc1. apply H.
-      * replace (n0 + S n' + horizon c1) with (S (n0 + n' + horizon c1)). apply lt_S. apply IHn'. apply H. omega.
+      * replace (n + S n' + horizon c1 tenv) with (S (n + n' + horizon c1 tenv)). apply lt_S. apply IHn'. apply H. omega.
     - right. apply IHc2. apply H0.
     - apply In_tDays_non_zero_horizon in H. simpl in H. apply plus0_n_not_zero in H. apply H.
 Qed.
@@ -384,7 +387,7 @@ Axiom EUR : Asset.
 
 Definition sampleExp := OpE Cond [OpE Less [(Obs (LabR some_obs) 0%Z); OpE (RLit 10) []]; OpE (RLit 10) []; (Obs (LabR some_obs) 0%Z)].
 
-Definition sampleContr := Translate 5%nat (Scale sampleExp (Transfer P1 P2 EUR)).
+Definition sampleContr := Translate (Tnum 5) (Scale sampleExp (Transfer P1 P2 EUR)).
 
 Definition optionApp (tr : option Trace) (n : nat) :=
   match tr with
@@ -392,11 +395,11 @@ Definition optionApp (tr : option Trace) (n : nat) :=
     | None => None
   end.
 
-Eval compute in (optionApp (Csem sampleContr [] (fun some_obs t => RVal 20)) 5).
+Eval compute in (optionApp (Csem sampleContr [] (fun some_obs t => RVal 20) (fun _ => 0)) 5).
 
 Eval compute in (horizon sampleContr).
 
-Example empty_trans_example :  (optionApp (Csem sampleContr [] (fun some_obs t => (RVal 20))) 4%nat = Some empty_trans).
+Example empty_trans_example :  (optionApp (Csem sampleContr [] (fun some_obs t => (RVal 20)) (fun _ => 0)) 4%nat = Some empty_trans).
 Proof.
 reflexivity.
 Qed.

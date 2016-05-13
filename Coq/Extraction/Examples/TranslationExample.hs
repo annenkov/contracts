@@ -17,6 +17,10 @@ deriving instance Show ILExpr
 deriving instance Show ILVal
 deriving instance Show C.Val
 deriving instance Eq ILVal
+deriving instance Eq ILExpr
+deriving instance Eq ObsLabel
+deriving instance Eq ILUnOp
+deriving instance Eq ILBinOp
     
 translateEuropean  = fromContr (fromHoas european) 0
 translateEuropean' = fromContr (fromHoas european') 0
@@ -74,3 +78,21 @@ commute_horizon = and $ map commute [0..(horizon composite)]
 -----------
 --test :: C.Contr
 test = appProd (fromHoas, id) (adv_both 365 (composite, sampleExt))
+
+c1_eq1 = C.Scale (C.OpE (C.RLit 2) []) (C.Scale (C.OpE (C.RLit 3) []) (C.Transfer X Y EUR))
+c2_eq1 = C.Scale (C.OpE C.Mult [C.OpE (C.RLit 2) [], C.OpE (C.RLit 3) []]) (C.Transfer X Y EUR)
+         
+c1_eq2 = C.Translate 2 $ C.Translate 3 $ C.Transfer X Y EUR
+c2_eq2 = C.Translate 5 $ C.Transfer X Y EUR
+
+eq2 = transC c1_eq2 == transC c2_eq2
+
+c1_eq3 = C.Translate 5 $ C.Both (C.Transfer X Y EUR) (C.Transfer X Y EUR)
+c2_eq3 = C.Both (C.Translate 5 $ C.Transfer X Y EUR) (C.Translate 5 $ C.Transfer X Y EUR)
+
+eq3 = transC c1_eq3 == transC c2_eq3
+
+nonObviouslyCausal = C.Scale (C.Obs (LabR (FX EUR DKK)) 1) (C.Translate 1 $ C.Transfer X Y EUR)
+obviouslyCausal = C.Translate 1 $ C.Scale (C.Obs (LabR (FX EUR DKK)) 0) (C.Transfer X Y EUR)
+
+eq_causal = transC nonObviouslyCausal == transC obviouslyCausal

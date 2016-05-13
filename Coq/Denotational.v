@@ -14,7 +14,6 @@ Import ListNotations.
 Inductive Val : Set := BVal : bool -> Val | RVal : R -> Val.
 
 
-
 (* Semantics of real expressions. *)
 
 Fixpoint Acc_sem {A} (f : nat -> A -> A) (n : nat) (z : A) : A :=
@@ -61,6 +60,7 @@ Definition ExtEnv := ExtEnv' Val.
 
 Definition Env := Env' Val.
 
+Definition TEnv := TEnv' TVar.
 
 (* Semantics of expressions. *)
 
@@ -227,13 +227,13 @@ Qed.
 
 (* The following function is needed to define the semantics of [IfWithin]. *)
 
-Fixpoint within_sem (c1 c2 : Env -> ExtEnv -> option Trace) 
-         (e : Exp) (i : nat)  (env : Env) (rc : ExtEnv) : option Trace 
+Fixpoint within_sem (c1 c2 : Env -> ExtEnv -> TEnv -> option Trace) 
+         (e : Exp) (i : nat)  (env : Env) (rc : ExtEnv) (tenv : TEnv) : option Trace 
   := match E[|e|] env rc with
-       | Some (BVal true) => c1 env rc
+       | Some (BVal true) => c1 env rc tenv
        | Some (BVal false) => match i with
-                         | O => c2 env rc
-                         | S j => liftM (delay_trace 1) (within_sem c1 c2 e j env (adv_ext 1 rc))
+                         | O => c2 env rc tenv
+                         | S j => liftM (delay_trace 1) (within_sem c1 c2 e j env (adv_ext 1 rc) tenv)
                        end
        | _ => None
      end.
@@ -246,17 +246,24 @@ Reserved Notation "'C[|' e '|]'" (at level 9).
 Definition toReal (v : Val) : option R := 
   match v with
     | RVal r => Some r
-    | BVal _ => None
+    | _ => None
   end.
 
-Fixpoint Csem (c : Contr) (env : Env) (ext : ExtEnv) : option Trace :=
+(* Semantics for template expressions *)
+Definition TexprSem (e : TExpr) (tenv : TEnv) : nat :=
+  match e with
+    | Tvar v => tenv v
+    | Tnum n => n
+  end.
+
+Fixpoint Csem (c : Contr) (env : Env) (ext : ExtEnv) (tenv : TEnv) : option Trace :=
     match c with
       | Zero => Some empty_trace
-      | Let e c => E[|e|] env ext >>= fun val => C[|c|] (val :: env) ext
+      | Let e c => E[|e|] env ext >>= fun val => C[|c|] (val :: env) ext tenv
       | Transfer p1 p2 c => Some (singleton_trace (singleton_trans p1 p2 c 1))
-      | Scale e c' => liftM2 scale_trace (E[|e|] env ext >>= toReal) (C[|c'|] env ext) 
-      | Translate d c' => liftM (delay_trace d) (C[|c'|]env (adv_ext (Z.of_nat d) ext))
-      | Both c1 c2 => liftM2 add_trace (C[|c1|]env ext) (C[|c2|]env ext)
-      | If e d c1 c2 => within_sem C[|c1|] C[|c2|] e d env ext
+      | Scale e c' => liftM2 scale_trace (E[|e|] env ext >>= toReal) (C[|c'|] env ext tenv)
+      | Translate v c' => liftM (delay_trace (TexprSem v tenv)) (C[|c'|]env (adv_ext (Z.of_nat (TexprSem v tenv)) ext) tenv)
+      | Both c1 c2 => liftM2 add_trace (C[|c1|]env ext tenv) (C[|c2|]env ext tenv)
+      | If e d c1 c2 => within_sem C[|c1|] C[|c2|] e (TexprSem d tenv) env ext tenv
     end
       where "'C[|' e '|]'" := (Csem e).

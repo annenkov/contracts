@@ -1,0 +1,7 @@
+- add some parameter "k" representing current time to the compiled payoff code.
+  This can help to enforce to keep this parameter when compiling payoff code further
+  to some general purpose language;
+- add loops to payoff language;
+- add accumulator;
+- check, whether we can have only one payoff language construct
+  for loops and accumulators.

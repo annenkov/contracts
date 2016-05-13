@@ -43,6 +43,12 @@ Parameter RealObs : Set.
 
 Inductive Var : Set := V1 | VS (v:Var).
 
+(* The type of "template" variables. *)
+
+Inductive TVar : Set := Tm (t: nat).
+Inductive TExpr : Set := Tvar (t : TVar) | Tnum (n : nat).
+
+
 (* The type of labels that describe external observables. *)
 
 Inductive ObsLabel : Set := LabR (l:RealObs) | LabB (l:BoolObs).
@@ -51,14 +57,14 @@ Inductive ObsLabel : Set := LabR (l:RealObs) | LabB (l:BoolObs).
 
 Inductive Op : Set := Add | Sub | Mult | Div | And | Or | Less | Leq | Equal |
                       Not | Neg |
-                      BLit (b : bool) | RLit (r:R) |
+                      BLit (b : bool) | RLit (r : R) |
                       Cond.
 
 (* The type of expressions. *)
 
 Inductive Exp : Set := OpE (op : Op) (args : list Exp)
-                     | Obs (l:ObsLabel) (i: Z)
-                     | VarE (v:Var)
+                     | Obs (l : ObsLabel) (i : Z)
+                     | VarE (v : Var)
                      | Acc (f : Exp) (d : nat) (e : Exp).
 
 
@@ -98,6 +104,6 @@ Inductive Contr : Type :=
  | Let : Exp -> Contr -> Contr
  | Transfer : Party -> Party -> Asset -> Contr
  | Scale : Exp -> Contr -> Contr
- | Translate : nat -> Contr -> Contr
+ | Translate : TExpr -> Contr -> Contr
  | Both : Contr -> Contr -> Contr
- | If : Exp -> nat -> Contr -> Contr -> Contr.
+ | If : Exp -> TExpr -> Contr -> Contr -> Contr.
