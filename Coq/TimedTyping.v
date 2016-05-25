@@ -4,6 +4,7 @@ Require Import Tactics.
 Require Import Utils.
 Require Import Environments.
 Require Import Causality.
+Require Import Templates.
 
 Import ListNotations. 
 
@@ -69,14 +70,14 @@ Inductive TiTyE : TiTyEnv -> TiTy -> Exp -> Prop:=
 Inductive TiTyC : TiTyEnv -> TimeB -> Contr -> Prop :=
 | causal_zero ts t : TiTyC ts t Zero
 | causal_translate ts t d c : TiTyC (map (sub_time d) ts) (tsub' d t) c
-                                     -> TiTyC ts t (Translate d c)
+                                     -> TiTyC ts t (Translate (Tnum d) c)
 | causal_let ts t t' e c : TiTyE ts t' e -> TiTyC (t' :: ts) t c -> TiTyC ts t (Let e c)
 | causal_scale ts ti ti' e c : ti' <= ti -> TiTyE ts (REAL @ ti) e -> TiTyC ts ti c -> TiTyC ts ti' (Scale e c)
 | causal_both ts t c1 c2 : TiTyC ts t c1 -> TiTyC ts t c2 -> TiTyC ts t (Both c1 c2)
 | causal_transfer t ts p1 p2 a : t <= Time 0 -> TiTyC ts t (Transfer p1 p2 a)
 | causal_if ts t d e c1 c2 : TiTyE ts (BOOL @ Time 0) e -> TiTyC ts t c1
                              -> TiTyC (map (sub_time d) ts) (tsub' d t) c2
-                             -> TiTyC ts t (If e d c1 c2)
+                             -> TiTyC ts t (If e (Tnum d) c1 c2)
 .
 
 Hint Constructors TiTyV TiTyE TiTyC.
@@ -180,7 +181,7 @@ Proof.
     rewrite time_sub_time. reflexivity.
 Qed.
 
-Corollary TiTyC_causal t c : TiTyC [] t c -> causal c.
+Corollary TiTyC_causal t c tenv : TiTyC [] t c -> causal c tenv.
 Proof.
   intros T. apply TiTyC_time in T. simpl in *. eauto using CausalC_sound.
 Qed.
@@ -464,22 +465,24 @@ Definition imin t1 t2 := if ileb t1 t2 then t1 else t2.
 
 Open Scope time.
 
-Fixpoint inferC (env : TiTyEnv) (c:Contr) : option TimeI :=
+Fixpoint inferC (env : TiTyEnv) (tenv : TEnv) (c:Contr) : option TimeI :=
   match c with
     | Zero => Some TimeTop
     | Transfer p1 p2 a => Some (Time' (Time 0))
-    | Translate d c' => liftM (iadd d) (inferC (map (sub_time d) env) c')
+    | Translate d c' => liftM (iadd (TexprSem d tenv)) (inferC (map (sub_time (TexprSem d tenv)) env) tenv c')
     | Scale e c' => inferE env e >>= fun ty => 
-                   inferC env c' >>= fun t => if tyeqb (type ty) REAL && tileb (time ty) t
+                   inferC env tenv c' >>= fun t => if tyeqb (type ty) REAL && tileb (time ty) t
                                               then Some t
                                               else None
-    | Both c1 c2 => liftM2 imin (inferC env c1) (inferC env c2)
-    | Let e c' => inferE env e >>= fun t => inferC (t :: env) c'
+    | Both c1 c2 => liftM2 imin (inferC env tenv c1) (inferC env tenv c2)
+    | Let e c' => inferE env e >>= fun t => inferC (t :: env) tenv c'
     | If e d c1 c2 => inferE env e >>= fun t =>
                       if tyeqb (type t) BOOL && tleb (time t) (Time 0)
-                      then liftM2 imin (inferC env c1) (liftM (iadd d) (inferC (map (sub_time d) env) c2))
+                      then liftM2 imin (inferC env tenv c1) (liftM (iadd (TexprSem d tenv))
+                                                                   (inferC (map (sub_time (TexprSem d tenv)) env) tenv c2))
                       else None
   end.
+
 
 
 
@@ -631,11 +634,11 @@ Proof.
   intros T. eauto using tile_imin_r, tile_tsub_iadd.
 Qed.
 
-
-Theorem inferC_sound env c i : inferC env c = Some i -> forall t, tile t i -> TiTyC env t c.
+Theorem inferC_sound env c i tenv :
+  inferC env tenv c = Some i -> IsClosedCT c -> forall t, tile t i -> TiTyC env t c.
 Proof.
   generalize dependent env. generalize dependent i.
-  induction c; intros i env I t E;simpl in *; option_inv_auto;
+  induction c; intros i env I C t0 E;simpl in *; option_inv_auto; inversion C;
   try solve [eauto using inferE_sound |inversion E;auto].
   - cases (tyeqb (type x) REAL && tileb (time x) x0) as TE;tryfalse.
     rewrite Bool.andb_true_iff in TE.
@@ -643,15 +646,15 @@ Proof.
     rewrite tileb_tile in TE2.
     destruct x. simpl in *. subst. inversion H3. subst.
     apply inferE_sound in H0.
-    cases (tleb t ti) as TL. rewrite tleb_tle in TL.
+    cases (tleb t0 ti) as TL. rewrite tleb_tle in TL.
     eapply IHc in H2;try eassumption.
     econstructor;eauto.
     rewrite tleb_tgt in TL.
     eapply IHc in H2; try apply E.
     eapply causal_scale in H2. eassumption.
     apply tle_refl. apply TiTyE_open' with (t:=REAL@ti);eauto.
-    constructor. reflexivity. simpl. auto using tle_tlt.
-  - eapply IHc in H0;eauto using tile_tsub_iadd.
+    constructor. reflexivity. simpl. auto using tle_tlt. inversion C. auto.
+  - subst; eapply IHc in H0; eauto using tile_tsub_iadd.
   - constructor; eauto using tile_imin_l, tile_imin_r. 
   - cases (tyeqb (type x) BOOL && tleb (time x) (Time 0)) as B;tryfalse.
     rewrite Bool.andb_true_iff in B. destruct B as [B1 B2].
@@ -679,10 +682,10 @@ Proof. unfold imin. destruct t;reflexivity. Qed.
 Lemma imin_top_r t : imin t TimeTop = t.
 Proof. unfold imin. destruct t;reflexivity. Qed.
 
-Theorem inferC_complete env c t : TiTyC env t c -> exists i, inferC env c = Some i /\ tile t i.
+Theorem inferC_complete env c t tenv: TiTyC env t c -> exists i, inferC env tenv c = Some i /\ tile t i.
 Proof.
   generalize dependent env. generalize dependent t.
-  induction c; intros t env T;simpl in *; option_inv_auto;inversion T;subst;eauto.
+  induction c; intros t0 env T;simpl in *; option_inv_auto;inversion T;subst;eauto.
   - apply inferE_complete in H3. decompose [ex and] H3. subst. 
     eapply TiTyC_open in H4.
     apply IHc in H4. decompose [ex and] H4. 
@@ -697,7 +700,7 @@ Proof.
     subst. rewrite <- tileb_tile in E. rewrite E.
     simpl. eexists. split. reflexivity.
     inversion H2;eauto.
-  - apply IHc in H2. decompose [ex and] H2. rewr_assumption. simpl. autounfold.
+  - apply IHc in H2. decompose [ex and] H2. simpl. rewr_assumption. simpl. autounfold.
     eexists. split. reflexivity. auto using tile_iadd_tsub.
   - apply IHc1 in H3. decompose [ex and] H3. apply IHc2 in H4. decompose [ex and] H4. 
     repeat rewr_assumption. simpl. autounfold. 
@@ -709,14 +712,14 @@ Proof.
     repeat rewr_assumption. rewrite tyeqb_refl. simpl. reflexivity.
     inversion H1; subst. rewrite imin_top_l. auto using tile_iadd_tsub.
     inversion H3; subst. simpl. rewrite imin_top_r. assumption.
-    simpl. unfold imin. cases (ileb (Time' t0) (Time' (tadd' n t1))).
+    simpl. unfold imin. cases (ileb (Time' t) (Time' (tadd' d t1))).
     assumption. simpl. constructor. unfold tadd', tsub' in *.
     auto using tsub_tadd_tle.
 Qed.
 
 
-Definition has_type (c : Contr) : bool := 
-  match inferC nil c with
+Definition has_type (tenv : TEnv) (c : Contr) : bool := 
+  match inferC nil tenv c with
     | Some _ => true
     | None => false
   end.
@@ -731,8 +734,9 @@ Proof.
   destruct t; simpl; constructor. apply tle_refl. 
 Qed.
 
-Corollary has_type_causal c : has_type c = true -> causal c.
+Corollary has_type_causal c tenv :
+  has_type tenv c = true -> IsClosedCT c -> causal c tenv.
 Proof.
-  unfold has_type. intros. cases (inferC [] c) as T;tryfalse.
+  unfold has_type. intros. cases (inferC [] tenv c) as T;tryfalse.
   eauto using inferC_sound,select_time_tile, TiTyC_causal.
 Qed.

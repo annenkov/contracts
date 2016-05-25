@@ -5,8 +5,8 @@ Require Import Tactics.
 
 Definition antisym (t : Trans) : Prop := forall p1 p2 c, t p1 p2 c = - t p2 p1 c.
 Definition antisym_trace (t : Trace) : Prop := forall i, antisym (t i).
-Definition antisym_trace' (t : Env -> ExtEnv -> option Trace) : Prop := 
-  forall env ext t', t env ext = Some t' -> antisym_trace t'.
+Definition antisym_trace' (tenv : TEnv) (t : Env -> ExtEnv -> TEnv -> option Trace) : Prop := 
+  forall env ext t', t env ext tenv = Some t' -> antisym_trace t'.
 
 
 Hint Resolve Ropp_0 Ropp_involutive.
@@ -80,8 +80,8 @@ Qed.
 Hint Resolve const_trace_antisym add_trace_antisym delay_trace_antisym 
      scale_trace_antisym singleton_trace_antisym empty_trans_antisym.
 
-Lemma within_trace_antisym t1 t2 b n : antisym_trace' t1 -> antisym_trace' t2 -> 
-                                       antisym_trace' (within_sem t1 t2 b n).
+Lemma within_trace_antisym t1 t2 b n tenv : antisym_trace' tenv t1 -> antisym_trace' tenv t2 -> 
+                                       antisym_trace' tenv (within_sem t1 t2 b n).
 Proof.
   intros T1 T2. intros. induction n; unfold antisym_trace'; intros; simpl in *;
   destruct (E[|b|]env ext); try destruct v; try destruct b0; eauto;tryfalse.
@@ -92,7 +92,7 @@ Proof.
 Hint Resolve within_trace_antisym.
 
 
-Theorem sem_antisym c : antisym_trace' (C[| c |]).
+Theorem sem_antisym c (tenv : TEnv): antisym_trace' tenv C[| c |].
 Proof.
   
   induction c; try solve[unfold antisym_trace'; intros; simpl in *; 

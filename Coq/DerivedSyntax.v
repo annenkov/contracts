@@ -19,7 +19,7 @@ Lemma IfBind_type ts t d e c1 c2 :
   (forall t', TiTyE (t' :: ts) (BOOL @ Time 0) e)
   -> (forall t', TiTyC (REAL @ Time 0 :: t' :: ts) t c1)
   -> (forall t', TiTyC (map (sub_time d) (t' :: ts)) (tsub' d t) c2)
-  -> TiTyC ts t (IfBind e d c1 c2).
+  -> TiTyC ts t (IfBind e (Tnum d) c1 c2).
 Proof.
   intros. unfold IfBind.
   apply causal_let with (t':= REAL @ Time 0). 

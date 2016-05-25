@@ -6,6 +6,7 @@ Require Import Tactics.
 Require Import FunctionalExtensionality.
 Require Export FinMap.
 Require Import TimedTyping.
+Require Import Templates.
 
 
 (********** reduction semantics **********)
@@ -29,16 +30,16 @@ Inductive Red : Contr -> EnvP -> ExtEnvP -> Contr -> Trans -> Prop :=
                                    ScaleTrans (fromRLit e') t t' -> Red c env ext c' t ->
                                    c'' = (smartScale (translateExp (-1) e') c') ->
                                    Red (Scale e c) env ext c'' t'
-| red_trans0 c env ext c' t : Red c env ext c' t -> Red (Translate 0 c) env ext c' t
-| red_transS c env ext n c' t' : t' = empty_trans -> c' = Translate n c -> Red (Translate (S n) c) env ext c' t'
+| red_trans0 c env ext c' t : Red c env ext c' t -> Red (Translate (Tnum 0) c) env ext c' t
+| red_transS c env ext n c' t' : t' = empty_trans -> c' = Translate (Tnum n) c -> Red (Translate (Tnum (S n)) c) env ext c' t'
 | red_both c1 c1' c2 c2' env ext t1 t2 c t : Red c1 env ext c1' t1 -> Red c2 env ext c2' t2 -> 
                                              c = smartBoth c1' c2' -> t = add_trans t1 t2 ->
                                              Red (Both c1 c2) env ext c t
 | red_if0_false env ext c1 c2 c' b t : fromBLit (specialiseExp b env ext) = Some false -> 
-                                         Red c2 env ext c' t -> Red (If b 0 c1 c2) env ext c' t
+                                         Red c2 env ext c' t -> Red (If b (Tnum 0) c1 c2) env ext c' t
 | red_ifS_false env ext c1 c2 n b c t : fromBLit (specialiseExp b env ext) = Some false -> 
-                                    c = If b n c1 c2 -> t = empty_trans -> 
-                                       Red (If b (S n) c1 c2) env ext c t
+                                    c = If b (Tnum n) c1 c2 -> t = empty_trans -> 
+                                       Red (If b (Tnum (S n)) c1 c2) env ext c t
 | red_if_true env ext c1 c2 c' n b t : fromBLit (specialiseExp b env ext) = Some true -> 
                                          Red c1 env ext c' t -> Red (If b n c1 c2) env ext c' t
 .
@@ -115,7 +116,7 @@ Proof.
   try apply IHR in  H6;try apply IHR in  H8;
   try apply IHR1 in  H5;try apply IHR2 in  H6;
   repeat inv;
-  unfold tsub' in *; simpl in *; try rewrite tsub_0,map_tsub_0 in *;
+  unfold tsub' in *; simpl in *; try rewrite tsub_0,map_tsub_0 in *;  
   eauto 7 using smartLet_timed, smartBoth_timed, smartScale_timed, translateExp_timed,specialiseExp_timed.
   - eexists. split. apply smartScale_timed. econstructor;eauto. unfold tsub. simpl. 
     assert (x = tadd (-1) (tadd 1 x)) as E. rewrite tadd_tadd. simpl. rewrite tadd_0. reflexivity.
@@ -165,13 +166,13 @@ Module Soundness.
 
   (* Proof of soundness of Red according to denotational semantics *)
 
-Theorem red_sound1 c c' env ext envp extp tr t g: 
+Theorem red_sound1 c c' env ext envp extp tr t g tenv: 
   g |-C c ->
       TypeEnv g env -> TypeExt ext -> 
   Red c envp extp c' t ->  
   ext_inst extp ext ->
   env_inst envp env ->
-  C[|c|] env ext = Some tr -> tr O = t.
+  C[|c|] env ext tenv = Some tr -> tr O = t.
 Proof.
 
   Ltac spec := repeat match goal with 
@@ -189,19 +190,19 @@ Proof.
     * symmetry in H3. spec. inversion H1. subst. simpl in H2. inversion H2. reflexivity.
   - erewrite <- IHR;eauto. rewrite adv_ext_0 in H1. rewrite delay_trace_0. assumption.
   - unfold add_trace. erewrite <- IHR1;eauto. erewrite <- IHR2;eauto.
-  - spec. eapply IHR;eauto. 
+  - spec. eapply IHR; eauto. 
   - spec. option_inv_auto. reflexivity.
-  - spec. eapply IHR;eauto. destruct n; simpl in S; rewrite H in S;assumption.
+  - spec. eapply IHR;eauto. destruct  (TexprSem n tenv); simpl in S; rewrite H in S;assumption.
 Qed.
 
 
-Theorem red_sound2 c c' env ext envp extp t t1 t2 i g: 
+Theorem red_sound2 c c' env ext envp extp t t1 t2 i g tenv: 
   g |-C c ->
       TypeEnv g env -> TypeExt ext -> 
   Red c envp extp c' t ->  
   ext_inst extp ext ->
   env_inst envp env ->
-  C[|c|]env ext = Some t1 -> C[|c'|] env (adv_ext 1 ext) = Some t2
+  C[|c|]env ext tenv = Some t1 -> C[|c'|] env (adv_ext 1 ext) tenv = Some t2
   -> t1 (S i) = t2 i.
 Proof.
   intros T E X R I J S1 S2. generalize dependent t1. generalize dependent t2. generalize dependent env. 
@@ -227,7 +228,7 @@ Proof.
   - spec. eapply IHR;eauto.
   - spec. option_inv_auto. rewrite delay_trace_S. rewrite delay_trace_0. simpl in S2.
     rewrite H1 in S2. inversion S2. reflexivity.
-  - spec. eapply IHR;eauto. destruct n; simpl in S1; rewrite H in S1; assumption.
+  - spec. eapply IHR;eauto. destruct (TexprSem n tenv); simpl in S1; rewrite H in S1; assumption.
     Qed.
 
 End Soundness.
@@ -473,7 +474,10 @@ Qed.
 
 Hint Resolve mk_ext_inst_ext_inst mk_env_inst_env_inst mk_ext_inst_typed mk_env_inst_typed : inst.
 
-Lemma red_empty tis ti ext env c c' t' : 
+(* TODO: We actually need tenv only for Csem_typed_total, and we're working with closed contracts here.
+   I think it would be better to prove lemma saying that it doesn't matter which tenv to use for closed contracts
+   and use this lemma here.*)
+Lemma red_empty tis ti ext env c c' t' (tenv : TEnv) : 
   Time 0 < ti -> TypeEnvP (map type tis) env -> TypeExtP ext -> TiTyC tis ti c -> 
   Red c env ext c' t' -> t' = empty_trans.
 Proof.
@@ -482,8 +486,9 @@ Proof.
   inversion L. subst.
   pose Tc1 as Tc1'.
   apply Csem_typed_total 
-  with (env := mk_env_inst (map type tis) env)
-       (ext := mk_ext_inst ext) in Tc1';
+  with (env  := mk_env_inst (map type tis) env)
+       (ext  := mk_ext_inst ext)
+       (tenv := tenv) in Tc1';
     eauto with inst. 
   unfold total_trace in *. destruct Tc1' as [t Tc1'].
   pose Tc1' as S.
@@ -497,7 +502,8 @@ Proof.
   constructor. omega.
 Qed.
 
-Theorem red_progress ti ti' tis c env ext : 
+(* TODO: The same thing with tenv as for red_empty *)
+Theorem red_progress ti ti' tis c env ext (tenv : TEnv): 
   Time 0 <= ti -> TiTyC tis ti' c
   -> ext_def_until ext ti -> env_def_until env tis ti -> TypeExtP ext -> TypeEnvP (map type tis) env
   -> exists c' t', Red c env ext c' t'.
@@ -509,7 +515,7 @@ Proof.
     destruct d; eauto.
     assert (exists c' t', Red c env ext c' t') as IH by
         (eapply IHT; try rewrite tsub'_0;try rewrite map_sub_time_0;eauto).
-    decompose [ex] IH. do 2 eexists. eauto. 
+    decompose [ex] IH. do 2 eexists. eauto.
   - (* Let *)
     assert (exists c' t', Red c (fromLit (specialiseExp e env ext) :: env) ext c' t') as IH
     by (eapply IHT;eauto; constructor;eauto using specialiseExp_complete;
@@ -526,7 +532,7 @@ Proof.
       rewr_assumption. constructor.
     * rewrite tleb_tgt in TL.
       assert (Time 0 < ti0) as Ti' by eauto using tle_tlt.
-      assert (x0 = empty_trans) as Em. 
+      assert (x0 = empty_trans) as Em.
       eauto using red_empty. subst.
       do 2 eexists. econstructor;eauto.
       eapply scaleTrans_empty.
@@ -579,31 +585,31 @@ Qed.
 
 (* Computable function that implements the reduction semantics. *)
 
-Fixpoint redfun (c : Contr) (env : EnvP) (ext : ExtEnvP) : option (Contr * SMap) :=
+Fixpoint redfun (c : Contr) (env : EnvP) (ext : ExtEnvP) (tenv : TEnv) : option (Contr * SMap) :=
   match c with
     | Zero => Some (Zero, SMap.empty)
     | Let e c => let e' := specialiseExp e env ext in
                  liftM (fun ct : Contr * SMap => let (c', t) := ct in (smartLet (translateExp (-1) e') c', t)) 
-                       (redfun c (fromLit e'::env) ext)
+                       (redfun c (fromLit e'::env) ext tenv)
     | Transfer c p1 p2 => Some (Zero, SMap.singleton c p1 p2 1 R1_neq_R0)
     | Scale e c => let e' := specialiseExp e env ext
-                   in redfun c env ext  >>= 
+                   in redfun c env ext tenv  >>= 
                       (fun ct => let (c', t) := ct in 
                                  liftM (fun t' => (smartScale (translateExp (-1) e') c', t'))
                                        (scale_trans' (fromRLit e') t))
-    | Translate n c => match n with
-                         | O => redfun c env ext
-                         | S n' => Some (Translate n' c, SMap.empty)
+    | Translate d c => match (TexprSem d tenv) with
+                         | O => redfun c env ext tenv
+                         | S n' => Some (Translate (Tnum n') c, SMap.empty)
                        end
     | Both c1 c2 =>  liftM2 (fun (ct1 ct2 : Contr * SMap) => let (c1',t1) := ct1 in 
                                      let (c2',t2) := ct2 
                                      in (smartBoth c1' c2', SMap.union_with Rplus t1 t2))
-                         (redfun c1 env ext) (redfun c2 env ext)
-    | If b n c1 c2 => fromBLit (specialiseExp b env ext) >>=
-                               (fun b' => if b' then redfun c1 env ext 
-                                          else match n with
-                                                 | O => redfun c2 env ext 
-                                                 | S n' => Some (If b n' c1 c2,SMap.empty)
+                         (redfun c1 env ext tenv) (redfun c2 env ext tenv)
+    | If b d c1 c2 => fromBLit (specialiseExp b env ext) >>=
+                               (fun b' => if b' then redfun c1 env ext tenv
+                                          else match (TexprSem d tenv) with
+                                                 | O => redfun c2 env ext tenv
+                                                 | S n' => Some (If b (Tnum n') c1 c2,SMap.empty)
                                                end)
   end.
 
@@ -701,16 +707,18 @@ Proof.
   unfold smap_fun, add_trans. repeat (apply functional_extensionality;intro). apply union_find.
 Qed.
 
-
-Theorem redfun_red c c' env ext t: 
-  redfun c env ext = Some (c', t) -> Red c env ext c' (smap_fun t) .
+(* Now, we have to include additional assumption IsClosedCT c, because Red relation defined only for closed contracts*)
+Theorem redfun_red c c' env ext t tenv: 
+  redfun c env ext tenv = Some (c', t) ->
+  IsClosedCT c ->
+  Red c env ext c' (smap_fun t) .
 Proof.
-  intro F. generalize dependent t. generalize dependent c'. 
+  intros F C. generalize dependent t. generalize dependent c'. 
   generalize dependent ext. generalize dependent env. 
-  induction c;intros;simpl in *;try first[option_inv' F|injection F;intros];dprod;option_inv_auto;dprod;subst;
+  induction c;intros;inversion C;simpl in *;try first[option_inv' F|injection F;intros];dprod;option_inv_auto;dprod;subst;
   eauto using smap_fun_empty, smap_fun_singleton, scale_trans_ScaleTrans, smap_fun_add.
-  - destruct n; inversion F; auto using smap_fun_empty.
-  - destruct x. auto. destruct n. auto. inversion H2. auto using smap_fun_empty.
+  - destruct n; inversion F; auto using smap_fun_empty.    
+  - destruct x. auto. simpl in *. destruct n. auto. inversion H8. auto using smap_fun_empty.
 Qed.
 
 
@@ -740,21 +748,22 @@ Proof.
     apply Rmult_0_r. intros. rewrite Ropp_mult_distr_r_reverse. reflexivity.
 Qed.
 
-
-Theorem red_redfun c c' env ext t: 
-  Red c env ext c' t -> exists m, redfun c env ext = Some (c', m) /\ smap_fun m = t.
+Theorem red_redfun c c' env ext t tenv :
+  Red c env ext c' t ->
+  exists m, redfun c env ext tenv = Some (c', m) /\ smap_fun m = t.
 Proof.
-  intro F. induction F; subst; 
+  intros F. induction F; subst;
   repeat match goal with | [T : exists _, _ /\ _ |- _] => decompose [ex and] T; clear T;subst end;
-  try solve[eexists;split;simpl;try reflexivity;eauto using smap_fun_empty,smap_fun_singleton, smap_fun_add;
-  repeat match goal with | [T : _ = Some _ |- _] => rewrite T; clear T end; 
-  simpl;unfold pure,compose;simpl;try reflexivity].
-  (* we only need to deal with scale *)
+  try solve[eexists;split;simpl; try reflexivity; eauto using smap_fun_empty,smap_fun_singleton, smap_fun_add;
+            repeat match goal with | [T : _ = Some _ |- _] => rewrite T; clear T end;
+            try (repeat match goal with | [T : TexprSem _ _ = _ |- _] => rewrite T in *; clear T end);
+            simpl;unfold pure,compose;simpl;try reflexivity].
+  (* we only need to deal with scale *)  
   - eapply ScaleTrans_scale_trans in H0. decompose [ex and] H0.
     eexists. split. simpl. rewrite H1. simpl.
     rewrite H3. simpl.
-    unfold pure, compose. rewrite H2. reflexivity. auto. eauto. 
-  Qed.
+    unfold pure, compose. rewrite H2. reflexivity. auto. eauto.  
+Qed.
 
 End Compute.
 Export Compute.

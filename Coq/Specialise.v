@@ -534,15 +534,15 @@ Fixpoint elimVarC (v : Var) (c : Contr) : option Contr :=
     | If e l c1 c2 => liftM3 (fun e' c1' c2' => If e' l c1' c2') (elimVarE v e) (elimVarC v c1) (elimVarC v c2)
   end.
 
-Lemma elimVarC_sound v vs1 vs2 ext c c' : elimVarC v c = Some c' -> elimVarEnv v vs1 vs2 -> 
-                                         C[|c|]vs1 ext = C[|c'|]vs2 ext.
+Lemma elimVarC_sound v vs1 vs2 ext c c' tenv : elimVarC v c = Some c' -> elimVarEnv v vs1 vs2 -> 
+                                         C[|c|]vs1 ext tenv = C[|c'|]vs2 ext tenv.
 Proof.
   intros O U. generalize dependent ext. generalize dependent vs1. generalize dependent vs2.
   generalize dependent v. generalize dependent c'.
   induction c;intros; simpl in *;try first [option_inv' O|inversion O];simpl;
   try solve [reflexivity|eauto using bind_equals, elimVarE_sound|f_equal;eauto using bind_equals, elimVarE_sound].
   
-  generalize dependent ext. induction n;intros;simpl;erewrite elimVarE_sound;eauto;erewrite IHc1;eauto.
+  generalize dependent ext. induction (TexprSem t tenv);intros;simpl;erewrite elimVarE_sound;eauto;erewrite IHc1;eauto.
   - erewrite IHc2;eauto.
   - erewrite IHn;eauto.
 Qed. 
@@ -571,8 +571,8 @@ Definition smartLet (e : Exp) (c : Contr) : Contr :=
 
 (* The smart let binding is equivalent to the ordinary let binding. *)
 
-Lemma smartLet_sound e c vs ext t g : 
-  g |-E e ∶ t -> TypeEnv g vs -> TypeExt ext -> C[|smartLet e c|]vs ext = C[|Let e c|]vs ext.
+Lemma smartLet_sound e c vs ext t g tenv: 
+  g |-E e ∶ t -> TypeEnv g vs -> TypeExt ext -> C[|smartLet e c|]vs ext tenv= C[|Let e c|]vs ext tenv.
 Proof.
   intros T G R. unfold smartLet. cases (elimVarC V1 c); try reflexivity.
   simpl.
@@ -603,8 +603,8 @@ Definition smartScale e c : Contr :=
          | c' => Scale e c'
        end.
 
-Lemma smartScale_sound e c vs ext g: 
-  g |-C Scale e c -> TypeEnv g vs -> TypeExt ext -> C[|smartScale e c|]vs ext = C[|Scale e c|]vs ext.
+Lemma smartScale_sound e c vs ext g tenv: 
+  g |-C Scale e c -> TypeEnv g vs -> TypeExt ext -> C[|smartScale e c|]vs ext tenv= C[|Scale e c|]vs ext tenv.
 Proof.
   intros T G R. inversion T. subst.
   unfold smartScale. cases (isZeroLit e) as E. apply isZeroLit_true in E.
@@ -640,8 +640,8 @@ Definition smartBoth c1 c2 : Contr :=
   end.
 
 
-Lemma smartBoth_sound c1 c2 vs ext g: 
-  g |-C Both c1 c2 -> TypeEnv g vs -> TypeExt ext -> C[|smartBoth c1 c2|]vs ext = C[|Both c1 c2|]vs ext.
+Lemma smartBoth_sound c1 c2 vs ext g tenv: 
+  g |-C Both c1 c2 -> TypeEnv g vs -> TypeExt ext -> C[|smartBoth c1 c2|]vs ext tenv= C[|Both c1 c2|]vs ext tenv.
 Proof.
   intros T G R. inversion T. subst.
   eapply Csem_typed_total in H2;eauto. destruct H2 as [t1 C1].
@@ -674,12 +674,12 @@ Definition smartTranslate l c : Contr :=
     | 0 => c
     | _ => match c with
              | Zero => Zero
-             | _ => Translate l c
+             | _ => Translate (Tnum l) c
            end
 end.
 
-Lemma smartTranslate_sound l c vs ext: 
-  C[|smartTranslate l c|]vs ext = C[|Translate l c|]vs ext.
+Lemma smartTranslate_sound l c vs ext tenv: 
+  C[|smartTranslate l c|]vs ext tenv = C[|Translate (Tnum l) c|]vs ext tenv.
 Proof.
   destruct l.
   - simpl. erewrite liftM_ext. rewrite liftM_id. rewrite adv_ext_0. reflexivity.
@@ -689,14 +689,14 @@ Proof.
 Qed.
 
 Lemma smartTranslate_typed l c g : 
-  g |-C Translate l c -> g |-C smartTranslate l c.
+  g |-C Translate (Tnum l) c -> g |-C smartTranslate l c.
 Proof.
-  intros T. inversion T. destruct l;auto;destruct c; auto.
+  intros T. inversion T. destruct l; destruct c;simpl;auto.
 Qed.
 
 
 Corollary smartTranslate_equiv l c g : 
-  g |-C Translate l c -> smartTranslate l c ≡[g] Translate l c.
+  g |-C Translate (Tnum l) c -> smartTranslate l c ≡[g] Translate (Tnum l) c.
 Proof.
   intros. unfold equiv. repeat split; auto. 
   - apply smartTranslate_typed. assumption.
@@ -716,33 +716,36 @@ Fixpoint traverseIf (env:EnvP) (ext : ExtEnvP) (e: Exp) (c1 c2 : ExtEnvP -> Cont
 
 
 
-Fixpoint specialise (c : Contr) (env : EnvP) (ext : ExtEnvP) : Contr :=
+Fixpoint specialise (c : Contr) (env : EnvP)  (tenv : TEnv) (ext : ExtEnvP): Contr :=
   match c with
     | Zero => c
     | Transfer _ _ _ => c
     | Let e c' => let e' := specialiseExp e env ext in
-                  smartLet e' (specialise c' (fromLit e' :: env) ext)
-    | Scale e c' => smartScale (specialiseExp e env ext) (specialise c' env ext)
-    | Translate l c' => smartTranslate l (specialise c' env (adv_ext (Z.of_nat l) ext))
-    | Both c1 c2 => smartBoth (specialise c1 env ext) (specialise c2 env ext)
-    | If e l c1 c2 => default c (traverseIf env ext e (specialise c1 env) (specialise c2 env) 0 l)
+                  smartLet e' (specialise c' (fromLit e' :: env) tenv ext)
+    | Scale e c' => smartScale (specialiseExp e env ext) (specialise c' env tenv ext)
+    | Translate l c' => let t' := TexprSem l tenv in
+                        smartTranslate t' (specialise c' env tenv (adv_ext (Z.of_nat t') ext))
+    | Both c1 c2 => smartBoth (specialise c1 env tenv ext) (specialise c2 env tenv ext)
+    | If e l c1 c2 => default c (traverseIf env ext e (specialise c1 env tenv) (specialise c2 env tenv) 0 (TexprSem l tenv))
   end.
+
 
 Hint Resolve smartTranslate_typed smartBoth_typed smartScale_typed 
      smartLet_typed specialiseExp_typed fromLit_typed : SmartTyped.
 
 
 
-Theorem specialise_typed g env ext  c : 
-  g |-C c -> TypeEnvP g env -> TypeExtP ext -> g |-C specialise c env ext.
+Theorem specialise_typed g env ext c tenv : 
+  g |-C c -> TypeEnvP g env -> TypeExtP ext -> g |-C specialise c env tenv ext.
 Proof.
   intros T E R. generalize dependent env. generalize dependent ext. generalize dependent g. 
-  induction c;intros; inversion T;subst;simpl; eauto 9 with SmartTyped.
+  induction c;
+  intros; inversion T;subst;simpl; eauto 9 with SmartTyped.
   (* all cases except If are caught by eauto *)
   match goal with [|-context[default _ ?x]] => cases x as S end;try auto.
   generalize dependent c. generalize dependent ext. generalize 0.
-  induction n;intros.
-  - simpl in *. cases (fromBLit (specialiseExp e env ext)) as B;tryfalse. 
+  induction (TexprSem t tenv);intros.
+  - simpl in *. cases (fromBLit (specialiseExp e env ext)) as B;tryfalse.
     destruct b; inversion S; auto with SmartTyped.
   - simpl in *. cases (fromBLit (specialiseExp e env ext)) as B;tryfalse.
     destruct b; inversion S; auto with SmartTyped. apply IHn in S;eauto.
@@ -758,17 +761,17 @@ Proof.
   intros. apply fromBLit_Some in H. subst. reflexivity.
 Qed.
 
-Definition pequiv g envp extp c1 c2 := forall env ext, 
+Definition pequiv g envp extp tenv c1 c2 := forall env ext, 
                                         TypeEnv g env -> TypeExt ext -> 
                                         ext_inst extp ext ->
                                         env_inst envp env ->
-                                        C[|c1|] env ext = C[|c2|] env ext.
+                                        C[|c1|] env ext tenv= C[|c2|] env ext tenv.
 Hint Unfold pequiv.
 
-Notation "c1 '≡[' g ',' envp ',' extp ']' c2" := (pequiv g envp extp c1 c2) (at level 50).
+Notation "c1 '≡[' g ',' envp ',' extp ',' tenv ']' c2" := (pequiv g envp extp tenv c1 c2) (at level 50).
 
-Theorem specialise_sound g envp extp  c : 
-  g |-C c -> specialise c envp extp ≡[g,envp,extp] c.
+Theorem specialise_sound g envp tenv extp c : 
+  g |-C c -> specialise c envp tenv extp ≡[g,envp,extp,tenv] c.
 Proof.
   unfold pequiv.
   intros T env ext E R I J. generalize dependent env. generalize dependent ext.
@@ -787,17 +790,17 @@ Proof.
     erewrite IHc2 by eauto. reflexivity.
 
   - match goal with [|-context[default _ ?x]] => cases x as S end;try auto.
-    generalize dependent c. generalize dependent ext. generalize dependent extp. 
+    generalize dependent c. generalize dependent ext. generalize dependent extp.
     assert (forall (n0 : nat) (extp : ExtEnvP) (ext : ExtEnv),
               TypeExt (adv_ext (Z.of_nat n0) ext) ->
               ext_inst extp (adv_ext (Z.of_nat n0) ext) ->
               forall c : Contr,
-                traverseIf envp extp e (specialise c1 envp) (specialise c2 envp) n0 n =
+                traverseIf envp extp e (specialise c1 envp tenv) (specialise c2 envp tenv) n0 (TexprSem t tenv) =
                 Some c ->
-                C[|c|] env ext =
-                liftM (delay_trace n0) (within_sem C[|c1|] C[|c2|] e n env (adv_ext (Z.of_nat n0) ext))) as G.
+                C[|c|] env ext tenv =
+                liftM (delay_trace n0) (within_sem C[|c1|] C[|c2|] e (TexprSem t tenv) env (adv_ext (Z.of_nat n0) ext) tenv)) as G.
     
-    induction n;intros;
+    induction (TexprSem t tenv);intros;
     simpl in *; pose H3 as HT; eapply Esem_typed_total in HT;eauto;
     decompose [ex and] HT; inversion H7; subst; rewrite H4;
     cases (fromBLit (specialiseExp e envp extp)) as B;tryfalse;
@@ -909,7 +912,7 @@ Proof.
   eauto 6 using elimVarE_timed,elimVarEnv_map.
 Qed. 
 
-Lemma smartLet_timed e c ts t: 
+Lemma smartLet_timed e c ts t : 
   CausalC ts t (Let e c) -> CausalC ts t (smartLet e c).
 Proof.
   intros T. inversion T. unfold smartLet. cases (elimVarC V1 c); eauto using elimVarC_timed.
@@ -927,8 +930,8 @@ Proof.
   intros T. inversion T. destruct c1;destruct c2; simpl; eauto.
 Qed.
 
-Lemma smartTranslate_timed l c ts t : 
-  CausalC ts t (Translate l c) -> CausalC ts t (smartTranslate l c).
+Lemma smartTranslate_timed l c ts t: 
+  CausalC ts t (Translate (Tnum l) c) -> CausalC ts t (smartTranslate l c).
 Proof.
   intros T. inversion T. 
   destruct l;auto;destruct c; simpl;
@@ -986,24 +989,24 @@ Proof.
       eapply IHl;eauto.
 Qed.
 
-Lemma specialise_timed ts t env ext  c :
-  CausalC ts t c -> CausalC ts t (specialise c env ext).
+Lemma specialise_timed ts t env ext c tenv:
+  CausalC ts t c -> CausalC ts t (specialise c env tenv ext).
 Proof.
   intros T. generalize dependent env. generalize dependent ext.
   generalize dependent ts. generalize dependent t.
   induction c;intros; inversion T;clear T;subst;simpl; eauto 9 with SmartTimed.
   (* all cases except If are caught by eauto *)
 
-  cases (traverseIf env ext e (specialise c1 env) (specialise c2 env) 0 n) as T;simpl;auto.
+  cases (traverseIf env ext e (specialise c1 env tenv) (specialise c2 env tenv) 0 d) as T;simpl;auto.
   eapply traverseIf_timed in T;eauto.
 Qed.
 
 Require Import TimedTyping.
 
 
-Theorem specialise_preservation ts t env ext  c : 
+Theorem specialise_preservation ts t env ext tenv c : 
   TiTyC ts t c -> TypeEnvP (map type ts) env -> TypeExtP ext ->
-  TiTyC ts t (specialise c env ext).
+  TiTyC ts t (specialise c env tenv ext).
 Proof.
   intros T Ev Ex. rewrite TiTyC_decompose in *. destruct T. 
   split;eauto using specialise_typed, specialise_timed.

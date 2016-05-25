@@ -1,6 +1,7 @@
 Require Import Causality.
 Require Import TranslateExp.
 Require Import Tactics.
+Require Import Templates.
 
 (* Simple causality. We define a simple syntactic notion of
 causality that conservatively approximates the semantic notion. In
@@ -50,13 +51,13 @@ fix F (e : Exp) (e0 : Epc e) {struct e0} : P e :=
 (* Causality predicate on contracts. *)
 
 Inductive Pc : Contr -> Prop :=
-| pc_transl : forall d c, Pc c -> Pc (Translate d c)
+| pc_transl : forall d c, Pc c -> Pc (Translate (Tnum d) c)
 | pc_let : forall e c, Epc e -> Pc c -> Pc (Let e c)
 | pc_transf : forall cur p1 p2, Pc (Transfer cur p1 p2)
 | pc_scale : forall e c, Epc e -> Pc c -> Pc (Scale e c)
 | pc_both : forall c1 c2, Pc c1 -> Pc c2 -> Pc (Both c1 c2)
 | pc_zero : Pc Zero
-| pc_if : forall c1 c2 b l, Epc b -> Pc c1 -> Pc c2 -> Pc (If b l c1 c2).
+| pc_if : forall c1 c2 b l, Epc b -> Pc c1 -> Pc c2 -> Pc (If b (Tnum l) c1 c2).
 
 
 Hint Constructors Epc Pc.
@@ -84,13 +85,13 @@ Qed.
 
 (* Causality of (open) contracts *)
 
-Definition causal' (c : Contr) : Prop :=
-  forall d env r1 r2 t1 t2,  ext_until (Z.of_nat d) r1 r2 -> C[|c|]env r1 = Some t1 -> C[|c|] env r2 = Some t2
+Definition causal' (tenv : TEnv) (c : Contr) : Prop :=
+  forall d env r1 r2 t1 t2,  ext_until (Z.of_nat d) r1 r2 -> C[|c|]env r1 tenv = Some t1 -> C[|c|] env r2 tenv = Some t2
                         -> t1 d = t2 d.
 
 (* The lemma below proves causality of open contracts. *)
 
-Lemma pc_causal' c : Pc c -> causal' c.
+Lemma pc_causal' c tenv : Pc c -> causal' tenv c.
 Proof.
   intros. induction H; unfold causal' in *; intros; simpl.
   
@@ -99,7 +100,7 @@ Proof.
     symmetry in HeqC. apply leb_complete in HeqC.
     assert (Z.of_nat d + Z.of_nat(d0 - d) = Z.of_nat d0) as D.
     rewrite <- Nat2Z.inj_add. f_equal. omega.
-    eapply IHPc; eauto. rewrite ext_until_adv with (t:=Z.of_nat d).  
+    eapply IHPc; eauto. rewrite ext_until_adv with (t:=Z.of_nat d).
     rewrite D. eassumption. reflexivity.
   - simpl in *. option_inv_auto. erewrite epc_ext_until in H4; eauto. rewrite H4 in H5. 
     inversion H5. subst. eauto. omega.
@@ -127,7 +128,7 @@ Qed.
 
 (* Soundness of simple causality. *)
 
-Theorem pc_causal c : Pc c -> causal c.
+Theorem pc_causal c tenv : Pc c -> causal c tenv.
 Proof.
   unfold causal. intros. eapply pc_causal';eauto.
 Qed.
@@ -184,17 +185,18 @@ Fixpoint pc_dec (c : Contr) : bool :=
     | If e _ c1 c2 => epc_dec e && pc_dec c1 && pc_dec c2
   end.
 
-Theorem pc_dec_correct (c : Contr) : pc_dec c = true <-> Pc c. 
+Theorem pc_dec_correct (c : Contr) : IsClosedCT c -> (pc_dec c = true <-> Pc c). 
 Proof.
+  intro CT.
   split.
-  - intro D. induction c; simpl in *; 
+  - intro D. induction c; simpl in *; inversion CT; subst;
     try first [repeat rewrite Bool.andb_true_iff in D; decompose [and] D
               |rewrite Z.leb_le in D]; auto.
     + rewrite -> epc_dec_correct in H. auto.
     + rewrite -> epc_dec_correct in H. auto.
-    + rewrite epc_dec_correct in H1. auto.
-  - intros D. induction D; simpl; try first [rewrite IHD1, IHD2| apply Z.leb_le]; auto.
-    + rewrite <- epc_dec_correct in H. rewrite H, IHD. auto.
+    + rewrite epc_dec_correct in H2. auto.
+  - intros D. induction D; simpl; inversion CT; try first [rewrite IHD1, IHD2| apply Z.leb_le]; auto.
+    + rewrite <- epc_dec_correct in H. rewrite H, IHD; auto.
     + rewrite <-epc_dec_correct in H. rewrite H. auto.
     + rewrite <-epc_dec_correct in H. rewrite H. auto.
 Qed.

@@ -98,8 +98,8 @@ Hint Unfold empty_trace empty_trans const_trace empty_trans
 (* The denotational semantics of contracts is total. *)
 
 
-Theorem Csem_typed_total c g (env: Env) (ext : ExtEnv) : 
- g |-C c -> TypeEnv g env -> TypeExt ext -> total_trace (C[|c|] env ext).
+Theorem Csem_typed_total c g (env: Env) (ext : ExtEnv) (tenv : TEnv): 
+ g |-C c -> TypeEnv g env -> TypeExt ext -> total_trace (C[|c|] env ext tenv).
 Proof.
   intros C T R. generalize dependent env. generalize dependent ext. generalize dependent g.
   unfold total_trace. induction c.
@@ -115,20 +115,20 @@ Proof.
     rewrite H1. inversion H4. simpl. rewrite  H.
     unfold pure, compose. eauto. 
   + intros. simpl. unfold delay_trace. inversion C; subst. 
-    assert (TypeExt (adv_ext (Z.of_nat n) ext)) as R' by auto.
-    destruct (IHc g H1 (adv_ext (Z.of_nat n) ext) R' env T).
+    assert (TypeExt (adv_ext (Z.of_nat (TexprSem t tenv)) ext)) as R' by auto.
+    destruct (IHc g H1 (adv_ext (Z.of_nat (TexprSem t tenv)) ext) R' env T).
     rewrite H. simpl. autounfold; eauto.
   + intros. simpl. unfold add_trace, add_trans, liftM2, bind. inversion C; subst.
     destruct (IHc1 g H2 ext R env T). rewrite H.
     destruct (IHc2 g H3 ext R env T). rewrite H0.
     unfold pure, compose. eauto.
-  + simpl. induction n; intros;inversion C; subst.
+  + simpl. induction (TexprSem t tenv); intros;inversion C; subst.
     - simpl. eapply  Esem_typed_total in H3; eauto. decompose [and ex] H3.
       rewrite H0. inversion H1. destruct b; eauto. 
     - simpl. eapply  Esem_typed_total in H3; eauto. decompose [and ex] H3.
       rewrite H0. inversion H1. destruct b; eauto. 
       assert (TypeExt (adv_ext 1 ext)) as R' by auto.
-      assert (g |-C If e n c1 c2) as C' by (inversion C; constructor;auto).
+      assert (g |-C If e t c1 c2) as C' by (inversion C; constructor;auto).
       destruct (IHn g C' (adv_ext 1 ext) R' env T).
       rewrite H2. simpl. autounfold. eauto.
 Qed.
