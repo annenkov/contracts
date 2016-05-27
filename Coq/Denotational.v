@@ -60,8 +60,6 @@ Definition ExtEnv := ExtEnv' Val.
 
 Definition Env := Env' Val.
 
-Definition TEnv := TEnv' TVar.
-
 (* Semantics of expressions. *)
 
 Reserved Notation "'E[|' e '|]'" (at level 9).

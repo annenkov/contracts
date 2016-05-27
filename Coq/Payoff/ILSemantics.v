@@ -15,7 +15,8 @@ Import ListNotations.
 
 Inductive ILVal : Set :=
 | ILBVal : bool -> ILVal
-| ILRVal : R -> ILVal.
+| ILRVal : R -> ILVal
+| ILNVal : nat -> ILVal.
 
 
 Definition fromRVal (v : ILVal) :=
@@ -39,11 +40,11 @@ Fixpoint toListR (vs : list ILVal) : option (list R):=
     | [] => Some []
   end.
 
-Definition translateILVal v :=
+(*Definition translateILVal v :=
   match v with
     | ILRVal r => RVal r
     | ILBVal b => BVal b
-  end.
+  end.*)
 
 Definition fromVal v :=
   match v with
@@ -65,6 +66,7 @@ Fixpoint ILBinOpSem (op : ILBinOp) (v1 v2 : ILVal) : option ILVal :=
     | ILLess, ILRVal v1', ILRVal v2' => Some (ILBVal (Rltb v1' v2'))
     | ILLeq, ILRVal v1', ILRVal v2' => Some (ILBVal (Rleb v1'  v2'))
     | ILEqual, ILRVal v1', ILRVal v2' => Some (ILBVal (Reqb v1' v2'))
+    | ILLessN, ILNVal n1, ILNVal n2 => Some (ILBVal (NPeano.ltb n1 n2))
     | _, _, _ => None
   end.
 
@@ -101,17 +103,6 @@ Fixpoint ILTexprSemZ t tenv :=
 
 Local Close Scope Z.
 
-Fixpoint ilexpr_size e :=
-  match e with
-    | ILIf e0 e1 e2 => ilexpr_size e0 + ilexpr_size e1 + ilexpr_size e2 + 1
-    | FloatV _ => 1
-    | Model _ _ => 1
-    | ILUnExpr _ e => 1 + ilexpr_size e
-    | ILBinExpr _ e1 e2 => ilexpr_size e1 + ilexpr_size e2 + 1
-    | ILLoopIf e0 e1 e2 _ => ilexpr_size e0 + ilexpr_size e1 + ilexpr_size e2 + 1
-    | Payoff _ _ _ => 1
-  end.
-
 Fixpoint loop_if_sem n t0 b e1 e2 : option ILVal:=
   b t0 >>=
        fun b' => match b' with
@@ -124,27 +115,27 @@ Fixpoint loop_if_sem n t0 b e1 e2 : option ILVal:=
                    | _ => None
                  end.
 
-Fixpoint ILsem (e : ILExpr) (env : Env' ILVal) (ext : ExtEnv' ILVal) (tenv : TEnv) (t0 : nat) disc p1 p2 : option ILVal:=
+Fixpoint ILsem (e : ILExpr) (ext : ExtEnv' ILVal) (tenv : TEnv) (t0 : nat) disc p1 p2 : option ILVal:=
   match e with
-    | ILUnExpr op e1 => IL[|e1|] env ext tenv t0 disc p1 p2 >>= fun v => ILUnOpSem op v
-    | ILBinExpr op e1 e2 => IL[|e1|] env ext tenv t0 disc p1 p2 >>=
-                            fun v1 => IL[|e2|] env ext tenv t0 disc p1 p2 >>=
+    | ILUnExpr op e1 => IL[|e1|] ext tenv t0 disc p1 p2 >>= fun v => ILUnOpSem op v
+    | ILBinExpr op e1 e2 => IL[|e1|] ext tenv t0 disc p1 p2 >>=
+                            fun v1 => IL[|e2|] ext tenv t0 disc p1 p2 >>=
                                         fun v2 => ILBinOpSem op v1 v2
-    | ILIf b e1 e2 => IL[|b|] env ext tenv t0 disc p1 p2 >>=
-                        fun b' => IL[|e1|] env ext tenv t0 disc p1 p2 >>=
-                                    fun e1' => IL[|e2|] env ext tenv t0 disc p1 p2 >>=
-                                                 fun e2' => match b', e1', e2' with
-                                                              | ILBVal true, ILRVal v1, _ => pure (ILRVal v1)
-                                                              | ILBVal false, _, ILRVal v2 => pure (ILRVal v2)
-                                                              | _ , _, _ => None
-                                                            end
+    | ILIf b e1 e2 => IL[|b|] ext tenv t0 disc p1 p2 >>=
+                        fun b' => match b' with
+                                    | ILBVal true => IL[|e1|] ext tenv t0 disc p1 p2
+                                    | ILBVal false => IL[|e2|] ext tenv t0 disc p1 p2
+                                    | _ => None
+                                  end
     | ILLoopIf b e1 e2 t => let n:= (TexprSem t tenv) in
                             loop_if_sem n t0
-                                         (fun t => IL[|b|] env ext tenv t disc p1 p2)
-                                         (fun t => IL[|e1|] env ext tenv t disc p1 p2)
-                                         (fun t => IL[|e2|] env ext tenv t disc p1 p2)
+                                         (fun t => IL[|b|] ext tenv t disc p1 p2)
+                                         (fun t => IL[|e1|] ext tenv t disc p1 p2)
+                                         (fun t => IL[|e2|] ext tenv t disc p1 p2)
     | FloatV v => Some (ILRVal v)
+    | NatV v => Some (ILNVal v)
     | Model lab t => Some (ext lab (Z.of_nat t0 + (ILTexprSemZ t tenv))%Z)
+    | ILtexpr e_t => Some (ILNVal (ILTexprSem e_t tenv))
     | Payoff t p1' p2' => Some (eval_payoff (disc (t0 + (ILTexprSem t tenv))) p1' p2' p1 p2)
   end
   where "'IL[|' e '|]'" := (ILsem e).
@@ -155,7 +146,7 @@ Axiom Lab : RealObs.
 
 Eval compute in
     (ILsem (ILBinExpr ILAdd (Model (LabR Lab) (ILTexprZ (ILTexpr (Tnum 0)))) (FloatV 20))
-           [] (fun _ t => if (beq_nat (Z.to_nat t) 0) then (ILRVal 100) else (ILRVal 0))
+           (fun _ t => if (beq_nat (Z.to_nat t) 0) then (ILRVal 100) else (ILRVal 0))
            (fun _ => 0) 0 (fun _ => 1%R) X Y).
 
 

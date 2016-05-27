@@ -3,12 +3,21 @@ Require Export Syntax.
 Require Import FunctionalExtensionality.
 Require Import Tactics.
 
+(* Template environments map template variables to values*)
+Definition TEnv := TVar -> nat.
+
+Fixpoint tvar_eq_dec (v1 v2 : TVar) :=
+  match v1,v2 with
+    | Tv n1, Tv n2 => beq_nat n1 n2
+  end.
+
+Definition tenv_update (tenv : TEnv) v n := fun v' => if (tvar_eq_dec v v') then n else (tenv v).
+
 (* External environments map observables to values. [ExtEnv'] is
 parametrised over the type of values so that we can instantiate it
 later to partial environments. *)
 
 Definition ExtEnv' A := ObsLabel -> Z -> A.
-Definition TEnv' A := A -> nat.
 
 
 Open Scope Z.
