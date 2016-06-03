@@ -3,7 +3,7 @@ Add LoadPath "..".
 Require Import Reals Syntax.
 
 Inductive ILTExpr : Set := ILTplus (e1 : ILTExpr) (e2 : ILTExpr) | ILTexpr (e : TExpr).
-Inductive ILTExprZ : Set := ILTplusZ (z : Z) (e2 : ILTExpr) | ILTexprZ (e : ILTExpr).
+Inductive ILTExprZ : Set := ILTplusZ (e1 : ILTExprZ) (e2 : ILTExprZ) | ILTexprZ (e : ILTExpr) | ILTnumZ (z : Z).
 
 Inductive ILBinOp : Set := ILAdd | ILSub | ILMult | ILDiv | ILAnd | ILOr |
                            ILLess | ILLessN  | ILLeq | ILEqual.

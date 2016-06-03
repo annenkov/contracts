@@ -96,7 +96,8 @@ Fixpoint ILTexprSem t tenv :=
 
 Fixpoint ILTexprSemZ t tenv :=
   match t with
-    | ILTplusZ z t2 => (z + Z.of_nat (ILTexprSem t2 tenv))
+    | ILTnumZ z => z
+    | ILTplusZ t1 t2 => (ILTexprSemZ t1 tenv + ILTexprSemZ t2 tenv)
     | ILTexprZ t1 => Z.of_nat (ILTexprSem t1 tenv)
   end.
 

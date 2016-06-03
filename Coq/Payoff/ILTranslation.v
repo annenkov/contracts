@@ -8,9 +8,11 @@ Require Import Syntax.
 Require Import Utils.
 Require Import Horizon.
 Require Import Misc.
+Require Import Reduction.
 
 Require Import List.
 Require Import ZArith.
+Require Import Arith.
 Require Import FunctionalExtensionality.
 Require Import Coq.Program.Equality.
 
@@ -18,7 +20,19 @@ Import ListNotations.
 
 Local Open Scope Z.
 
-Fixpoint fromExp (t0 : ILTExpr) (e : Exp) :=
+Definition tsmartPlus e1 e2 :=
+  match e1 with
+    | ILTexpr (Tnum 0) => e2
+    | _ => ILTplus e1 e2
+  end.
+
+Lemma tsmartPlus_sound e1 e2 tenv:
+  ILTexprSem (tsmartPlus e1 e2) tenv = ILTexprSem (ILTplus e1 e2) tenv.
+Proof.
+  destruct e1; try (destruct e); try (destruct n); reflexivity.
+Qed.
+
+Fixpoint fromExp (t0 : ILTExprZ) (e : Exp) :=
   match e with
     | OpE Add [a1;a2] => (fromExp t0 a1) >>= (fun v1 =>
                            (fromExp t0 a2) >>= (fun v2 =>
@@ -56,7 +70,7 @@ Fixpoint fromExp (t0 : ILTExpr) (e : Exp) :=
                                   pure (ILIf b_il v1 v2))))
     | OpE (RLit v) _ => Some (FloatV v)
     | OpE _ _ => None
-    | Obs lab t => Some (Model lab (ILTplusZ t t0))
+    | Obs lab t => Some (Model lab (ILTplusZ (ILTnumZ t) t0))
     | VarE n => None
     | Acc _ _ _ => None
   end.
@@ -89,13 +103,13 @@ Fixpoint nestedIfs (cond : ILExpr) (t' : nat)
 
 Fixpoint fromContr (c : Contr) (t0 : ILTExpr) : option ILExpr:=
   match c with
-    | Scale e c      => fromExp t0 e
+    | Scale e c      => fromExp (ILTexprZ t0) e
                                 >>= fun v => (fromContr c t0)
                                                >>= fun v' => pure (ILBinExpr ILMult v v')                          
-    | Translate t' c => fromContr c (ILTplus (ILTexpr t') t0)
+    | Translate t' c => fromContr c (tsmartPlus (ILTexpr t') t0)
     | If e t' c1 c2  => (fromContr c1 t0)
                           >>= fun v1 => (fromContr c2 t0)
-                                          >>= fun v2 => fromExp t0 e
+                                          >>= fun v2 => fromExp (ILTexprZ t0) e
                                                                 >>= fun e => Some (ILLoopIf e v1 v2 t')
     | Zero           => Some (FloatV 0)
     | Let e c        => None
@@ -135,6 +149,18 @@ Lemma fromVal_RVal_f_eq f x1 x2 y1 y2:
   fromVal (RVal (f x1 x2)) = (ILRVal (f y1 y2)).
 Proof.
   intros. simpl in *. inversion H. inversion H0. subst. reflexivity.
+Qed.
+
+Lemma ILRVal_zero_mult_l x1 x2:
+  ILRVal x1 = ILRVal 0 -> ILRVal (x1 * x2) = ILRVal 0.
+Proof.
+  intros. inversion H. rewrite Rmult_0_l. reflexivity.
+Qed.
+
+Lemma ILRVal_zero_mult_r x1 x2:
+  ILRVal x2 = ILRVal 0 -> ILRVal (x1 * x2) = ILRVal 0.
+Proof.
+  intros. inversion H. rewrite Rmult_0_r. reflexivity.
 Qed.
 
 Lemma fromVal_BVal_f_eq f x1 x2 y1 y2:
@@ -197,7 +223,7 @@ Theorem Exp_translation_sound : forall (e : Exp) (il_e : ILExpr) (envC : Env' Va
                                           (v : Val) (v' : ILVal) p1 p2 t0 t0' disc,
   fromExp t0 e = Some il_e ->
   (forall l t, fromVal (extC l t) = extIL l t) ->
-  E[|e|] envC (adv_ext (Z.of_nat (ILTexprSem t0 envT) + Z.of_nat t0') extC) = Some v ->
+  E[|e|] envC (adv_ext (ILTexprSemZ t0 envT + Z.of_nat t0') extC) = Some v ->
   IL[|il_e|] extIL envT t0' disc p1 p2 = Some v'->
   fromVal v = v'.
 Proof.
@@ -208,7 +234,7 @@ Proof.
   induction e using Exp_ind'.
   + (* OpE *)
     intros v' v il_e Htrans extIL envT Hilsem extC Heqext envC Hesem. destruct op;
-    (* Binary operations *)    
+      (* Binary operations *)
     try (simpl in *; do 3 try (destruct args; tryfalse); tryfalse; simpl in *;
          option_inv_auto; subst; simpl in *; try (some_inv); subst; simpl in *; subst;
          option_inv_auto; subst; simpl in *; destruct_vals;
@@ -243,7 +269,7 @@ Proof.
     
   + (* Obs *)
     intros. simpl in *. some_inv. subst. simpl in *. some_inv. subst.
-    replace (Z.of_nat t0' + (i + Z.of_nat (ILTexprSem t0 envT))) with (Z.of_nat (ILTexprSem t0 envT) + Z.of_nat t0' + i). eapply H0. ring.
+    replace (Z.of_nat t0' + (i + ILTexprSemZ t0 envT)) with (ILTexprSemZ t0 envT + Z.of_nat t0' + i). eapply H0. ring.
   + (* Var *)
     intros. inversion H.
   + (* Acc *)
@@ -253,7 +279,7 @@ Qed.
 Lemma delay_scale_trace tr t n :
   scale_trace n (delay_trace t tr) = delay_trace t (scale_trace n tr).
 Proof.
-  unfold scale_trace, delay_trace, compose. apply functional_extensionality. intros. destruct (leb t x).
+  unfold scale_trace, delay_trace, compose. apply functional_extensionality. intros. destruct (Compare_dec.leb t x).
   - reflexivity.
   - apply scale_empty_trans.
 Qed.
@@ -275,9 +301,9 @@ Proof.
   intros. unfold delay_trace. apply leb_correct_conv in H. rewrite H. reflexivity.
 Qed.
 
-Lemma sum_of_map_empty_trace : forall n n0 p1 p2 curr trace ,
+Lemma sum_of_map_empty_trace : forall n n0 p1 p2 curr trace f,
   trace = empty_trace ->
-  sum_list (map (fun t => trace t p1 p2 curr) (seq n0 n)) = 0%R.
+  sum_list (map (fun t => (f t * trace t p1 p2 curr)%R) (seq n0 n)) = 0%R.
 Proof.
   induction n.
   + intros. reflexivity.
@@ -296,10 +322,51 @@ Qed.
 
 Lemma sum_delay t0 t n tr p1 p2 curr f:
   sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq t0 (n + t))) =
-  sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq (t0+n) t)).
+  sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq (n + t0) t)).
 Proof.
-  rewrite seq_split. rewrite map_app. rewrite sum_split. rewrite delay_trace_zero_before_n. rewrite Rplus_0_l. reflexivity.
+  rewrite seq_split. rewrite map_app. rewrite sum_split. rewrite delay_trace_zero_before_n. rewrite Rplus_0_l. rewrite plus_comm. reflexivity.
 Qed.
+
+(*Lemma delay_trace_plus n n0 tr t0:
+  delay_trace (n + n0) tr (t0 + n0) = delay_trace n tr t0.
+Proof.
+  destruct n.
+  - simpl. destruct t0.
+    + rewrite Equivalence.delay_trace_at. rewrite delay_trace_0. reflexivity.
+    + simpl. rewrite delay_trace_0. rewrite delay_trace_S.
+ *)
+
+Lemma sum_delay' n tr p1 p2 curr f t0 n1:
+  sum_list (map (fun t : nat =>(f t * delay_trace (1 + n) tr t p1 p2 curr)%R) (seq (t0 + 1) n1)) =
+  sum_list (map (fun t : nat => (f (1 + t)%nat * delay_trace n tr t p1 p2 curr)%R) (seq t0 n1)).
+Proof.
+  generalize dependent t0. generalize dependent n1.
+  induction n.
+  - intros. simpl. generalize dependent t0. induction n1; intros.
+    + reflexivity.
+    + simpl. f_equal.
+      * rewrite plus_comm. simpl. rewrite delay_trace_S. reflexivity.
+      * rewrite plus_comm. simpl. rewrite <- IHn1. rewrite plus_comm. reflexivity.
+  - generalize dependent n. induction n1; intros.
+    + reflexivity.
+    + rewrite plus_comm. simpl. f_equal.
+      * rewrite plus_comm. simpl. rewrite delay_trace_S. rewrite plus_comm. reflexivity.
+      * rewrite <- IHn1. simpl. rewrite plus_comm. simpl. reflexivity.
+Qed.
+
+(*
+Lemma sum_delay' n tr p1 p2 curr f t0 n0 n1:
+  sum_list (map (fun t : nat =>(f t * delay_trace (n0 + n) tr t p1 p2 curr)%R) (seq (t0 + n0) (n + n1))) =
+  sum_list (map (fun t : nat => (f (n0 + t)%nat * delay_trace n tr t p1 p2 curr)%R) (seq t0 (n + n1))).
+Proof.
+  generalize dependent t0. generalize dependent n0.
+  induction n.
+  - intros. destruct n0.
+    + simpl. rewrite plus_0_r. reflexivity.
+    + simpl.
+  - intros; simpl. replace (S (n+n0)) with (S n + n0). rewrite delay_trace_S. f_equal. apply IHn.
+Admitted.
+*)
 
 Lemma zero_horizon_empty_trans c t trace env ext tenv:
   horizon c tenv = 0 ->
@@ -323,7 +390,7 @@ Lemma zero_horizon_delay_trace c m trace env ext tenv:
   C[|c|] env ext tenv = Some trace ->
   delay_trace m trace = trace.
 Proof.
-  intros. apply functional_extensionality. intros. unfold delay_trace. destruct (leb m x).
+  intros. apply functional_extensionality. intros. unfold delay_trace. destruct (Compare_dec.leb m x).
   - erewrite zero_horizon_empty_trans. erewrite zero_horizon_empty_trans. reflexivity.
     eassumption. eassumption. eassumption. eassumption.
   - erewrite zero_horizon_empty_trans. reflexivity. eassumption. eassumption.
@@ -377,7 +444,7 @@ Qed.
 Lemma delay_add_trace n tr1 tr2:
       add_trace (delay_trace n tr1) (delay_trace n tr2) = delay_trace n (add_trace tr1 tr2).
 Proof.
-  unfold add_trace, delay_trace, compose. apply functional_extensionality. intros. destruct (leb n x).
+  unfold add_trace, delay_trace, compose. apply functional_extensionality. intros. destruct (Compare_dec.leb n x).
   - reflexivity.
   - rewrite add_empty_trans_l. reflexivity.
 Qed.
@@ -424,7 +491,7 @@ Hint Resolve Zle_0_nat.
 Lemma delay_trace_at d t : delay_trace d t d = t O.
 Proof.
   unfold delay_trace. 
-  assert (leb d d = true) as E by (apply leb_correct; auto).
+  assert (Compare_dec.leb d d = true) as E by (apply leb_correct; auto).
   rewrite E. rewrite minus_diag. reflexivity.
 Qed.
 
@@ -438,6 +505,16 @@ Qed.
 Lemma fromVal_RVal_eq v : fromVal (RVal v) = ILRVal v.
 Proof. reflexivity. Qed.
 
+Lemma fold_unfold_ILTexprSem t t0 tenv:
+  ILTexprSem (match t with
+               | Tvar _ => ILTplus (ILTexpr t) t0
+               | Tnum 0 => t0
+               | Tnum (S _) => ILTplus (ILTexpr t) t0
+              end) tenv = ILTexprSem (tsmartPlus (ILTexpr t) t0) tenv.
+Proof.
+  reflexivity.
+Qed.
+
 Theorem Contr_translation_sound: forall c envC extC t0 t0',
   translation_sound c envC extC t0 t0'.
 Proof.
@@ -447,19 +524,15 @@ Proof.
     intros. simpl in *.
     option_inv_auto. rewrite adv_ext_iter in H3. rewrite delay_trace_iter.
     eapply IHc with (envC := envC); try eassumption. simpl.
-    rewrite Nat2Z.inj_add. rewrite Nat2Z.inj_add. rewrite Nat2Z.inj_add in H3.
+    rewrite Nat2Z.inj_add. rewrite fold_unfold_ILTexprSem. rewrite tsmartPlus_sound. simpl.
+    rewrite Nat2Z.inj_add. rewrite Nat2Z.inj_add in H3.
     rewrite Zplus_comm in H3. rewrite Zplus_assoc in H3. rewrite H3.
-    reflexivity. simpl.
-    replace (TexprSem t tenv + ILTexprSem t0 tenv + t0') with (ILTexprSem t0 tenv + t0' + TexprSem t tenv) at 1.
-    autorewrite with ILDB.
-    (*replace (TexprSem t tenv + Z.to_nat (ILTexprSem0 0 t0 tenv) + t0') with (Z.to_nat (ILTexprSem0 0 t0 tenv) + t0' + TexprSem t tenv).
-    reflexivity. omega. omega. assumption. rewrite Hseq.*)
-    rewrite <- plus_assoc.
-    rewrite <- sum_delay. destruct (horizon c tenv) eqn:Hhor.
+    reflexivity. simpl. rewrite fold_unfold_ILTexprSem. rewrite tsmartPlus_sound. simpl.
+    (*replace (TexprSem t tenv + ILTexprSem t0 tenv + t0') with (ILTexprSem t0 tenv + t0' + TexprSem t tenv) at 1.*)
+    rewrite <- plus_assoc. rewrite <- sum_delay. destruct (horizon c tenv) eqn:Hhor.
     - simpl. eapply sum_list_zero_horizon with (c:=c) (tenv:=tenv). assumption.
       erewrite zero_horizon_delay_trace. eassumption. eassumption. eassumption.
     - unfold plus0. reflexivity.
-    - omega.
   + (* Zero *)
     intros. simpl in *. some_inv. subst. simpl in *. some_inv. compute. unfold compose in H2. some_inv.
     reflexivity.
@@ -478,7 +551,7 @@ Proof.
     intros. simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto.
     destruct_vals. some_inv. subst. rewrite <- delay_scale_trace. unfold scale_trace, compose, scale_trans.
     rewrite summ_list_common_factor. rewrite <- fromVal_RVal_eq. apply fromVal_RVal_f_eq.
-    - eapply Exp_translation_sound; try (simpl in *; some_inv; subst); try eassumption. rewrite  <- Nat2Z.inj_add. eassumption.
+    - eapply Exp_translation_sound; try (simpl in *; some_inv; subst); try eassumption. simpl. rewrite <- Nat2Z.inj_add. eassumption.
     - eapply IHc with (envC := envC) (curr := curr); try eassumption. autounfold in *. simpl.
       rewrite H3. reflexivity. reflexivity.
   + (* Both *)
@@ -507,7 +580,7 @@ Proof.
     induction n.
     - (* n = 0 *)
       intros.
-      simpl in *. destruct (fromExp t0 e) eqn:Hfromexp; tryfalse.
+      simpl in *. destruct (fromExp (ILTexprZ t0) e) eqn:Hfromexp; tryfalse.
       option_inv_auto. simpl in *. subst.
       destruct (E[|e|] envC (adv_ext (Z.of_nat (ILTexprSem t0 tenv + t0')) extC)) eqn: Hexp; tryfalse.
       destruct v; tryfalse. destruct b.
@@ -605,11 +678,35 @@ Fixpoint cutPayoff (e : ILExpr) : ILExpr :=
   end.
 
 (*Semantic equvivalence of IL expressions*)
-Check ILsem.
+
 Definition ILequiv tenv e1 e2 := forall ext t0 disc p1 p2, IL[|e1|] ext tenv t0 disc p1 p2 = IL[|e2|]ext tenv t0 disc p1 p2.
 
 Notation "e1 '~~[' tenv ']' e2" := (ILequiv tenv e1 e2) (at level 50).
 
+(* We treat variable (Tv 0) as "current time" *)
+Definition set_t_now tenv t_now := tenv_update tenv (Tv 0) t_now.
+
+Lemma cutPayoff_eq_compiled_expr e e_il t0: fromExp t0 e = Some e_il -> e_il = cutPayoff e_il.
+Proof.
+  generalize dependent t0. generalize dependent e_il.
+  induction e using Exp_ind'; intros; tryfalse.
+  - simpl in *. destruct op;
+    (* Binary operations *)    
+    simpl in *; do 3 try (destruct args; tryfalse); tryfalse; simpl in *;
+         option_inv_auto; subst; simpl in *; try some_inv; subst; simpl in *;
+         destruct_vals; subst; option_inv_auto;
+         try (apply all_to_forall2 in H; inversion_clear H as [He1 He2];
+              erewrite <- He1; eauto; erewrite <- He2; eauto; reflexivity);
+    (* Unary operations*)    
+         try (apply all_to_forall1 in H; erewrite <- H; eauto; reflexivity); try reflexivity.
+    (* Cond *)
+    simpl in *. do 4 try (destruct args; tryfalse); tryfalse; simpl in *;
+    eapply all_to_forall3 in H; inversion_clear H as [IHe1 IHe']; inversion_clear IHe' as [IHe2 IHe3];
+    option_inv_auto; subst; simpl in *; try some_inv; subst.
+    simpl in *. erewrite <- IHe2;eauto. erewrite <- IHe3;eauto.
+  - simpl in *. some_inv. reflexivity.
+Qed.
+  
 Lemma ILexpr_eq_cutPayoff_at_zero e tenv: e ~~[tenv_update tenv (Tv 0) 0] cutPayoff e.
 Proof.
   generalize dependent tenv.
@@ -627,3 +724,229 @@ Proof.
       destruct (IL[|cutPayoff e1|] ext (tenv_update tenv (Tv 0) 0) t0 disc p1 p2); try reflexivity. destruct i; try reflexivity.
       destruct b; try reflexivity. apply IHn.
 Qed.
+
+Hint Resolve cutPayoff_eq_compiled_expr.
+
+Require Import Arith.Compare_dec. 
+Lemma ILexpr_eq_cutPayoff_at_n e tenv c t0 n t_now:
+  fromContr c t0 = Some e ->
+  ILTexprSem t0 (tenv_update tenv (Tv 0) t_now) = n ->
+  NPeano.ltb n t_now = false ->
+  e ~~[tenv_update tenv (Tv 0) t_now] cutPayoff e.
+Proof.
+  intros. generalize dependent e. generalize dependent t0. generalize dependent n.
+  induction c; intros; simpl in *; tryfalse; some_inv; subst; unfold ILequiv; intros.
+  - reflexivity.
+  - simpl in *. some_inv. unfold eval_payoff. destruct (Party.eqb p p0); simpl; try reflexivity. unfold tenv_update at 3.
+    simpl. rewrite H1. reflexivity.
+  - option_inv_auto. some_inv. subst. simpl. unfold bind,compose,pure.
+    replace (cutPayoff x) with x by eauto. rewrite <- IHc with (n:=(ILTexprSem t0 (tenv_update tenv (Tv 0) t_now))) (t0:=t0). reflexivity.
+    assumption. reflexivity. assumption.
+  - unfold ILequiv in IHc.
+    replace match t with
+        | Tvar _ => ILTplus (ILTexpr t) t0
+        | Tnum 0 => t0
+        | Tnum (S _) => ILTplus (ILTexpr t) t0
+                         end with (tsmartPlus (ILTexpr t) t0) in H by reflexivity.
+    eapply IHc with (t0:=(tsmartPlus (ILTexpr t) t0)) (n:=ILTexprSem (tsmartPlus (ILTexpr t) t0) (tenv_update tenv (Tv 0) t_now)).
+    simpl. rewrite fold_unfold_ILTexprSem. rewrite tsmartPlus_sound. simpl. apply not_true_is_false. unfold not. intros.
+    apply NPeano.ltb_lt in H0. apply not_true_iff_false in H1. unfold not in H1. rewrite NPeano.ltb_lt in H1. apply H1. omega. reflexivity.
+    assumption.
+  - option_inv_auto. some_inv. subst. simpl. unfold bind,compose,pure. erewrite <- IHc1; eauto. erewrite <- IHc2; eauto.
+  - option_inv_auto. some_inv. subst. simpl. unfold bind,compose,pure.
+    generalize dependent t1.
+    induction (TexprSem t (tenv_update tenv (Tv 0) t_now)); intros.
+    + simpl. unfold bind,compose,pure. erewrite <- IHc1; eauto. erewrite <- IHc2; eauto.
+    + simpl. unfold bind,compose,pure. erewrite <- IHc1; eauto. simpl in *.
+      destruct (IL[|x1|] ext (tenv_update tenv (Tv 0) t_now) t1 disc p1 p2); try reflexivity.
+      destruct i; try reflexivity. destruct b.
+      * reflexivity.
+      * simpl. rewrite IHn. reflexivity.
+Qed.
+
+Lemma horizon_smartScale_eq c e' tenv:
+  isZeroLit e' = false ->
+  horizon c tenv = horizon (smartScale e' c) tenv.
+Proof.
+  intros. unfold smartScale. rewrite H. destruct c; reflexivity.
+Qed.
+  
+Lemma horizon_gt_0_smartScale c e' tenv:
+  0 < horizon (smartScale e' c) tenv ->
+  horizon c tenv = horizon (smartScale e' c) tenv.
+Proof.
+  generalize dependent e'.
+  induction c; intros; simpl; unfold smartScale;
+  try (destruct (isZeroLit e') eqn:HisZ; unfold smartScale in H; try (rewrite HisZ in *); simpl in *; inversion H; reflexivity).
+Qed.
+
+(*Lemma exp_not_zero_smartScale c e' tenv:
+  0 < horizon (smartScale e' c) tenv ->
+  horizon c tenv = horizon (smartScale e' c) tenv.
+Proof.
+  generalize dependent e'.
+  induction c; intros; simpl; unfold smartScale;
+  try (destruct (isZeroLit e') eqn:HisZ; unfold smartScale in H; try (rewrite HisZ in ; simpl in *; inversion H; reflexivity).
+Qed.*)
+       
+Lemma horizon_eq_0_smartScale c e' tenv:
+  horizon c tenv = 0->
+  horizon (smartScale e' c) tenv = 0.
+Proof.
+  generalize dependent e'.
+  induction c; intros; simpl in *; unfold smartScale; destruct (isZeroLit e') eqn:HisZ; tryfalse; simpl; try reflexivity; auto.
+Qed.
+
+Hint Resolve ext_inst_typed env_inst_typed.
+
+Hint Constructors Red.
+
+Lemma horizon_smartBoth c1 c2 tenv:
+  horizon (Both c1 c2) tenv = horizon (smartBoth c1 c2) tenv.
+Proof.
+  simpl. destruct c1; simpl; try reflexivity; destruct c2; try (rewrite Max.max_0_r); try reflexivity.
+Qed. 
+    
+
+Theorem cutPayoff_sound c c' envC extC:
+  forall (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
+         (v' : ILVal) p1 p2 curr v old_trace trace (disc : nat -> R ) tenv tr g,
+  (forall a a', Asset.eqb a a' = true) ->
+  (forall l t, fromVal (extC l t) = extIL l t) ->
+  fromContr c (ILTexpr (Tnum 0)) = Some il_e ->
+  Red c envP extP c' tr ->
+  C[|c|] envC extC (set_t_now tenv 1) = Some old_trace ->
+  C[|c'|] envC (adv_ext 1 extC) (set_t_now tenv 1) = Some trace ->
+  sum_list (map (fun t => (disc (1+t)%nat * trace t p1 p2 curr)%R)
+                (seq 0 (horizon c' (set_t_now tenv 1)))) = v ->
+  IL[|cutPayoff il_e|] extIL (set_t_now tenv 1) 0 disc p1 p2 = Some v'->
+  TypeExt extC ->
+  TypeEnv g envC ->
+  g |-C c ->
+  ext_inst extP extC ->
+  env_inst envP envC ->
+  fromVal (RVal v) = v'.
+Proof.
+  intros.
+  generalize dependent il_e. generalize dependent extIL.
+  generalize dependent trace. generalize dependent old_trace. generalize dependent disc.
+  generalize dependent tenv. generalize dependent v. generalize dependent v'.
+  induction H2.
+  - (* red_zero *)intros. simpl in *. some_inv. subst. simpl in *. unfold compose,bind,pure in *. some_inv. reflexivity.
+  - (* red_let *)
+    intros. simpl in *.
+    option_inv_auto.
+  - (* red_transf *)
+    intros. simpl in *. option_inv_auto. simpl in *. some_inv. subst.
+    destruct (Party.eqb c p0).
+    + simpl in *. some_inv. reflexivity.
+    + simpl in *. some_inv. reflexivity.
+  - (* red_scale *)
+    intros. subst. simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto.
+    destruct_vals. some_inv. subst.
+    inversion H9.
+    unfold smartScale in H5.
+    cases (isZeroLit (TranslateExp.translateExp (-1) (specialiseExp e env ext))) as Zerolit.
+
+    + simpl in *. some_inv. rewrite sum_of_map_empty_trace.
+      assert (E[|TranslateExp.translateExp (-1) (specialiseExp e env ext)|] envC (adv_ext 1 extC) = Some (RVal 0)) as Hexp.
+      rewrite isZeroLit_true with (x:=TranslateExp.translateExp (-1) (specialiseExp e env ext)). reflexivity. eassumption.      
+      symmetry. apply ILRVal_zero_mult_l. symmetry.
+      erewrite <- cutPayoff_eq_compiled_expr in H16; try eassumption.
+      
+      rewrite TranslateExp.translateExp_ext in Hexp.
+      erewrite specialiseExp_sound in Hexp; try (rewrite adv_ext_iter; simpl; rewrite adv_ext_0); try assumption.
+      rewrite <- fromVal_RVal_eq.
+      eapply Exp_translation_sound with (envC:=envC);
+      try (simpl in *; some_inv; subst); try eassumption. simpl.
+      rewrite adv_ext_iter in Hexp. simpl in *. eassumption.
+      eassumption. assumption. reflexivity.
+    + erewrite <- cutPayoff_eq_compiled_expr in H16; try eassumption.
+      replace (match c' with
+                 | Zero => Zero
+                 | _ => Scale (TranslateExp.translateExp (-1) (specialiseExp e env ext)) c'
+               end) with (smartScale (TranslateExp.translateExp (-1) (specialiseExp e env ext)) c') in H5.
+      erewrite smartScale_sound in H5; eauto.
+      simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto.
+      destruct_vals. some_inv. subst. unfold scale_trace, compose, scale_trans.
+      rewrite summ_list_common_factor. rewrite <- fromVal_RVal_eq. apply fromVal_RVal_f_eq.
+      * eapply Exp_translation_sound; try (simpl in *; some_inv; subst); try eassumption. simpl.
+        rewrite TranslateExp.translateExp_ext in H5.
+        erewrite specialiseExp_sound in H5; eauto; try (rewrite adv_ext_iter in H5; simpl; rewrite adv_ext_0 in H5);
+        try (rewrite adv_ext_iter; simpl; rewrite adv_ext_0); eauto.
+      * eapply IHRed; eauto. rewrite <- horizon_smartScale_eq. reflexivity. assumption.
+      * constructor. apply TranslateExp.translateExp_type; eauto. eapply Preservation.red_typed; eauto.
+      * unfold smartScale. rewrite Zerolit. reflexivity.       
+  - (*red_trans0 *)
+    intros. inversion H9. simpl in *. option_inv_auto. eapply IHRed; eauto.
+  - (*red_transS *)
+    intros. inversion H9. 
+    subst. simpl in *. option_inv_auto.
+
+    eapply Contr_translation_sound with (envC:=envC) (tenv:=set_t_now tenv 1); eauto; try reflexivity. simpl.
+    unfold liftM,compose,bind,pure. erewrite adv_ext_iter in H1. instantiate (2:=0).
+    
+    (*replace (n + 0 + 0) with n. rewrite H4. reflexivity. omega. unfold ILTexprSem. simpl.
+                    replace (n + 0 + 0) with n.*)
+
+    replace (Z.pos (Pos.of_succ_nat (n + 0 + 0))) with (1 + Z.of_nat n)%Z. rewrite H1. reflexivity.
+    rewrite Zpos_P_of_succ_nat. replace (n + 0 + 0) with n by omega. omega.
+    simpl. replace (n + 0 + 0) with n by omega.
+    rewrite <- NPeano.Nat.add_1_l. rewrite plus_comm. replace (n + 1) with (n +1 + 0) by omega.
+    rewrite <- sum_delay.
+    replace (n + 1 + horizon c (set_t_now tenv 1)) with (S (n + horizon c (set_t_now tenv 1))) by omega. simpl.
+    erewrite Soundness.red_sound1 with (t:=empty_trans) (c:=Translate (Tnum (S n)) c); eauto.
+    unfold empty_trans. rewrite Rmult_0_r. rewrite Rplus_0_l.
+    destruct (horizon c (set_t_now tenv 1)) eqn:Hhor.
+    + simpl. eapply sum_list_zero_horizon with (c:=c) (tenv:=set_t_now tenv 1). assumption.
+      erewrite zero_horizon_delay_trace. eassumption. eassumption. eassumption.
+    + unfold plus0. replace (n + 1 + 0) with (n + 1) by omega.
+      rewrite plus_comm. replace 1 with (0 + 1) at 1 by reflexivity.
+      rewrite sum_delay'. simpl.  reflexivity.
+    + simpl. instantiate (1:=set_t_now tenv 1). unfold liftM,compose,bind,pure.
+      replace (Z.pos (Pos.of_succ_nat n)) with (1 + Z.of_nat n)%Z. rewrite adv_ext_iter in H1. rewrite H1.
+      replace (n + 1 + 0) with (S n) by omega. reflexivity.
+      rewrite Zpos_P_of_succ_nat. replace (n + 0 + 0) with n by omega.
+      omega.
+    + rewrite <- H12. eapply ILexpr_eq_cutPayoff_at_n; try eassumption. reflexivity. simpl.
+      apply not_true_is_false. unfold not. intros. apply NPeano.ltb_lt in H0. omega.
+  - (*red_both *)
+    intros. inversion H9.
+    simpl in *.  option_inv_auto. some_inv. subst. erewrite smartBoth_sound in H4; eauto.
+    simpl in *. option_inv_auto. destruct_vals. some_inv. rewrite <- horizon_smartBoth. simpl.
+    unfold add_trace, add_trans. rewrite summ_list_plus. rewrite <- fromVal_RVal_eq.
+    apply fromVal_RVal_f_eq.
+    + eapply IHRed1; try eassumption.
+      destruct (Max.max_dec (horizon c1' (set_t_now tenv 1)) (horizon c2' (set_t_now tenv 1))) as [Hmax_h1 | Hmax_h2].
+      * rewrite Hmax_h1. reflexivity.
+      * rewrite Hmax_h2. apply NPeano.Nat.max_r_iff in Hmax_h2.
+        assert (Hh2eq: horizon c2' (set_t_now tenv 1) =
+                       (horizon c1' (set_t_now tenv 1)) + (horizon c2' (set_t_now tenv 1) - horizon c1' (set_t_now tenv 1))). omega.
+        rewrite Hh2eq. replace x3 with (delay_trace 0 x3) by apply delay_trace_0.
+        erewrite sum_before_after_horizon. reflexivity. eassumption.
+    + eapply IHRed2; try eassumption.
+      destruct (Max.max_dec (horizon c1' (set_t_now tenv 1)) (horizon c2' (set_t_now tenv 1))) as [Hmax_h1 | Hmax_h2].
+      * rewrite Hmax_h1. apply NPeano.Nat.max_l_iff in Hmax_h1.
+        assert (Hh2eq: (horizon c1' (set_t_now tenv 1)) =
+                       (horizon c2' (set_t_now tenv 1)) + ((horizon c1' (set_t_now tenv 1)) - (horizon c2' (set_t_now tenv 1)))). omega.
+        rewrite Hh2eq. replace x4 with (delay_trace 0 x4) by apply delay_trace_0.
+        erewrite sum_before_after_horizon. reflexivity. eassumption.
+      * rewrite Hmax_h2. reflexivity.      
+    + constructor. eapply Preservation.red_typed. eauto. eauto. apply H16. eassumption.
+      eapply Preservation.red_typed. eauto. eauto. apply H17. eassumption.
+  - (*red_if0_false*)
+    intros. inversion H9.
+    simpl in *. option_inv_auto. simpl in *. option_inv_auto.    
+    replace x2 with (fromVal (BVal false)) in H15. simpl in H15.
+    eapply IHRed. 
+    (*
+    replace x3 with (fromVal (BVal false)) in H8. simpl in H8.
+    eapply IHc2 with (envC:=envC); try eassumption. simpl. rewrite H6.
+    reflexivity. rewrite plus0_0_n.
+    destruct (Max.max_dec (horizon c1 tenv) (horizon c2 tenv)) as [Hmax_h1 | Hmax_h2].
+    rewrite Hmax_h1. apply NPeano.Nat.max_l_iff in Hmax_h1.
+    assert (Hh2eq: horizon c1 tenv = horizon c2 tenv+ (horizon c1 tenv - horizon c2 tenv)). omega.
+    rewrite Hh2eq. simpl. simpl. erewrite sum_before_after_horizon. reflexivity. eassumption.
+    rewrite Hmax_h2. simpl. simpl. reflexivity.
+       eapply Exp_translation_sound; rewrite Nat2Z.inj_add in Hexp; try eassumption. *)
+    
