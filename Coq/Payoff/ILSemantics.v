@@ -136,7 +136,8 @@ Fixpoint ILsem (e : ILExpr) (ext : ExtEnv' ILVal) (tenv : TEnv) (t0 : nat) disc 
     | FloatV v => Some (ILRVal v)
     | NatV v => Some (ILNVal v)
     | Model lab t => Some (ext lab (Z.of_nat t0 + (ILTexprSemZ t tenv))%Z)
-    | ILtexpr e_t => Some (ILNVal (ILTexprSem e_t tenv))
+    | ILtexpr e_t => Some (ILNVal (t0 + ILTexprSem e_t tenv))
+    | ILtvar v => Some (ILNVal (tenv v))
     | Payoff t p1' p2' => Some (eval_payoff (disc (t0 + (ILTexprSem t tenv))) p1' p2' p1 p2)
   end
   where "'IL[|' e '|]'" := (ILsem e).

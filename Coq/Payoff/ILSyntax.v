@@ -15,6 +15,7 @@ Inductive ILExpr : Set :=
 | FloatV : R -> ILExpr
 | NatV : nat -> ILExpr
 | ILtexpr : ILTExpr -> ILExpr
+| ILtvar  : TVar -> ILExpr
 | Model : ObsLabel -> ILTExprZ -> ILExpr
 | ILUnExpr : ILUnOp -> ILExpr -> ILExpr
 | ILBinExpr : ILBinOp -> ILExpr -> ILExpr -> ILExpr
