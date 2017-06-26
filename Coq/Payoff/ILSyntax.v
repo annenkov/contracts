@@ -12,12 +12,13 @@ Inductive ILUnOp : Set := ILNot | ILNeg.
 
 Inductive ILExpr : Set :=
 | ILIf : ILExpr -> ILExpr -> ILExpr -> ILExpr
-| FloatV : R -> ILExpr
-| NatV : nat -> ILExpr
+| ILFloat : R -> ILExpr
+| ILNat : nat -> ILExpr
+| ILBool : bool -> ILExpr
 | ILtexpr : ILTExpr -> ILExpr
-| ILtvar  : TVar -> ILExpr
-| Model : ObsLabel -> ILTExprZ -> ILExpr
+| ILNow  :  ILExpr
+| ILModel : ObsLabel -> ILTExprZ -> ILExpr
 | ILUnExpr : ILUnOp -> ILExpr -> ILExpr
 | ILBinExpr : ILBinOp -> ILExpr -> ILExpr -> ILExpr
 | ILLoopIf : ILExpr -> ILExpr -> ILExpr -> TExpr -> ILExpr
-| Payoff  : ILTExpr -> Party -> Party -> ILExpr.
+| ILPayoff  : ILTExpr -> Party -> Party -> ILExpr.

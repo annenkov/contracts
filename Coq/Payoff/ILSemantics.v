@@ -40,12 +40,6 @@ Fixpoint toListR (vs : list ILVal) : option (list R):=
     | [] => Some []
   end.
 
-(*Definition translateILVal v :=
-  match v with
-    | ILRVal r => RVal r
-    | ILBVal b => BVal b
-  end.*)
-
 Definition fromVal v :=
   match v with
     | RVal r => ILRVal r
@@ -116,29 +110,32 @@ Fixpoint loop_if_sem n t0 b e1 e2 : option ILVal:=
                    | _ => None
                  end.
 
-Fixpoint ILsem (e : ILExpr) (ext : ExtEnv' ILVal) (tenv : TEnv) (t0 : nat) disc p1 p2 : option ILVal:=
+Check loop_if_sem.
+
+Fixpoint ILsem (e : ILExpr) (ext : ExtEnv' ILVal) (tenv : TEnv) (t0 : nat) t_now disc p1 p2: option ILVal:=
   match e with
-    | ILUnExpr op e1 => IL[|e1|] ext tenv t0 disc p1 p2 >>= fun v => ILUnOpSem op v
-    | ILBinExpr op e1 e2 => IL[|e1|] ext tenv t0 disc p1 p2 >>=
-                            fun v1 => IL[|e2|] ext tenv t0 disc p1 p2 >>=
+    | ILUnExpr op e1 => IL[|e1|] ext tenv t0 t_now disc p1 p2 >>= fun v => ILUnOpSem op v
+    | ILBinExpr op e1 e2 => IL[|e1|] ext tenv t0 t_now disc p1 p2 >>=
+                            fun v1 => IL[|e2|] ext tenv t0 t_now disc p1 p2 >>=
                                         fun v2 => ILBinOpSem op v1 v2
-    | ILIf b e1 e2 => IL[|b|] ext tenv t0 disc p1 p2 >>=
+    | ILIf b e1 e2 => IL[|b|] ext tenv t0 t_now disc p1 p2 >>=
                         fun b' => match b' with
-                                    | ILBVal true => IL[|e1|] ext tenv t0 disc p1 p2
-                                    | ILBVal false => IL[|e2|] ext tenv t0 disc p1 p2
+                                    | ILBVal true => IL[|e1|] ext tenv t0 t_now disc p1 p2
+                                    | ILBVal false => IL[|e2|] ext tenv t0 t_now disc p1 p2
                                     | _ => None
                                   end
     | ILLoopIf b e1 e2 t => let n:= (TexprSem t tenv) in
                             loop_if_sem n t0
-                                         (fun t => IL[|b|] ext tenv t disc p1 p2)
-                                         (fun t => IL[|e1|] ext tenv t disc p1 p2)
-                                         (fun t => IL[|e2|] ext tenv t disc p1 p2)
-    | FloatV v => Some (ILRVal v)
-    | NatV v => Some (ILNVal v)
-    | Model lab t => Some (ext lab (Z.of_nat t0 + (ILTexprSemZ t tenv))%Z)
+                                         (fun t => IL[|b|] ext tenv t t_now disc p1 p2)
+                                         (fun t => IL[|e1|] ext tenv t t_now disc p1 p2)
+                                         (fun t => IL[|e2|] ext tenv t t_now disc p1 p2)
+    | ILFloat v => Some (ILRVal v)
+    | ILNat v => Some (ILNVal v)
+    | ILBool b => Some (ILBVal b)
+    | ILModel lab t => Some (ext lab (Z.of_nat t0 + (ILTexprSemZ t tenv))%Z)
     | ILtexpr e_t => Some (ILNVal (t0 + ILTexprSem e_t tenv))
-    | ILtvar v => Some (ILNVal (tenv v))
-    | Payoff t p1' p2' => Some (eval_payoff (disc (t0 + (ILTexprSem t tenv))) p1' p2' p1 p2)
+    | ILNow => Some (ILNVal t_now)
+    | ILPayoff t p1' p2' => Some (eval_payoff (disc (t0 + (ILTexprSem t tenv))) p1' p2' p1 p2)
   end
   where "'IL[|' e '|]'" := (ILsem e).
 
@@ -147,31 +144,6 @@ Axiom Y : Party.
 Axiom Lab : RealObs.
 
 Eval compute in
-    (ILsem (ILBinExpr ILAdd (Model (LabR Lab) (ILTexprZ (ILTexpr (Tnum 0)))) (FloatV 20))
+    (ILsem (ILBinExpr ILAdd (ILModel (LabR Lab) (ILTexprZ (ILTexpr (Tnum 0)))) (ILFloat 20))
            (fun _ t => if (beq_nat (Z.to_nat t) 0) then (ILRVal 100) else (ILRVal 0))
-           (fun _ => 0) 0 (fun _ => 1%R) X Y).
-
-
-(*
-Fixpoint ILsem_k (e : ILExpr) (env : Env' ILVal) (ext : ExtEnv' ILVal) (envT : TEnv) disc p1 p2 (k : nat) : option ILVal:=
-  match e with
-    | ILUnExpr op e1 => ILk[|e1|] env ext envT disc p1 p2 k >>= fun v => ILUnOpSem op v
-    | ILBinExpr op e1 e2 => ILk[|e1|] env ext envT disc p1 p2 k >>=
-                            fun v1 => ILk[|e2|] env ext envT disc p1 p2 k >>=
-                                        fun v2 => ILBinOpSem op v1 v2
-    | ILIf b e1 e2 => ILk[|b|] env ext envT disc p1 p2 k >>=
-                        fun b' => ILk[|e1|] env ext envT disc p1 p2 k >>=
-                                    fun e1' => ILk[|e2|] env ext envT disc p1 p2 k >>=
-                                                 fun e2' => match b', e1', e2' with
-                                                              | ILBVal true, ILRVal v1, _ => pure (ILRVal v1)
-                                                              | ILBVal false, _, ILRVal v2 => pure (ILRVal v2)
-                                                              | _ , _, _ => None
-                                                            end
-    | FloatV v => Some (ILRVal v)
-    | Model lab t => Some (ext lab (evalTexpr t envT))
-    | Payoff e_t p1' p2' => let t := Z.to_nat (evalTexpr e_t envT) in
-                            if (NPeano.ltb t k) then (Some (ILRVal 0))
-                            else Some (eval_payoff (disc t) p1' p2' p1 p2)    
-  end
-where "'ILk[|' e '|]'" := (ILsem_k e).
-*)
+           (fun _ => 0) 0 0 (fun _ => 1%R) X Y).
