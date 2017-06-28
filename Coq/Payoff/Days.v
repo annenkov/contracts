@@ -1,4 +1,4 @@
-Add LoadPath "..".
+(* Add LoadPath "..". *)
 
 Require Import ZArith Arith Syntax Misc Sorting Orders List Utils Denotational Horizon.
 Require Import Environments.
@@ -324,11 +324,11 @@ Proof.
   induction c; intros; simpl; try (apply IHc).
   + apply le_refl.
   + rewrite Max.max_0_r. apply le_n_Sn.
-  + rewrite maximum_app. rewrite maximum_app. apply NPeano.Nat.max_le_compat. apply IHc1. apply IHc2.
-  + rewrite maximum_app. rewrite maximum_app. apply NPeano.Nat.max_le_compat.
+  + rewrite maximum_app. rewrite maximum_app. apply Nat.max_le_compat. apply IHc1. apply IHc2.
+  + rewrite maximum_app. rewrite maximum_app. apply Nat.max_le_compat.
     - induction (TexprSem t tenv) as [| n'].
       * simpl. rewrite app_nil_r. rewrite app_nil_r. apply IHc1.
-      * simpl. rewrite maximum_app. rewrite maximum_app. apply NPeano.Nat.max_le_compat. apply IHc1. apply IHn'.
+      * simpl. rewrite maximum_app. rewrite maximum_app. apply Nat.max_le_compat. apply IHc1. apply IHn'.
     - apply IHc2.
 Qed.
 
@@ -339,7 +339,7 @@ Proof.
   generalize dependent t.
   induction t' as [| t''].
   + intros. simpl. rewrite app_nil_r. rewrite plus_0_r. reflexivity.
-  + intros. simpl. rewrite maximum_app. apply NPeano.Nat.max_l_iff. rewrite IHt''. replace (t + S t'') with ( S (t + t'')). 
+  + intros. simpl. rewrite maximum_app. apply Nat.max_l_iff. rewrite IHt''. replace (t + S t'') with ( S (t + t'')). 
     apply maximum_tDays_n_Sn. omega.
 Qed.
 
@@ -366,11 +366,11 @@ Proof.
   + (* Scale *) simpl. intros. apply IHc. apply H.
   + (* Translate *) simpl. intros. rewrite plus0_to_plus. rewrite plus_assoc.
     apply (IHc (n + TexprSem t tenv) x). apply H. apply In_tDays_non_zero_horizon in H. apply H.
-  + (* Both *) intros. simpl. simpl in *. rewrite <- Max.plus_max_distr_l. apply NPeano.Nat.max_lt_iff.
+  + (* Both *) intros. simpl. simpl in *. rewrite <- Max.plus_max_distr_l. apply Nat.max_lt_iff.
      apply in_app_iff in H. inversion H as [H1 | H2].
     - left. apply IHc1. apply H1.
     - right. apply IHc2. apply H2.
-  + (* If *) intros. simpl. rewrite plus0_to_plus. rewrite plus_assoc. rewrite <- Max.plus_max_distr_l. apply NPeano.Nat.max_lt_iff.
+  + (* If *) intros. simpl. rewrite plus0_to_plus. rewrite plus_assoc. rewrite <- Max.plus_max_distr_l. apply Nat.max_lt_iff.
     simpl in H. apply in_app_iff in H. inversion_clear H. left. induction (TexprSem t tenv) as [| n'].
     - simpl in H0. rewrite app_nil_r in H0. rewrite plus_0_r. apply IHc1. apply H0.
     - simpl in H0. apply in_app_iff in H0. inversion_clear H0.

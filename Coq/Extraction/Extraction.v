@@ -4,6 +4,7 @@ Add LoadPath "../Payoff".
 Require Import Denotational.
 Require Import Reduction.
 Require Import Horizon.
+Require Import Templates.
 Require Import Specialise.
 Require Import TimedTyping.
 Require Import ILTranslation.
@@ -116,11 +117,12 @@ Extraction "ContractExtracted.hs"
   horizon
   redfun
   specialise
-  has_type.
+  has_type
+  inst_contr.
 
 Extraction "ContractTranslationExtracted.hs"
            fromExp
            fromContr
            fromExtEnv
-           ILsem
-           ILsem_k.
+           cutPayoff
+           ILsem.

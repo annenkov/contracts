@@ -1,4 +1,4 @@
-Add LoadPath "..".
+(* Add LoadPath "..". *)
 
 Require Import Reals Syntax.
 

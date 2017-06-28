@@ -1,4 +1,4 @@
-Add LoadPath "..".
+(* Add LoadPath "..". *)
 
 Require Import ILSyntax.
 Require Import Syntax.
@@ -60,7 +60,7 @@ Fixpoint ILBinOpSem (op : ILBinOp) (v1 v2 : ILVal) : option ILVal :=
     | ILLess, ILRVal v1', ILRVal v2' => Some (ILBVal (Rltb v1' v2'))
     | ILLeq, ILRVal v1', ILRVal v2' => Some (ILBVal (Rleb v1'  v2'))
     | ILEqual, ILRVal v1', ILRVal v2' => Some (ILBVal (Reqb v1' v2'))
-    | ILLessN, ILNVal n1, ILNVal n2 => Some (ILBVal (NPeano.ltb n1 n2))
+    | ILLessN, ILNVal n1, ILNVal n2 => Some (ILBVal (Nat.ltb n1 n2))
     | _, _, _ => None
   end.
 

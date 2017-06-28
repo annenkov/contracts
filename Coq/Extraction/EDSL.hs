@@ -25,6 +25,9 @@ false, true,
 bNot,
 bObs,
 
+-- * Template expressions
+TExpr,
+TVar,
 -- * Contract combinators
 ContrHoas,
 Contr,
@@ -37,6 +40,7 @@ both,
 translate,
 (!),
 ifWithin,
+ifWithinT,
 iff,
 letc,
 
@@ -67,15 +71,15 @@ import qualified Data.Map as Map
 import Data.Maybe
 
 
-horizon :: Contr -> Int
-horizon c = C.horizon (fromHoas c)
+horizon ::  Contr -> TEnv -> Int
+horizon c tenv = C.horizon (fromHoas c) tenv
 
-advance :: Contr -> ExtEnvP -> (Contr, FMap)
-advance c env = let (c',t) = fromJust (redfun (fromHoas c) [] env)
+advance :: Contr -> ExtEnvP -> TEnv -> (Contr, FMap)
+advance c env tenv = let (c',t) = fromJust (redfun (fromHoas c) [] env tenv)
                 in (toHoas c', t)
 
-specialise :: Contr -> ExtEnvP -> Contr
-specialise c = toHoas . C.specialise (fromHoas c) []
+specialise :: Contr -> TEnv -> ExtEnvP -> Contr
+specialise c tenv = toHoas . C.specialise (fromHoas c) [] tenv
 
 mkExtEnvP :: [(RealObs, Int,Double)] -> [(BoolObs, Int,Bool)] -> ExtEnvP
 mkExtEnvP rs bs = env
@@ -87,8 +91,8 @@ mkExtEnvP rs bs = env
           env (LabB l) i = Map.lookup (l,i) tabB
 
 
-hasType :: Contr -> Bool
-hasType = C.has_type . fromHoas
+hasType :: TEnv -> Contr -> Bool
+hasType tenv = C.has_type tenv . fromHoas
 
 printContr :: Contr -> IO ()
 printContr = putStrLn . showContr

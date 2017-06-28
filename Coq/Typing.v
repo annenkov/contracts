@@ -93,8 +93,8 @@ fix F (t : TyEnv) (e : Exp) (t0 : Ty) (t1 : t |-E e ∶ t0) {struct t1} :
   | type_op g op es ts t2 t3 f3 =>
     let fix step es ts (args: all2 (TypeExp g) es ts) :=
         match args with
-          | all2_nil => all2_nil (P g)
-          | all2_cons e t0 es ts ty tys => all2_cons (P g) (F g e t0 ty) (step es ts tys)
+          | all2_nil _ => all2_nil (P g)
+          | @all2_cons _ _ _ e t0 es ts ty tys => all2_cons (P g) (F g e t0 ty) (step es ts tys)
         end
           in f g op es ts t2 t3 f3 (step es ts f3)
   | type_obs t2 g o z t3 => f0 t2 g o z t3

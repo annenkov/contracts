@@ -1,4 +1,4 @@
-Add LoadPath "..".
+(* Add LoadPath "..". *)
 
 Require Import Tactics.
 Require Import ILSyntax.
@@ -53,7 +53,7 @@ Qed.
 
 Fixpoint fromExp (t0 : ILTExprZ) (e : Exp) :=
   match e with
-    | OpE Add [a1;a2] => (fromExp t0 a1) >>= (fun v1 =>
+    | OpE Syntax.Add [a1;a2] => (fromExp t0 a1) >>= (fun v1 =>
                            (fromExp t0 a2) >>= (fun v2 =>
                              pure (ILBinExpr ILAdd v1 v2)))
     | OpE Sub [a1;a2] => (fromExp t0 a1) >>= (fun v1 =>
@@ -625,7 +625,32 @@ Theorem Contr_translation_sound: forall c envC extC t0 t0',
   translation_sound c envC extC t0 t0'.
 Proof.
   intro c. induction c;  unfold translation_sound.
- Focus 5.
+  + (* Zero *)
+    intros. simpl in *. some_inv. subst. simpl in *. some_inv. compute.
+    unfold compose in H2. some_inv.
+    reflexivity.
+  + (* Let *)
+    intros. tryfalse.
+  + (* Transfer *)
+    intros. simpl in *. some_inv. subst. rewrite Rplus_0_r. unfold compose in H2. some_inv.
+    rewrite delay_trace_at. unfold singleton_trace, singleton_trans.
+    destruct (Party.eqb p p0).
+    - simpl in *. some_inv. subst. rewrite Rmult_0_r. destruct t0; reflexivity. 
+    - simpl in *. some_inv. unfold eval_payoff.
+      destruct (Party.eqb p p1); destruct (Party.eqb p0 p2);
+      try (rewrite H; rewrite Rmult_1_r; reflexivity);
+      simpl; destruct (Party.eqb p p2); destruct (Party.eqb p0 p1); simpl;
+        try (rewrite H); apply f_equal;
+       try (rewrite plus_comm); try ring; try assumption; reflexivity.
+  + (* Scale *)
+    intros. simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto.
+    destruct_vals. some_inv. subst. rewrite <- delay_scale_trace.
+    unfold scale_trace, compose, scale_trans.
+    rewrite summ_list_common_factor. rewrite <- fromVal_RVal_eq. apply fromVal_RVal_f_eq.
+    - eapply Exp_translation_sound; try (simpl in *; some_inv; subst);
+        try eassumption. simpl. rewrite <- Nat2Z.inj_add. eassumption.
+    - eapply IHc with (envC := envC) (curr := curr); try eassumption. autounfold in *. simpl.
+      rewrite H3. reflexivity. reflexivity.
   + (*Translate *)
     intros. simpl in *.
     option_inv_auto. rewrite adv_ext_iter in H3. rewrite delay_trace_iter.
@@ -636,44 +661,31 @@ Proof.
     reflexivity. simpl. rewrite fold_unfold_ILTexprSem'. rewrite tsmartPlus_sound'. simpl.
     (*replace (TexprSem t tenv + ILTexprSem t0 tenv + t0') with (ILTexprSem t0 tenv + t0' + TexprSem t tenv) at 1.*)
     rewrite <- plus_assoc. rewrite <- sum_delay. destruct (horizon c tenv) eqn:Hhor.
-    - simpl. eapply sum_list_zero_horizon with (c:=c) (tenv:=tenv). assumption.
-      erewrite zero_horizon_delay_trace. eassumption. eassumption. eassumption.
-    - unfold plus0. reflexivity.
-  + (* Zero *)
-    intros. simpl in *. some_inv. subst. simpl in *. some_inv. compute. unfold compose in H2. some_inv.
-    reflexivity.
-  + (* Let *)
-    intros. tryfalse.
-  + (* Transfer *)
-    intros. simpl in *. some_inv. subst. rewrite Rplus_0_r. unfold compose in H2. some_inv.
-    rewrite delay_trace_at. unfold singleton_trace, singleton_trans.
-    destruct (Party.eqb p p0).
-    - simpl in *. some_inv. subst. rewrite Rmult_0_r. destruct t0; reflexivity. 
-    - simpl in *. some_inv. unfold eval_payoff. destruct (Party.eqb p p1); destruct (Party.eqb p0 p2);
-      try (rewrite H; rewrite Rmult_1_r; reflexivity);
-      simpl; destruct (Party.eqb p p2); destruct (Party.eqb p0 p1); simpl; try (rewrite H); apply f_equal;
-       try (rewrite plus_comm); try ring; try assumption; reflexivity.
-  + (* Scale *)
-    intros. simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto.
-    destruct_vals. some_inv. subst. rewrite <- delay_scale_trace. unfold scale_trace, compose, scale_trans.
-    rewrite summ_list_common_factor. rewrite <- fromVal_RVal_eq. apply fromVal_RVal_f_eq.
-    - eapply Exp_translation_sound; try (simpl in *; some_inv; subst); try eassumption. simpl. rewrite <- Nat2Z.inj_add. eassumption.
-    - eapply IHc with (envC := envC) (curr := curr); try eassumption. autounfold in *. simpl.
-      rewrite H3. reflexivity. reflexivity.
+    * simpl.
+      eapply sum_list_zero_horizon with (c:=c) (tenv:=tenv)
+                       (ext:=(adv_ext (Z.of_nat (ILTexprSem t0 tenv + t0') +
+                              Z.of_nat (TexprSem t tenv)) extC)) (env:=envC); eauto.
+      erewrite zero_horizon_delay_trace;eauto.
+    * unfold plus0. reflexivity.
   + (* Both *)
-    intros. simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto. destruct_vals. some_inv.
-    rewrite <- delay_add_trace. unfold add_trace, add_trans. rewrite summ_list_plus. rewrite <- fromVal_RVal_eq.
+    intros. simpl in *. option_inv_auto. some_inv. subst. simpl in *.
+    option_inv_auto. destruct_vals. some_inv.
+    rewrite <- delay_add_trace. unfold add_trace, add_trans.
+    rewrite summ_list_plus. rewrite <- fromVal_RVal_eq.
     apply fromVal_RVal_f_eq.
-    - eapply IHc1 with (envC:=envC); try eassumption. autounfold in *. simpl. rewrite H2. reflexivity.
+    - eapply IHc1 with (envC:=envC); try eassumption.
+      autounfold in *. simpl. rewrite H2. reflexivity.
       destruct (Max.max_dec (horizon c1 tenv) (horizon c2 tenv)) as [Hmax_h1 | Hmax_h2].
       * rewrite Hmax_h1. reflexivity.
-      * rewrite Hmax_h2. apply NPeano.Nat.max_r_iff in Hmax_h2.
-        assert (Hh2eq: horizon c2 tenv = horizon c1 tenv + (horizon c2 tenv - horizon c1 tenv)). omega.
+      * rewrite Hmax_h2. apply Nat.max_r_iff in Hmax_h2.
+        assert (Hh2eq: horizon c2 tenv = horizon c1 tenv + (horizon c2 tenv - horizon c1 tenv))
+          by omega.
         rewrite Hh2eq. erewrite sum_before_after_horizon with (t1:=0). reflexivity. eassumption.
     - eapply IHc2 with (envC:=envC); try eassumption. autounfold in *. simpl. rewrite H3. reflexivity.
       destruct (Max.max_dec (horizon c1 tenv) (horizon c2 tenv)) as [Hmax_h1 | Hmax_h2].
-      * rewrite Hmax_h1. apply NPeano.Nat.max_l_iff in Hmax_h1.
-        assert (Hh2eq: horizon c1 tenv = horizon c2 tenv + (horizon c1 tenv - horizon c2 tenv)). omega.
+      * rewrite Hmax_h1. apply Nat.max_l_iff in Hmax_h1.
+        assert (Hh2eq: horizon c1 tenv = horizon c2 tenv + (horizon c1 tenv - horizon c2 tenv))
+          by omega.
         rewrite Hh2eq. erewrite sum_before_after_horizon with (t1:=0). reflexivity. eassumption.
       * rewrite Hmax_h2. reflexivity.
   + (* If *)
@@ -696,8 +708,9 @@ Proof.
         reflexivity. rewrite plus0_0_n.
         destruct (Max.max_dec (horizon c1 tenv) (horizon c2 tenv)) as [Hmax_h1 | Hmax_h2].
         rewrite Hmax_h1. reflexivity.
-        rewrite Hmax_h2. apply NPeano.Nat.max_r_iff in Hmax_h2.
-        assert (Hh2eq: horizon c2 tenv = horizon c1 tenv + (horizon c2 tenv - horizon c1 tenv)). omega.
+        rewrite Hmax_h2. apply Nat.max_r_iff in Hmax_h2.
+        assert (Hh2eq: horizon c2 tenv = horizon c1 tenv + (horizon c2 tenv - horizon c1 tenv))
+          by omega.
         rewrite Hh2eq. erewrite sum_before_after_horizon with (t1:=0). reflexivity. eassumption.
         eapply Exp_translation_sound; rewrite Nat2Z.inj_add in Hexp; try eassumption.
      * (* Condition evaluates to false *)
@@ -705,10 +718,12 @@ Proof.
        eapply IHc2 with (envC:=envC); try eassumption. simpl. rewrite H6.
        reflexivity. rewrite plus0_0_n.
        destruct (Max.max_dec (horizon c1 tenv) (horizon c2 tenv)) as [Hmax_h1 | Hmax_h2].
-       rewrite Hmax_h1. apply NPeano.Nat.max_l_iff in Hmax_h1.
-       assert (Hh2eq: horizon c1 tenv = horizon c2 tenv+ (horizon c1 tenv - horizon c2 tenv)). omega.
-       rewrite Hh2eq. simpl. simpl. erewrite sum_before_after_horizon with (t1:=0). reflexivity. eassumption.
-       rewrite Hmax_h2. simpl. simpl. reflexivity.
+       rewrite Hmax_h1. apply Nat.max_l_iff in Hmax_h1.
+       assert (Hh2eq: horizon c1 tenv = horizon c2 tenv+ (horizon c1 tenv - horizon c2 tenv))
+         by omega.
+       rewrite Hh2eq. simpl. erewrite sum_before_after_horizon with (t1:=0).
+       reflexivity. eassumption.
+       rewrite Hmax_h2. simpl. reflexivity.
        eapply Exp_translation_sound; rewrite Nat2Z.inj_add in Hexp; try eassumption.
     - (* n = S n' *) 
       intros. simpl in *. option_inv_auto.      
@@ -723,13 +738,14 @@ Proof.
         unfold plus0. rewrite <- Hhor1. replace (S n + horizon c1 tenv) with (horizon c1 tenv + S n).
         erewrite sum_before_after_horizon with (t1:=0); try reflexivity; try eassumption. ring.
         (* max = horizon c2 *)
-        rewrite Hmax_h2. apply NPeano.Nat.max_r_iff in Hmax_h2.
+        rewrite Hmax_h2. apply Nat.max_r_iff in Hmax_h2.
         destruct (horizon c2 tenv) eqn:Hhor2.
         simpl. eapply sum_list_zero_horizon with (c:=c1) (tenv:=tenv).
-        omega. erewrite zero_horizon_delay_trace with (c:=c1) (tenv:=tenv). eassumption. omega. eassumption.
+        omega. erewrite zero_horizon_delay_trace with (c:=c1) (tenv:=tenv).
+        eassumption. omega. eassumption.
         
         unfold plus0. rewrite <- Hhor2.
-        assert (Hh2eq: S n + horizon c2 tenv = horizon c1 tenv + ((horizon c2 tenv - horizon c1 tenv)) + S n). omega.
+        assert (Hh2eq: S n + horizon c2 tenv = horizon c1 tenv + ((horizon c2 tenv - horizon c1 tenv)) + S n) by omega.
         rewrite Hh2eq. rewrite <- plus_assoc.
         erewrite sum_before_after_horizon with (t1:=0). reflexivity. eassumption.
         

@@ -37,7 +37,7 @@ abstract. *)
 
 Parameter BoolObs : Set.
 Parameter RealObs : Set.
-
+Parameter TVar : Set.
 
 (* The type of variables. *)
 
@@ -45,7 +45,6 @@ Inductive Var : Set := V1 | VS (v:Var).
 
 (* The type of "template" variables. *)
 
-Inductive TVar : Set := Tv (t: nat).
 Inductive TExpr : Set := Tvar (t : TVar) | Tnum (n : nat).
 
 

@@ -9,19 +9,19 @@ Require Import DenotationalTyped.
 
 (* Full equivalence. *)
 
-Definition equiv (g : TyEnv) (c1 c2 : Contr) : Prop
+Definition equiv (g : TyEnv) (tenv : TEnv) (c1 c2 : Contr) : Prop
   := g |-C c1 /\ g |-C c2 /\ 
-    (forall (env : Env) (ext : ExtEnv) (tenv : TEnv), 
+    (forall (env : Env) (ext : ExtEnv), 
       TypeExt ext -> TypeEnv g env -> C[|c1|]env ext tenv = C[|c2|]env ext tenv).
-Notation "c1 '≡[' g ']' c2" := (equiv g c1 c2) (at level 50).
+Notation "c1 '≡[' g ',' tenv ']' c2" := (equiv g tenv c1 c2) (at level 50).
 
 
-Lemma equiv_typed g c1 c2 :
+Lemma equiv_typed g c1 c2 tenv:
   g |-C c1 ->
   g |-C c2 ->
-      (forall t1 t2 env ext tenv,
+      (forall t1 t2 env ext,
          TypeExt ext -> TypeEnv g env -> C[|c1|]env ext tenv = Some t1 -> C[|c2|]env ext tenv = Some t2 -> t1 = t2) ->
-  c1 ≡[g] c2.
+  c1 ≡[g,tenv] c2.
 Proof. 
   intros T1 T2 E. unfold equiv. repeat split;auto. intros. 
   eapply Csem_typed_total in T1;eauto. destruct T1 as [t1 T1].
@@ -37,23 +37,23 @@ Proof.
 Qed.
 
 Hint Resolve translateExp_type.
-
-(* FIX THIS *)
-(*Theorem transl_ifwithin g e d t c1 c2 tenv n : g |-C c1 -> g |-C c2 -> g |-E e ∶ BOOL -> (forall tenv0, TexprSem t tenv0 = n) ->
-  If (translateExp (Z.of_nat (TexprSem d tenv)) e) t (Translate d c1) (Translate d c2) ≡[g]
+Theorem transl_ifwithin g e d t c1 c2 tenv n : g |-C c1 -> g |-C c2 -> g |-E e ∶ BOOL -> TexprSem t tenv = n ->
+  If (translateExp (Z.of_nat (TexprSem d tenv)) e) t (Translate d c1) (Translate d c2) ≡[g,tenv]
   Translate d (If e t c1 c2).
 Proof.
-  unfold equiv. intros. repeat split; eauto. intros env ext tenv1 R V.
-  generalize dependent ext.
+  unfold equiv. intros. repeat split; eauto. intros env ext R V.    
   generalize dependent tenv.
-  induction n; intros. 
+  generalize dependent d.  
+  generalize dependent ext.
+  generalize dependent t.
+  induction n; intros.
   - eapply Esem_typed_total with (ext:=(adv_ext (Z.of_nat (TexprSem d tenv)) ext)) in H1;eauto.
     decompose [ex and] H1. simpl in *. erewrite H2. simpl. rewrite translateExp_ext, H4 in *.
-    remember (E[|e|] env (adv_ext (Z.of_nat (TexprSem d tenv1)) ext)) as x1;
-    destruct x1. destruct x. destruct b. reflexivity.
-  - pose H1 as H1'. eapply Esem_typed_total with (ext:=(adv_ext (Z.of_nat d) ext)) in H1';eauto.
-    decompose [ex and] H1'. simpl in *. rewrite translateExp_ext, H3. destruct x; try reflexivity. destruct b. reflexivity.
-    rewrite IHt;eauto. rewrite adv_ext_swap. repeat rewrite liftM_liftM. apply liftM_ext. 
+    destruct x. destruct b; reflexivity. reflexivity.
+  - pose H1 as H1'. eapply Esem_typed_total with (ext:=(adv_ext (Z.of_nat (TexprSem d tenv)) ext)) in H1';eauto.
+    decompose [ex and] H1'. simpl in *. rewrite H2. simpl.
+    rewrite translateExp_ext, H4. destruct x; try reflexivity. destruct b. reflexivity.
+    specialize IHn with (ext := adv_ext 1 ext) (t:=Tnum n). simpl in IHn.
+    rewrite IHn;eauto. rewrite adv_ext_swap. repeat rewrite liftM_liftM. apply liftM_ext. 
     intros. unfold compose. apply delay_trace_swap. 
 Qed.
-*)

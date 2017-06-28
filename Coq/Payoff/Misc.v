@@ -1,11 +1,13 @@
-Add LoadPath "..".
+(* Add LoadPath "..". *)
 Require Import Reals Arith List Sorting Orders Tactics.
 
 Import ListNotations.
+Import Omega.
 
 Open Scope nat.
 
 Fixpoint concat {X : Type} (ll : list (list X)) : list X :=
+
   match ll with
     | [] => []
     | h :: t => h ++ concat t
@@ -197,7 +199,7 @@ Proof.
   intros l.
   induction l as [| h l'].
   + contradiction.
-  + intros. unfold maximum_nat. simpl. simpl in H. apply NPeano.Nat.max_le_iff. inversion_clear H.
+  + intros. unfold maximum_nat. simpl. simpl in H. apply Nat.max_le_iff. inversion_clear H.
     - left. rewrite H0. apply le_refl.
     - right. apply IHl'. apply H0.
 Qed.
@@ -211,9 +213,9 @@ Qed.
 Lemma max_lt_compat : forall n m p q,
   n < p -> m < q -> max n m < max p q.
 Proof.
-  intros. apply NPeano.Nat.max_lub_lt_iff. split.
-  + apply NPeano.Nat.max_lt_iff. left. apply H.
-  + apply NPeano.Nat.max_lt_iff. right. apply H0.
+  intros. apply Nat.max_lub_lt_iff. split.
+  + apply Nat.max_lt_iff. left. apply H.
+  + apply Nat.max_lt_iff. right. apply H0.
 Qed.
 
 Lemma maximum_n_le : forall l n,
@@ -222,7 +224,7 @@ Proof.
   intros l.
   induction l as [| h l'].
   + intros. apply le_refl.
-  + intros. simpl. apply NPeano.Nat.max_le_iff. right. apply IHl'.
+  + intros. simpl. apply Nat.max_le_iff. right. apply IHl'.
 Qed.
 
 Lemma maximum_app : forall (l1 l2 : list nat) (n : nat),
@@ -299,7 +301,7 @@ Qed.
 Lemma leb_refl n :
   leb n n = true.
 Proof.
-  intros. apply leb_iff. apply NPeano.Nat.le_refl.
+  intros. apply leb_iff. apply Nat.le_refl.
 Qed.
 
 Lemma beq_nat_leb n m:

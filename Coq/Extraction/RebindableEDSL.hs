@@ -16,13 +16,15 @@ module RebindableEDSL
      -- * do notation
      (>>=), 
      (>>),
-     wait ,
+     wait,
+     waitT,
      max,
      min,
 
      module P,
      ifThenElse,
      within,
+     withinT,
      module EDSL,
 ) where
 
@@ -95,15 +97,23 @@ instance Boolean Bool where
 (>>=) :: ContrHoas exp contr => exp t -> (exp t -> contr) -> contr
 (>>=) = letc
 
-newtype Wait = Wait Int
+data Wait = Wait Int
+          | WaitT TExpr
 
 wait :: Int -> Wait
 wait = Wait
 
+waitT :: TExpr -> Wait
+waitT = WaitT
+
 data Within exp = Within (exp B) Int
+                | WithinT (exp B) TExpr
 
 within :: ExpHoas exp => exp B -> Int -> Within exp
-within = Within
+within n = Within n
+
+withinT :: ExpHoas exp => exp B -> TExpr -> Within exp
+withinT t = WithinT t
 
 class IfThenElse b c where
     ifThenElse :: b -> c -> c -> c
@@ -122,6 +132,7 @@ instance ContrHoas exp contr => IfThenElse (exp B) contr where
 
 instance ContrHoas exp contr => IfThenElse (Within exp) contr where
     ifThenElse (Within b l) = ifWithin b l
+    ifThenElse (WithinT b l) = ifWithinT b l
 
 
 (>>) :: ContrHoas exp contr => Wait -> contr -> contr

@@ -1,12 +1,11 @@
 
 -- | Implementation of pretty printing for contracts.
 
-
 module PrettyPrinting where
 
 import Contract hiding (map)
 import Data.Maybe
-
+    
 instance Show ObsLabel where
     show (LabR l) = show l
     show (LabB l) = show l
@@ -54,17 +53,24 @@ ppExp c names e =
           where c' = c + 1
                 names' = c : names
 
+ppTExpr :: TExpr -> String
+ppTExpr (Tnum n) = show n
+ppTExpr (Tvar v) = v
 
+isZeroNum :: TExpr -> Bool
+isZeroNum (Tnum 0) = True
+isZeroNum _        = False
+                   
 ppContr :: Int -> Env' Int -> Contr -> String
 ppContr cur names c = case c of
                         Zero -> "zero"
-                        Translate l c -> parentheses (show l ++ " ! " ++ ppContr cur names c)
+                        Translate l c -> parentheses (ppTExpr l ++ " ! " ++ ppContr cur names c)
                         Scale e c -> parentheses (ppExp cur names e ++ " # " ++ ppContr cur names c)
                         Transfer p1 p2 a -> show a ++ "(" ++ show p1 ++ " -> " ++ show p2 ++ ")"
                         Both c1 c2 -> parentheses (ppContr cur names c1 ++ " & " ++ ppContr cur names c2)
                         If b l c1 c2 -> "if " ++ ppExp cur names b ++ within ++ " then " ++
                                         ppContr cur names c1 ++ " else " ++ ppContr cur names c2
-                            where within = if l == 0 then "" else " within " ++ show l
+                            where within = if (isZeroNum l) then "" else " within " ++ ppTExpr l
                         Let e c -> "let " ++ varName cur ++ " = " ++ ppExp cur names e 
                                      ++ " in " ++ ppContr cur' names' c
                             where cur' = cur + 1

@@ -1,6 +1,7 @@
 *.glob
 *.v.d
 *.vo
+*.aux
 Extraction/Contract.hs
 Extraction/ContractExtracted.hs
 Extraction/ContractTranslation.hs

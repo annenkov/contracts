@@ -13,3 +13,5 @@ data RealObs = FX Asset Asset
                deriving (Show, Ord, Eq)
 
 data Party = X | Y | Z | P1 | P2 | P3 deriving (Show, Ord, Eq)
+
+type TVar = String

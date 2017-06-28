@@ -1,6 +1,5 @@
 Require Import Denotational.
 Require Import Tactics.
-(*Require Import DenotationalTyped.*)
 
 (* Definition of contract horizon and proof of its correctness. *)
 
@@ -74,7 +73,7 @@ Proof.
     rewrite Heqh in *. eapply IHc in H'. 
     unfold delay_trace. assert (leb n0 i = true) as L. apply leb_correct. omega. rewrite L.
     destruct H'; eauto. eauto. 
-  - rewrite NPeano.Nat.max_lub_iff in HO. destruct HO as [H1 H2].
+  - rewrite Nat.max_lub_iff in HO. destruct HO as [H1 H2].
     remember (C[|c1|] env ext tenv) as C1. remember (C[|c2|] env ext tenv) as C2.
     destruct C1; destruct C2; tryfalse.
     simpl in T. unfold pure, compose in T. inversion T.

@@ -8,7 +8,7 @@ CONTRACT_SED_SCRIPT = '/^data Var =/,$$'p
 TRANSLATION_TARGET = ContractTranslation.hs
 TRANSLATION_EXTRACTED = ContractTranslationExtracted.hs
 TRANSLATION_HEADER = TranslationHeader.hs
-TRANSLATION_SED_SCRIPT = '/^data ILBinOp =/,$$'p
+TRANSLATION_SED_SCRIPT = '/^data ILTExpr =/,$$'p
 
 COQ_FILE = Extraction.v
 

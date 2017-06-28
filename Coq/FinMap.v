@@ -11,6 +11,7 @@ Require Export Reals.
 Require Export Syntax.
 Require Export Utils.
 Require Export Tactics.
+Require Import Coq.Logic.ProofIrrelevance.
 Open Scope R.
 
 
@@ -236,9 +237,6 @@ checking whether the underlying finite mapping is empty. *)
     unfold Compact. split. intros. rewrite FMap.empty_find. intro C. inversion C.
     intros. apply FMap.empty_find.
   Qed.
-
-Require Import Coq.Logic.ProofIrrelevance.
-
 
   Lemma mkSMap_eq m1 m2 p q : m1 = m2 -> mkSMap m1 p = mkSMap m2 q.
   Proof.

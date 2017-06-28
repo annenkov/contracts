@@ -3,6 +3,7 @@
 module Examples.SampleContracts where
 
 import RebindableEDSL
+import qualified Contract as C
 import qualified Prelude as P
 import Data.Time (Day, diffDays)
 import Data.Time.Format (parseTimeOrError, formatTime, defaultTimeLocale)
@@ -13,6 +14,15 @@ simple = 100 # (transfer X Y EUR)
 twoCF :: Contr
 twoCF = both (10 # (transfer X Y EUR)) (translate 1 (100 # (transfer X Y EUR)))
 
+barrier :: Contr
+barrier = if (theObs <= barrier) `withinT` maturity
+           then zero
+           else (payment # (transfer X Y EUR))
+    where theObs = rObs (Stock "DJ_Eurostoxx_50") 0
+          barrier = 4000
+          payment = 2000
+          maturity = C.Tvar "maturity"
+        
 european :: Contr
 european = translate 365 
             ((max 0 (theObs - strike)) # (transfer X Y EUR))

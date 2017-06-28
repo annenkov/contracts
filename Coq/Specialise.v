@@ -3,6 +3,7 @@ Require Export DenotationalTyped.
 Require Export ContextualCausality.
 Require Import Tactics.
 Require Import Equivalence.
+Require TimedTyping.
 
 
 (* Specialisation (a.k.a. partial evaluation) of contracts. *)
@@ -586,8 +587,8 @@ Proof.
   intros T. inversion T. unfold smartLet. cases (elimVarC V1 c); eauto using elimVarC_typed.
 Qed.
 
-Corollary smartLet_equiv e c g : 
-  g |-C Let e c -> smartLet e c ≡[g] Let e c.
+Corollary smartLet_equiv e c g tenv: 
+  g |-C Let e c -> smartLet e c ≡[g,tenv] Let e c.
 Proof.
   intros. unfold equiv. repeat split; auto. 
   - apply smartLet_typed. assumption.
@@ -622,8 +623,8 @@ Proof.
 Qed.
 
 
-Corollary smartScale_equiv e c g : 
-  g |-C Scale e c -> smartScale e c ≡[g] Scale e c.
+Corollary smartScale_equiv e c g tenv: 
+  g |-C Scale e c -> smartScale e c ≡[g,tenv] Scale e c.
 Proof.
   intros. unfold equiv. repeat split; auto. 
   - apply smartScale_typed. assumption.
@@ -659,8 +660,8 @@ Proof.
 Qed.
 
 
-Corollary smartBoth_equiv c1 c2 g : 
-  g |-C Both c1 c2 -> smartBoth c1 c2 ≡[g] Both c1 c2.
+Corollary smartBoth_equiv c1 c2 g tenv: 
+  g |-C Both c1 c2 -> smartBoth c1 c2 ≡[g,tenv] Both c1 c2.
 Proof.
   intros. unfold equiv. repeat split; auto. 
   - apply smartBoth_typed. assumption.
@@ -695,8 +696,8 @@ Proof.
 Qed.
 
 
-Corollary smartTranslate_equiv l c g : 
-  g |-C Translate (Tnum l) c -> smartTranslate l c ≡[g] Translate (Tnum l) c.
+Corollary smartTranslate_equiv l c g tenv: 
+  g |-C Translate (Tnum l) c -> smartTranslate l c ≡[g,tenv] Translate (Tnum l) c.
 Proof.
   intros. unfold equiv. repeat split; auto. 
   - apply smartTranslate_typed. assumption.
@@ -1001,7 +1002,7 @@ Proof.
   eapply traverseIf_timed in T;eauto.
 Qed.
 
-Require Import TimedTyping.
+Import TimedTyping.
 
 
 Theorem specialise_preservation ts t env ext tenv c : 

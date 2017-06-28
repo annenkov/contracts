@@ -21,6 +21,10 @@ data Var =
    V1
  | VS Var
 
+data TExpr =
+   Tvar TVar
+ | Tnum Int
+
 data ObsLabel =
    LabR RealObs
  | LabB BoolObs
@@ -52,13 +56,15 @@ data Contr =
  | Let Exp Contr
  | Transfer Party Party Asset
  | Scale Exp Contr
- | Translate Int Contr
+ | Translate TExpr Contr
  | Both Contr Contr
- | If Exp Int Contr Contr
+ | If Exp TExpr Contr Contr
 
 data Ty =
    REAL
  | BOOL
+
+type TEnv = TVar -> Int
 
 type ExtEnv' a = ObsLabel -> Int -> a
 
@@ -306,6 +312,12 @@ opSem op vs =
                  (:) v2 l2 -> Nothing}}}}};
        RVal r -> Nothing}}}
 
+texprSem :: TExpr -> TEnv -> Int
+texprSem e tenv =
+  case e of {
+   Tvar v -> tenv v;
+   Tnum n -> n}
+
 translateExp :: Int -> Exp -> Exp
 translateExp d e =
   case e of {
@@ -344,6 +356,18 @@ tadd' d =
 tsub' :: Int -> TimeB -> TimeB
 tsub' d =
   tsub (id d)
+
+inst_contr :: Contr -> TEnv -> Contr
+inst_contr c tenv =
+  case c of {
+   Let e c' -> Let e (inst_contr c' tenv);
+   Scale e c' -> Scale e (inst_contr c' tenv);
+   Translate texp c' -> Translate (Tnum (texprSem texp tenv))
+    (inst_contr c' tenv);
+   Both c' c'' -> Both (inst_contr c' tenv) (inst_contr c'' tenv);
+   If e texp c' c'' -> If e (Tnum (texprSem texp tenv)) (inst_contr c' tenv)
+    (inst_contr c'' tenv);
+   x -> x}
 
 data TiTy =
    TimedType Ty TimeB
@@ -599,31 +623,34 @@ imin t1 t2 =
    True -> t1;
    False -> t2}
 
-inferC :: TiTyEnv -> Contr -> Maybe TimeI
-inferC env c =
+inferC :: TiTyEnv -> TEnv -> Contr -> Maybe TimeI
+inferC env tenv c =
   case c of {
    Zero -> Just TimeTop;
-   Let e c' -> (>>=) (inferE env e) (\t -> inferC ((:) t env) c');
+   Let e c' -> (>>=) (inferE env e) (\t -> inferC ((:) t env) tenv c');
    Transfer p1 p2 a -> Just (Time' (Time 0));
    Scale e c' ->
     (>>=) (inferE env e) (\ty ->
-      (>>=) (inferC env c') (\t ->
+      (>>=) (inferC env tenv c') (\t ->
         case (&&) (tyeqb (type0 ty) REAL) (tileb (time ty) t) of {
          True -> Just t;
          False -> Nothing}));
-   Translate d c' -> liftM (iadd d) (inferC (P.map (sub_time d) env) c');
-   Both c1 c2 -> liftM2 imin (inferC env c1) (inferC env c2);
+   Translate d c' ->
+    liftM (iadd (texprSem d tenv))
+      (inferC (P.map (sub_time (texprSem d tenv)) env) tenv c');
+   Both c1 c2 -> liftM2 imin (inferC env tenv c1) (inferC env tenv c2);
    If e d c1 c2 ->
     (>>=) (inferE env e) (\t ->
       case (&&) (tyeqb (type0 t) BOOL) (tleb (time t) (Time 0)) of {
        True ->
-        liftM2 imin (inferC env c1)
-          (liftM (iadd d) (inferC (P.map (sub_time d) env) c2));
+        liftM2 imin (inferC env tenv c1)
+          (liftM (iadd (texprSem d tenv))
+            (inferC (P.map (sub_time (texprSem d tenv)) env) tenv c2));
        False -> Nothing})}
 
-has_type :: Contr -> Bool
-has_type c =
-  case inferC [] c of {
+has_type :: TEnv -> Contr -> Bool
+has_type tenv c =
+  case inferC [] tenv c of {
    Just t -> True;
    Nothing -> False}
 
@@ -905,7 +932,7 @@ smartTranslate l c =
     (\n ->
     case c of {
      Zero -> Zero;
-     _ -> Translate l c})
+     _ -> Translate (Tnum l) c})
     l
 
 traverseIf :: EnvP -> ExtEnvP -> Exp -> (ExtEnvP -> Contr) -> (ExtEnvP ->
@@ -924,19 +951,23 @@ traverseIf env ext e c1 c2 d l =
         l};
    Nothing -> Nothing}
 
-specialise :: Contr -> EnvP -> ExtEnvP -> Contr
-specialise c env ext =
+specialise :: Contr -> EnvP -> TEnv -> ExtEnvP -> Contr
+specialise c env tenv ext =
   case c of {
    Let e c' ->
     let {e' = specialiseExp e env ext} in
-    smartLet e' (specialise c' ((:) (fromLit e') env) ext);
-   Scale e c' -> smartScale (specialiseExp e env ext) (specialise c' env ext);
+    smartLet e' (specialise c' ((:) (fromLit e') env) tenv ext);
+   Scale e c' ->
+    smartScale (specialiseExp e env ext) (specialise c' env tenv ext);
    Translate l c' ->
-    smartTranslate l (specialise c' env (adv_ext (id l) ext));
-   Both c1 c2 -> smartBoth (specialise c1 env ext) (specialise c2 env ext);
+    let {t' = texprSem l tenv} in
+    smartTranslate t' (specialise c' env tenv (adv_ext (id t') ext));
+   Both c1 c2 ->
+    smartBoth (specialise c1 env tenv ext) (specialise c2 env tenv ext);
    If e l c1 c2 ->
     fromMaybe c
-      (traverseIf env ext e (specialise c1 env) (specialise c2 env) 0 l);
+      (traverseIf env ext e (specialise c1 env tenv) (specialise c2 env tenv)
+        0 (texprSem l tenv));
    _ -> c}
 
 type Key = (,) ((,) Party Party) Asset
@@ -1020,8 +1051,8 @@ scale_trans' v t =
      True -> Just empty;
      False -> Nothing}}
 
-redfun :: Contr -> EnvP -> ExtEnvP -> Maybe ((,) Contr SMap)
-redfun c env ext =
+redfun :: Contr -> EnvP -> ExtEnvP -> TEnv -> Maybe ((,) Contr SMap)
+redfun c env ext tenv =
   case c of {
    Zero -> Just ((,) Zero empty);
    Let e c0 ->
@@ -1029,40 +1060,40 @@ redfun c env ext =
     liftM (\ct ->
       case ct of {
        (,) c' t -> (,) (smartLet (translateExp (negate 1) e') c') t})
-      (redfun c0 ((:) (fromLit e') env) ext);
+      (redfun c0 ((:) (fromLit e') env) ext tenv);
    Transfer c0 p1 p2 -> Just ((,) Zero (singleton0 c0 p1 p2 1));
    Scale e c0 ->
     let {e' = specialiseExp e env ext} in
-    (>>=) (redfun c0 env ext) (\ct ->
+    (>>=) (redfun c0 env ext tenv) (\ct ->
       case ct of {
        (,) c' t ->
         liftM (\t' -> (,) (smartScale (translateExp (negate 1) e') c') t')
           (scale_trans' (fromRLit e') t)});
-   Translate n c0 ->
+   Translate d c0 ->
     (\fO fS n -> if n==0 then fO () else fS (n-1))
       (\_ ->
-      redfun c0 env ext)
-      (\n' -> Just ((,) (Translate n' c0)
+      redfun c0 env ext tenv)
+      (\n' -> Just ((,) (Translate (Tnum n') c0)
       empty))
-      n;
+      (texprSem d tenv);
    Both c1 c2 ->
     liftM2 (\ct1 ct2 ->
       case ct1 of {
        (,) c1' t1 ->
         case ct2 of {
          (,) c2' t2 -> (,) (smartBoth c1' c2') (union_with (+) t1 t2)}})
-      (redfun c1 env ext) (redfun c2 env ext);
-   If b n c1 c2 ->
+      (redfun c1 env ext tenv) (redfun c2 env ext tenv);
+   If b d c1 c2 ->
     (>>=) (fromBLit (specialiseExp b env ext)) (\b' ->
       case b' of {
-       True -> redfun c1 env ext;
+       True -> redfun c1 env ext tenv;
        False ->
         (\fO fS n -> if n==0 then fO () else fS (n-1))
           (\_ ->
-          redfun c2 env ext)
-          (\n' -> Just ((,) (If b n' c1 c2)
+          redfun c2 env ext tenv)
+          (\n' -> Just ((,) (If b (Tnum n') c1 c2)
           empty))
-          n})}
+          (texprSem d tenv)})}
 
 smap_fun :: SMap -> Party -> Party -> Asset -> Double
 smap_fun m p1 p2 a =
@@ -1077,14 +1108,15 @@ plus0 n m =
     (+) n m)
     m
 
-horizon :: Contr -> Int
-horizon c =
+horizon :: Contr -> TEnv -> Int
+horizon c tenv =
   case c of {
    Zero -> 0;
-   Let e c' -> horizon c';
+   Let e c' -> horizon c' tenv;
    Transfer p p0 a -> succ 0;
-   Scale e c' -> horizon c';
-   Translate l c' -> plus0 l (horizon c');
-   Both c1 c2 -> max (horizon c1) (horizon c2);
-   If e l c1 c2 -> plus0 l (max (horizon c1) (horizon c2))}
+   Scale e c' -> horizon c' tenv;
+   Translate v c' -> plus0 (texprSem v tenv) (horizon c' tenv);
+   Both c1 c2 -> max (horizon c1 tenv) (horizon c2 tenv);
+   If e l c1 c2 ->
+    plus0 (texprSem l tenv) (max (horizon c1 tenv) (horizon c2 tenv))}
 

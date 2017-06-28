@@ -40,8 +40,8 @@ fix F (e : Exp) (e0 : Epc e) {struct e0} : P e :=
   | epc_obs o i l => f o i l
   | epc_op op es f3 => let fix step {es} (ps : all Epc es) : all P es := 
                            match ps in all _ es return all P es with
-                             | forall_nil => forall_nil P
-                             | forall_cons e es p ps' => forall_cons P (F e p) (step ps')
+                             | forall_nil _ => forall_nil P
+                             | @forall_cons _ _ e es p ps' => forall_cons P (F e p) (step ps')
                            end
                        in f0 op es f3 (step f3)
   | epc_var v => f1 v
@@ -51,13 +51,13 @@ fix F (e : Exp) (e0 : Epc e) {struct e0} : P e :=
 (* Causality predicate on contracts. *)
 
 Inductive Pc : Contr -> Prop :=
-| pc_transl : forall d c, Pc c -> Pc (Translate (Tnum d) c)
+| pc_transl : forall d c, Pc c -> Pc (Translate d c)
 | pc_let : forall e c, Epc e -> Pc c -> Pc (Let e c)
 | pc_transf : forall cur p1 p2, Pc (Transfer cur p1 p2)
 | pc_scale : forall e c, Epc e -> Pc c -> Pc (Scale e c)
 | pc_both : forall c1 c2, Pc c1 -> Pc c2 -> Pc (Both c1 c2)
 | pc_zero : Pc Zero
-| pc_if : forall c1 c2 b l, Epc b -> Pc c1 -> Pc c2 -> Pc (If b (Tnum l) c1 c2).
+| pc_if : forall c1 c2 b l, Epc b -> Pc c1 -> Pc c2 -> Pc (If b l c1 c2).
 
 
 Hint Constructors Epc Pc.
@@ -96,11 +96,11 @@ Proof.
   intros. induction H; unfold causal' in *; intros; simpl.
   
   - simpl in *. option_inv_auto. unfold delay_trace.
-    remember (leb d d0) as C. destruct C.
+    remember (leb (TexprSem d tenv) d0) as C. destruct C.
     symmetry in HeqC. apply leb_complete in HeqC.
-    assert (Z.of_nat d + Z.of_nat(d0 - d) = Z.of_nat d0) as D.
+    assert (Z.of_nat (TexprSem d tenv) + Z.of_nat(d0 - (TexprSem d tenv)) = Z.of_nat d0) as D.
     rewrite <- Nat2Z.inj_add. f_equal. omega.
-    eapply IHPc; eauto. rewrite ext_until_adv with (t:=Z.of_nat d).
+    eapply IHPc; eauto. rewrite ext_until_adv with (t:=Z.of_nat (TexprSem d tenv)).
     rewrite D. eassumption. reflexivity.
   - simpl in *. option_inv_auto. erewrite epc_ext_until in H4; eauto. rewrite H4 in H5. 
     inversion H5. subst. eauto. omega.
@@ -112,18 +112,18 @@ Proof.
   - simpl in *. option_inv_auto. unfold add_trace. f_equal; eauto.
   - simpl in *. inversion H0. inversion H1. reflexivity.
   - generalize dependent d. generalize dependent r1. generalize dependent r2. 
-    generalize dependent t1. generalize dependent t2. 
-    induction l; intros; simpl in *.
+    generalize dependent t1. generalize dependent t2. simpl in *.
+    induction (TexprSem l tenv); intros; simpl in *.
     + rewrite epc_ext_until with (r2:=r2) (d:=Z.of_nat d) in * by (eauto;omega).
       remember (E[|b|] env r2) as bl. destruct bl;tryfalse. destruct v;tryfalse. 
       destruct b0; [eapply IHPc1|eapply IHPc2]; eassumption. 
-    +rewrite epc_ext_until with (r2:=r2) (d:=Z.of_nat d) in * by (eauto;omega). 
-     remember (E[|b|] env r2) as bl. destruct bl;tryfalse. destruct v;tryfalse.
-     destruct b0.  eapply IHPc1; eassumption. 
-     option_inv_auto. pose (IHl _ _ _ H5 _ H6) as IH.
-     unfold delay_trace in *. remember (leb 1 d) as L. destruct L;try reflexivity. eapply IH.
-     symmetry in HeqL. apply leb_complete in HeqL. rewrite Nat2Z.inj_sub by assumption.
-     apply ext_until_adv_1. apply inj_le in HeqL. assumption. assumption.
+    + rewrite epc_ext_until with (r2:=r2) (d:=Z.of_nat d) in * by (eauto;omega). 
+      remember (E[|b|] env r2) as bl. destruct bl;tryfalse. destruct v;tryfalse.
+      destruct b0.  eapply IHPc1; eassumption. 
+      option_inv_auto. pose (IHn _ _ _ H5 _ H6) as IH.
+      unfold delay_trace in *. remember (leb 1 d) as L. destruct L;try reflexivity. eapply IH.
+      symmetry in HeqL. apply leb_complete in HeqL. rewrite Nat2Z.inj_sub by assumption.
+      apply ext_until_adv_1. apply inj_le in HeqL. assumption. assumption.
 Qed.
 
 (* Soundness of simple causality. *)

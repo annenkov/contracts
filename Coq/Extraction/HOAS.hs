@@ -124,7 +124,9 @@ class ExpHoas exp => ContrHoas exp contr | exp -> contr, contr -> exp where
     both :: contr -> contr -> contr
     transfer :: Party -> Party -> Asset -> contr
     translate :: Int -> contr -> contr
+    translateT :: TExpr -> contr -> contr
     ifWithin :: exp B -> Int -> contr -> contr -> contr
+    ifWithinT :: exp B -> TExpr -> contr -> contr -> contr
     fromClosed :: C.Contr -> contr
 
 
@@ -134,9 +136,11 @@ instance ContrHoas DB CDB where
                           in Let (unDB e i) (unCDB (c (DB v)) (i+1)))
     transfer p1 p2 a = CDB (\_-> Transfer p1 p2 a)
     scale e c = CDB (\i -> Scale (unDB e i) (unCDB c i))
-    translate t c = CDB (\i -> Translate t (unCDB c i))
+    translate t c = CDB (\i -> Translate (C.Tnum t) (unCDB c i))
+    translateT t c = CDB (\i -> Translate t (unCDB c i))
     both c1 c2 = CDB (\i -> Both (unCDB c1 i) (unCDB c2 i))
-    ifWithin e t c1 c2 = CDB (\i -> If (unDB e i) t (unCDB c1 i) (unCDB c2 i))
+    ifWithin e t c1 c2 = CDB (\i -> If (unDB e i) (C.Tnum t) (unCDB c1 i) (unCDB c2 i))
+    ifWithinT e t c1 c2 = CDB (\i -> If (unDB e i) t (unCDB c1 i) (unCDB c2 i))
 
     fromClosed c = CDB (const c)
     
@@ -154,6 +158,9 @@ toHoas c = fromClosed c
 
 (!) :: ContrHoas exp contr => Int -> contr -> contr
 (!) = translate
+
+(!^) :: ContrHoas exp contr => TExpr -> contr -> contr
+(!^) = translateT
 
 (#) :: ContrHoas exp contr => exp R -> contr -> contr
 (#) = scale

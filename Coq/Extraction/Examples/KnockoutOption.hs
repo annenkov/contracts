@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RebindableSyntax #-}
 
-module KnockoutOption where
+module Examples.KnockoutOption where
 
 import RebindableEDSL
 
