@@ -1,0 +1,54 @@
+transfer(me,you) ; iter(10,transfer(you,me))
+
+E ::= (oe,ve,te)
+
+C[iter(n,c)] E =
+   if n = 0 then zero
+   else C[both(c,translate(1,iter(n-1,c)))] E
+
+checkWithin(e,n,c1,c2) =
+  iter(n,if(acc(false,\x.x or e),c1),c2) -- WRONG!
+
+
+  seq(c1,c2) = both(checkWithin())
+
+
+  all[translate(0 ,transfer(me,you)),
+      translate(10,transfer(me,you)),
+      translate(20,transfer(me,you)),
+      translate(30,transfer(me,you)),
+      translate(40,transfer(me,you))]
+
+
+
+
+  waitUB(x,ub,c) = let timeFuture = now()+x
+                   in checkWithin(timeFuture > now(),ub,c,zero)
+
+
+  iter(12,\x.translate(34,translate(x*30,transfer(me,you))))
+
+  iter(12,\x.translate(34,waitUB(x*30,1200,transfer(me,you))))
+
+  iter(12,\x.translate(34,let timeFuture = now()+x*30
+                          in checkWithin(timeFuture > now(),
+                                         1200,
+                                         transfer(me,you),
+                                         zero)))
+
+
+  iter(12,\x.waitUB(x*30,1200,payoutInThreeDaysMF(me,you)))
+
+
+  payoutInThreeDaysMF(p1,p2) = if (obs("Month",0) <> obs("Month",3) checkWithin(obs("ForwardInfo7daysTodayWeekday", -7),100,transfer(me,you),zero)
+
+
+-- iter with sequential composition
+
+C[c1;c2] E := C[c1] E ++ C[c2] E
+
+C[iter(n,c)] E :=
+   if n = 0 then zero
+   else C[c;iter(n-1,c)] E
+
+monthly_year := iter(12, delay(30, transfer(you,me)))

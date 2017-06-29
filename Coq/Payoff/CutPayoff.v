@@ -51,13 +51,13 @@ Proof.
   generalize dependent t0. generalize dependent e_il.
   induction e using Exp_ind'; intros; tryfalse.
   - simpl in *. destruct op;
-    (* Binary operations *)    
+    (* Binary operations *)
     simpl in *; do 3 try (destruct args; tryfalse); tryfalse; simpl in *;
          option_inv_auto; subst; simpl in *; try some_inv; subst; simpl in *;
          destruct_vals; subst; option_inv_auto;
          try (apply all_to_forall2 in H; inversion_clear H as [He1 He2];
               erewrite <- He1; eauto; erewrite <- He2; eauto; reflexivity);
-    (* Unary operations*)    
+    (* Unary operations*)
          try (apply all_to_forall1 in H; erewrite <- H; eauto; reflexivity); try reflexivity.
     (* Cond *)
     simpl in *. do 4 try (destruct args; tryfalse); tryfalse; simpl in *;
@@ -81,7 +81,7 @@ Proof.
   intros. apply not_true_is_false. apply not_true_iff_false in H. unfold not in *. intros. apply ltb_lt in H0.
   apply H. apply ltb_lt.  omega.
 Qed.
-  
+
 Lemma ILexpr_eq_cutPayoff_at_zero e tenv: e ~~[0,tenv] cutPayoff e.
 Proof.
   (*generalize dependent tenv.*)
@@ -102,7 +102,7 @@ Qed.
 
 Hint Resolve cutPayoff_eq_compiled_expr.
 
-Require Import Arith.Compare_dec. 
+Require Import Arith.Compare_dec.
 Lemma ILexpr_eq_cutPayoff_at_n e tenv c t0 n t_now:
   fromContr c t0 = Some e ->
   ILTexprSem t0 tenv = n ->
@@ -120,7 +120,7 @@ Proof.
   - unfold ILequiv in IHc.
     replace match t0 with
         | Tvar _ =>
-            match t1 with            
+            match t1 with
             | ILTexpr (Tnum 0) => ILTexpr t0
             | _ => ILTplus (ILTexpr t0) t1
             end
@@ -172,7 +172,7 @@ Proof.
   induction c; intros; simpl; unfold smartScale;
   try (destruct (isZeroLit e') eqn:HisZ; unfold smartScale in H; try (rewrite HisZ in ; simpl in *; inversion H; reflexivity).
 Qed.*)
-       
+
 Lemma horizon_eq_0_smartScale c e' tenv:
   horizon c tenv = 0->
   horizon (smartScale e' c) tenv = 0.
@@ -189,7 +189,7 @@ Lemma horizon_smartBoth c1 c2 tenv:
   horizon (Both c1 c2) tenv = horizon (smartBoth c1 c2) tenv.
 Proof.
   simpl. destruct c1; simpl; try reflexivity; destruct c2; try (rewrite Max.max_0_r); try reflexivity.
-Qed. 
+Qed.
 
 Check within_sem.
 
@@ -248,7 +248,7 @@ Proof.
   generalize dependent il_e. generalize dependent extIL.
   generalize dependent trace. (*generalize dependent old_trace.*) generalize dependent disc.
   generalize dependent tenv. generalize dependent v. generalize dependent v'.
-  induction R.  
+  induction R.
   - (* red_zero *)intros. simpl in *. some_inv. subst. simpl in *. unfold compose,bind,pure in *. some_inv. reflexivity.
   - (* red_let *)
     intros. simpl in *.
@@ -265,10 +265,10 @@ Proof.
     cases (isZeroLit (TranslateExp.translateExp (-1) (specialiseExp e env ext))) as Zerolit.
     + simpl in *. some_inv. rewrite sum_of_map_empty_trace.
       assert (E[|TranslateExp.translateExp (-1) (specialiseExp e env ext)|] envC (adv_ext 1 extC) = Some (RVal 0)) as Hexp.
-      rewrite isZeroLit_true with (x:=TranslateExp.translateExp (-1) (specialiseExp e env ext)). reflexivity. eassumption.      
+      rewrite isZeroLit_true with (x:=TranslateExp.translateExp (-1) (specialiseExp e env ext)). reflexivity. eassumption.
       symmetry. apply ILRVal_zero_mult_l. symmetry.
       erewrite <- cutPayoff_eq_compiled_expr in H2. try eassumption.
-      
+
       rewrite TranslateExp.translateExp_ext in Hexp.
       erewrite specialiseExp_sound in Hexp; try (rewrite adv_ext_iter; simpl; rewrite adv_ext_0); try assumption.
       rewrite <- fromVal_RVal_eq.
@@ -291,11 +291,11 @@ Proof.
         try (rewrite adv_ext_iter; simpl; rewrite adv_ext_0); eauto.
       * eapply IHR; eauto. rewrite <- horizon_smartScale_eq. reflexivity. assumption.
       * constructor. apply TranslateExp.translateExp_type; eauto. eapply Preservation.red_typed; eauto.
-      * unfold smartScale. rewrite Zerolit. reflexivity.       
+      * unfold smartScale. rewrite Zerolit. reflexivity.
   - (*red_trans0 *)
     intros. inversion T. simpl in *. option_inv_auto. eapply IHR; eauto.
   - (*red_transS *)
-    intros. inversion T. 
+    intros. inversion T.
     subst. simpl in *. option_inv_auto.
 
     eapply Contr_translation_sound with (envC:=envC) (tenv:=tenv); eauto; try reflexivity. simpl.
@@ -341,7 +341,7 @@ Proof.
                        (horizon c2' tenv) + ((horizon c1' tenv) - (horizon c2' tenv))). omega.
         rewrite Hh2eq. replace x2 with (delay_trace 0 x2) by apply delay_trace_0.
         erewrite sum_before_after_horizon with (t1:=0). reflexivity. eassumption.
-      * rewrite Hmax_h2. reflexivity.      
+      * rewrite Hmax_h2. reflexivity.
     + constructor. eapply Preservation.red_typed. eauto. eauto. apply H4. eassumption.
       eapply Preservation.red_typed. eauto. eauto. apply H5. eassumption.
   - (* red_if0_false *)
@@ -377,7 +377,7 @@ Proof.
         rewrite sum_delay'. simpl. rewrite delay_trace_0.  reflexivity. simpl. erewrite <- specialiseExp_sound; eauto.
         rewrite Esem_fromBLit with (r:=false); eauto. unfold liftM,compose,bind,pure. simpl in *.
         instantiate (1:= tenv). rewrite Cs. reflexivity.
-    + intros. rewrite <- ILs. simpl in *. option_inv_auto. symmetry.      
+    + intros. rewrite <- ILs. simpl in *. option_inv_auto. symmetry.
       apply cutPayoff_ILsem_at_n'; eauto. simpl in *. option_inv_auto. simpl in *. option_inv_auto. simpl in *.
       assert (fromVal (BVal false) = x2).
       eapply Exp_translation_sound with (envC:=envC) (extC:=extC); try eassumption.
@@ -422,7 +422,7 @@ Proof.
   - inversion H3.
     + inversion H4. subst. simpl in *. rewrite H in H0. option_inv_auto. some_inv. simpl. unfold compose,bind,pure. subst. simpl in *.
       option_inv_auto. some_inv. destruct x0; tryfalse. some_inv. subst. rewrite H5 in H1. some_inv. ring.
-    + subst. rewrite H in H0. some_inv. subst. rewrite H1 in H2. some_inv. auto.      
+    + subst. rewrite H in H0. some_inv. subst. rewrite H1 in H2. some_inv. auto.
 Qed.
 
 Lemma fromContr_smartBoth_eq_exists c1 c2 il_e extIL tenv disc p1 p2 t0 t r:
@@ -489,7 +489,7 @@ Lemma Esem_ILsem_eq e1 e2 il_e1 il_e2 env ext extIL disc p1 p2 n0 t tenv t0 v1 v
   v1 = v2.
 Proof.
   intros. subst.
-  
+
   erewrite <- Exp_translation_sound with (v':=v1) (e:=e1) (il_e:=il_e1); eauto.
   erewrite <- Exp_translation_sound with (v':=v2) (e:=e2) (il_e:=il_e2);eauto.
 Qed.
@@ -499,7 +499,7 @@ Import TranslateExp.
 Lemma specialiseExp_ILsem_sound e il_e1 il_e2 extIL disc p1 p2 n0 t tenv t0 extp envp v1 v2 ext g env ty:
   (forall l t, fromVal (ext l t) = extIL l t) ->
   g |-E e ∶ ty -> TypeEnv g env -> TypeExt (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) ->
-  ext_inst extp (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) -> env_inst envp env -> 
+  ext_inst extp (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) -> env_inst envp env ->
   fromExp t0 e = Some il_e1 ->
   fromExp t0 (specialiseExp e envp extp) = Some il_e2 ->
   IL[|il_e1|]extIL tenv n0 t disc p1 p2 = Some v1 ->
@@ -509,7 +509,7 @@ Proof.
   intros Hexteq Hty TE TX X N TE1 TE2 IL1 IL2. assert (g |-E  e ∶ ty) as Hty1. assumption.
   eapply Esem_typed_total in Hty1;eauto. inversion_clear Hty1. inversion H.
   eapply Esem_ILsem_eq with (v1:=v1) (v2:=v2) (il_e1:=il_e1) (il_e2:=il_e2)
-                                     (e1:=e) (e2:=specialiseExp e envp extp); eauto.  
+                                     (e1:=e) (e2:=specialiseExp e envp extp); eauto.
   erewrite specialiseExp_sound; eauto.
 Qed.
 
@@ -527,7 +527,7 @@ Proof.
   destruct (isZeroLit (specialiseExp e envp extp)); eauto; cases (isZeroLit (specialiseExp e0 envp extp)); eauto;
   destruct (isOneLit (specialiseExp e envp extp)); eauto; cases (isOneLit (specialiseExp e0 envp extp)); eauto;
   unfold specialiseOpSimp; unfold bind,compose,pure; simpl;
-  cases (fromLit (specialiseExp e envp extp)); cases (fromLit (specialiseExp e0 envp extp));  
+  cases (fromLit (specialiseExp e envp extp)); cases (fromLit (specialiseExp e0 envp extp));
   simpl;
   try destruct v; try destruct v0; simpl;
   unfold compose,bind,pure; apply H0 in H2; inversion H2; apply H3 in H1; inversion H1; eexists;
@@ -553,13 +553,13 @@ Proof.
     unfold compose,bind,pure; apply H in H2; inversion H2;
     eexists; try rewrite H; try rewrite H0; reflexivity);
 
-  (* Lit *)  
+  (* Lit *)
   try (simpl in *; destruct args; tryfalse; simpl in *; eexists; reflexivity).
 
   (* Cond *)
   simpl in *; do 4 (destruct args; tryfalse); tryfalse; simpl in *.
   option_inv_auto; subst; simpl in *; some_inv; subst; simpl in *; subst.
-  apply all_to_forall3 in H. inversion_clear H. inversion_clear H4. unfold default. 
+  apply all_to_forall3 in H. inversion_clear H. inversion_clear H4. unfold default.
   cases (fromBLit (specialiseExp e envp extp)); simpl;
   try destruct b; simpl; eauto.
   unfold compose,bind,pure; apply H0 in H2; inversion_clear H2;  apply H in H1; inversion_clear H1;
@@ -570,11 +570,11 @@ Proof.
   unfold default. destruct (extp l i); simpl; try destruct v; simpl; eexists; reflexivity.
 Qed.
 
-  
+
 Lemma ZeroLit_ILsem_sound e il_e extIL tenv envp extp disc p1 p2 t0 t n0 v env ext g ty:
   (forall l t, fromVal (ext l t) = extIL l t) ->
   g |-E e ∶ ty -> TypeEnv g env -> TypeExt (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) ->
-  ext_inst extp (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) -> env_inst envp env -> 
+  ext_inst extp (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) -> env_inst envp env ->
   specialiseExp e envp extp = OpE (RLit 0) [] ->
   fromExp t0 e = Some il_e ->
   IL[|il_e|]extIL tenv n0 t disc p1 p2 = Some v ->
@@ -590,7 +590,7 @@ Definition adv_disc (n : nat) (disc_fun : nat -> R) : nat -> R
 
 Lemma ILsem_fromExpr_adv_ext: forall e il_e il_e' ext tenv t_now n disc p1 p2 n0,
   fromExp (ILTexprZ (ILTexpr (Tnum (S n)))) e = Some il_e ->
-  fromExp (ILTexprZ (ILTexpr (Tnum n))) e = Some il_e' -> 
+  fromExp (ILTexprZ (ILTexpr (Tnum n))) e = Some il_e' ->
   IL[|il_e|] ext tenv n0 t_now disc p1 p2 = IL[|il_e'|] (adv_ext 1 ext) tenv n0 t_now (adv_disc 1 disc) p1 p2.
 Proof.
   induction e using Exp_ind'; intros; simpl in *; tryfalse.
@@ -661,7 +661,7 @@ Proof.
        apply all_to_forall2 in H; inversion_clear H as [IH1 IH2];
        try rewrite <- IH1 with (il_e:=x) (t_now:=t_now) (t0:=t0) (disc1:=disc1);
        try rewrite <- IH2 with (il_e:=x0) (t_now:=t_now) (t0:=t0) (disc1:=disc1); eauto);
-       
+
     (* UnOp *)
    try (simpl in *; do 2 try (destruct args; tryfalse); tryfalse; simpl in *;
        option_inv_auto; subst; simpl in *; some_inv; subst; simpl in *; subst; unfold compose,bind,pure;
@@ -677,7 +677,7 @@ Proof.
       erewrite <- IHe2 with (il_e:=x0) (t_now:=t_now) (t0:=t0) (disc1:=disc1); eauto.
       erewrite <- IHe3 with (il_e:=x1) (t_now:=t_now) (t0:=t0) (disc1:=disc1);eauto.
   (* Obs *)
-    intros. simpl in *. some_inv. reflexivity. 
+    intros. simpl in *. some_inv. reflexivity.
 Qed.
 
 Lemma t_now_before_cutPayoff: forall c t0 t_now il_e disc p1 p2 tenv extIL n0,
@@ -685,7 +685,7 @@ Lemma t_now_before_cutPayoff: forall c t0 t_now il_e disc p1 p2 tenv extIL n0,
   IL[|il_e|] extIL tenv n0 0 disc p1 p2 = IL[|il_e|] extIL tenv n0 t_now disc p1 p2.
 Proof.
   induction c; intros; simpl in *; some_inv; tryfalse; eauto.
-  - simpl in *. destruct (Party.eqb p p0); some_inv; reflexivity.    
+  - simpl in *. destruct (Party.eqb p p0); some_inv; reflexivity.
   - simpl in *. option_inv_auto. some_inv. simpl. unfold bind,compose,pure.
     erewrite t_now_before_cutPayoff_exp with (il_e:=x) (t_now:=t_now); eauto;
     erewrite <- IHc with (il_e:=x0) (t_now:=t_now);eauto.
@@ -715,7 +715,7 @@ Lemma translateExp_ILsem: forall e t0 n v1 v2 il_e1 il_e2 disc p1 p2 t n0 tenv e
   v1 = v2.
 Proof.
   induction e using Exp_ind'; simpl in *; intros; tryfalse.
-    
+
   destruct op; intros;
   (*BinOp *)
     try (do 3 (destruct args; tryfalse); apply all_to_forall2 in H; inversion_clear H;
@@ -730,7 +730,7 @@ Proof.
 
     (* Lit *)
     simpl in *; destruct args; tryfalse; simpl in *; option_inv_auto; tryfalse; subst; simpl in *; some_inv; subst; try reflexivity.
-    
+
     (* cond *)
     simpl in *. do 4 try (destruct args; tryfalse); tryfalse; simpl in *;
     eapply all_to_forall3 in H; inversion_clear H as [IHe1 IHe']; inversion_clear IHe' as [IHe2 IHe3];
@@ -739,7 +739,7 @@ Proof.
     destruct b.
     replace x5 with (ILBVal true) in H9; simpl in H9; eauto.
     replace x5 with (ILBVal false) in H9; simpl in H9; eauto.
-      
+
     (* Obs *)
      intros. some_inv. subst. simpl in *. some_inv. subst. unfold adv_ext.
      replace (n + (Z.of_nat n0 + (- n + i + ILTexprSemZ t0 tenv)))%Z with (Z.of_nat n0 + (i + ILTexprSemZ t0 tenv))%Z by ring.
@@ -752,7 +752,7 @@ Lemma translateExp_ILsem': forall e t0 n il_e1 il_e2 disc p1 p2 t n0 tenv extIL,
   IL[|il_e1|]extIL tenv n0 t disc p1 p2 = IL[|il_e2|](adv_ext n extIL) tenv n0 t disc p1 p2.
 Proof.
   induction e using Exp_ind'; simpl in *; intros; tryfalse.
-    
+
   destruct op; intros;
   (*BinOp *)
     try (do 3 (destruct args; tryfalse); apply all_to_forall2 in H; inversion_clear H;
@@ -767,7 +767,7 @@ Proof.
 
     (* Lit *)
     simpl in *; destruct args; tryfalse; simpl in *; option_inv_auto; tryfalse; subst; simpl in *; some_inv; subst; try reflexivity.
-    
+
     (* cond *)
     simpl in *. do 4 try (destruct args; tryfalse); tryfalse; simpl in *;
     eapply all_to_forall3 in H; inversion_clear H as [IHe1 IHe']; inversion_clear IHe' as [IHe2 IHe3];
@@ -776,7 +776,7 @@ Proof.
     erewrite <- IHe1 with (il_e1:=x2);eauto. rename t1 into t.
     destruct (IL[|x2|] extIL tenv n0 t disc p1 p2); try destruct i; try reflexivity.
     destruct b; eauto.
-      
+
     (* Obs *)
      intros. some_inv. subst. simpl in *. some_inv. subst. unfold adv_ext.
      replace (n + (Z.of_nat n0 + (- n + i + ILTexprSemZ t0 tenv)))%Z with (Z.of_nat n0 + (i + ILTexprSemZ t0 tenv))%Z by ring.
@@ -803,7 +803,7 @@ Fixpoint shiftILExpr n e :=
 Lemma translateExp_specialiseExp_ILsem_sound e il_e1 il_e2 extIL disc p1 p2 n0 t tenv t0 extp envp v1 v2 ext g env ty:
   (forall l t, fromVal (ext l t) = extIL l t) ->
   g |-E e ∶ ty -> TypeEnv g env -> TypeExt (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) ->
-  ext_inst extp (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) -> env_inst envp env -> 
+  ext_inst extp (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) -> env_inst envp env ->
   fromExp t0 e = Some il_e1 ->
   fromExp t0 (translateExp (-1) (specialiseExp e envp extp)) = Some il_e2 ->
   IL[|il_e1|]extIL tenv n0 t disc p1 p2 = Some v1 ->
@@ -812,16 +812,16 @@ Lemma translateExp_specialiseExp_ILsem_sound e il_e1 il_e2 extIL disc p1 p2 n0 t
 Proof.
   intros Hexteq Hty TE TX X N TE1 TE2 IL1 IL2. assert (g |-E  e ∶ ty) as Hty1. assumption.
   assert (fromExp t0 e = Some il_e1) as TE1' by assumption. eapply fromExp_specialiseExp_exists in TE1'. inversion TE1'.
-  erewrite <- translateExp_ILsem' in IL2. 
+  erewrite <- translateExp_ILsem' in IL2.
   eapply Esem_typed_total in Hty1;eauto. inversion_clear Hty1. inversion H0.
-  eapply Esem_ILsem_eq with (v1:=v1) (v2:=v2) 
+  eapply Esem_ILsem_eq with (v1:=v1) (v2:=v2)
                                      (e1:=e) (e2:=specialiseExp e envp extp); eauto.
   erewrite specialiseExp_sound; eauto. eauto. eauto.
 Qed.
 
-(* Sometimes we need to limit proof of properties of IL payoff expressions 
+(* Sometimes we need to limit proof of properties of IL payoff expressions
    to constructs that are used in the compiled expressions. For example,
-   such constructs as ILNow and ILtexp can appear only after cutPayoff, but 
+   such constructs as ILNow and ILtexp can appear only after cutPayoff, but
    not after compiling contacts and expressions to IL payoff language.*)
 
 Inductive IsCompiled : ILExpr -> Prop :=
@@ -833,7 +833,7 @@ Inductive IsCompiled : ILExpr -> Prop :=
 | ic_ilunexpr  : forall op e, IsCompiled e -> IsCompiled (ILUnExpr op e)
 | ic_ilbinexpr : forall op e1 e2, IsCompiled e1 -> IsCompiled e2 -> IsCompiled (ILBinExpr op e1 e2)
 | ic_illoopif  : forall n e1 e2 e3, IsCompiled e1 -> IsCompiled e2 -> IsCompiled e3
-                           -> IsCompiled (ILLoopIf e1 e2 e3 n)      
+                           -> IsCompiled (ILLoopIf e1 e2 e3 n)
 | ic_ilpayoff  : forall t p1 p2, IsCompiled (ILPayoff t p1 p2).
 
 Hint Constructors IsCompiled.
@@ -842,7 +842,7 @@ Lemma fromExp_IsCompiled: forall e t0 il_e,
   fromExp t0 e = Some il_e -> IsCompiled il_e.
 Proof.
   induction e using Exp_ind'; simpl in *; intros; tryfalse.
-    
+
   destruct op; intros;
   (*BinOp *)
     try (do 3 (destruct args; tryfalse); apply all_to_forall2 in H; inversion_clear H;
@@ -853,12 +853,12 @@ Proof.
 
     (* Lit *)
     simpl in *; destruct args; tryfalse; simpl in *; some_inv; eauto.
-    
+
     (* cond *)
     simpl in *. do 4 try (destruct args; tryfalse); tryfalse; simpl in *;
     eapply all_to_forall3 in H; inversion_clear H as [IHe1 IHe']; inversion_clear IHe' as [IHe2 IHe3];
     option_inv_auto; subst; simpl in *; try (some_inv); subst. eauto.
-      
+
     (* Obs *)
      intros. some_inv. eauto.
 Qed.
@@ -944,7 +944,7 @@ Proof.
   intros. inversion HC. inversion T. subst. simpl in *. erewrite <- ILexpr_eq_cutPayoff_at_n in H1; eauto.
   erewrite <- t_now_before_cutPayoff in H1;eauto.
   erewrite <- ILsem_fromContr_adv_ext with (c:=c) in H2; eauto. rewrite H2 in H1. some_inv. reflexivity.
-  
+
   - intros. subst. simpl in *. some_inv. subst. simpl in *. some_inv. reflexivity.
   - intros. subst. simpl in *. tryfalse.
   - intros. subst. simpl in *. some_inv. simpl.
@@ -953,7 +953,7 @@ Proof.
     + subst. simpl in *. some_inv. reflexivity.
   - intros. inversion HC. inversion T. subst. simpl in *. option_inv_auto. some_inv. simpl. subst. simpl in *. option_inv_auto. some_inv.
     destruct x1; tryfalse. destruct x2; tryfalse. some_inv.
-    erewrite <- cutPayoff_eq_compiled_expr in H4; eauto. 
+    erewrite <- cutPayoff_eq_compiled_expr in H4; eauto.
     unfold smartScale in *. cases (isZeroLit (TranslateExp.translateExp (-1) (specialiseExp e env ext))) as Zerolit.
     + simpl in *. some_inv. simpl.  subst. simpl in *. some_inv.
       apply isZeroLit_true in Zerolit.
@@ -974,7 +974,7 @@ Proof.
         destruct x3; tryfalse. destruct x4; tryfalse. some_inv. subst.
         assert (ILRVal r0 = ILRVal r).
         eapply translateExp_specialiseExp_ILsem_sound with (n0:=0); eauto.  simpl. rewrite adv_ext_0. eassumption.
-        erewrite <-  t_now_before_cutPayoff_exp; eauto. 
+        erewrite <-  t_now_before_cutPayoff_exp; eauto.
         assert (r1 = r2). eauto. congruence.
   - intros. inversion HC. inversion T. subst. simpl in *. eauto.
   - intros. inversion HC. inversion T. subst. simpl in *. option_inv_auto. simpl in *. option_inv_auto. destruct_vals.
@@ -985,7 +985,7 @@ Proof.
     assert (x = x2) by congruence. assert (x0 = x3) by congruence.
     assert (x1 = x4) by congruence. subst.
     rewrite cutPayoff_ILsem_at_n' in *; eauto.
-    rewrite <- loopif_adv_ext_n in H3.    
+    rewrite <- loopif_adv_ext_n in H3.
     erewrite <- t_now_before_cutPayoff with (c:=If b (Tnum (S n)) c1 c2) (t0:=(ILTexpr (Tnum 0))) in H2.
     rewrite H2 in H3. congruence. simpl. unfold compose,bind,pure. rewrite H5. rewrite H1. rewrite H10. reflexivity.
     eapply fromExp_IsCompiled; eauto. eapply fromContr_IsCompiled; eauto. eapply fromContr_IsCompiled; eauto.
@@ -1048,7 +1048,7 @@ Proof.
   Admitted.
 
 Lemma fromContr_ILsem_Red_exists c c' t0 tr extp envp il_e il_e' disc p1 p2 extIL tenv r:
-  fromContr c t0 = Some il_e ->  
+  fromContr c t0 = Some il_e ->
   Red c envp extp c' tr ->
   fromContr c' t0 = Some il_e' ->
   IL[|il_e|]extIL tenv 0 0 disc p1 p2 = Some (ILRVal r) ->
@@ -1064,3 +1064,75 @@ Lemma fromContr_ILsem_RedN_exists c c' n t0 extp envp il_e il_e' disc p1 p2 extI
   exists r', IL[|cutPayoff il_e'|](adv_ext (Z.of_nat n) extIL) tenv 0 1 disc p1 p2 = Some (ILRVal r').
 Proof.
 Admitted.
+
+Definition cutPayoff_sound c n :=
+  forall envC extC (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
+         (v' : ILVal) m n0 p1 p2 curr v trace (disc : nat -> R ) tenv,
+  (forall a a', Asset.eqb a a' = true) ->
+  (forall l t, fromVal (extC l t) = extIL l t) ->
+  IsClosedCT c ->
+  fromContr c (ILTexpr (Tnum n0)) = Some il_e ->
+  C[|Translate (Tnum n0) c|] envC extC tenv = Some trace ->
+  m + n = horizon c tenv ->
+  sum_list (map (fun t => (disc t * trace t p1 p2 curr)%R)
+                (seq (n+n0) m)) = v ->
+  IL[|cutPayoff il_e|] extIL tenv 0 (n+n0) disc p1 p2 = Some v'->
+  fromVal (RVal v) = v'.
+
+Hint Resolve delay_empty_trace.
+
+Lemma cutPayoff_sound_base c : cutPayoff_sound c 0.
+Proof.
+  unfold cutPayoff_sound. intros.
+  eapply Contr_translation_sound with (tenv:=tenv) (envC:=envC) (disc:=disc); eauto;
+  try rewrite plus_0_r in *; try rewrite plus_0_l in *; subst; try eassumption; try reflexivity.
+  erewrite ILexpr_eq_cutPayoff_at_n with (c:=c) (t0:=(ILTexpr (Tnum n0))); try eassumption. reflexivity.
+  simpl. apply not_true_is_false. intro. apply ltb_lt in H4. omega.
+Qed.
+
+Lemma cp_Scale_inversion c n e :
+  cutPayoff_sound (Scale e c) n -> cutPayoff_sound c n.
+Proof.
+Admitted.
+
+Lemma cutPayoff_sound_step c n :
+  cutPayoff_sound c n -> cutPayoff_sound c (1 + n).
+Proof.
+  generalize dependent n.
+  induction c; intros until tenv; intros A Xeq TC CC Cs Hor S ILs.
+  - (* zero *)
+    simpl in *. some_inv. subst. simpl in *.
+    unfold compose,bind,pure in *. some_inv. rewrite sum_of_map_empty_trace; auto.
+  - (* let *)
+    simpl in *. option_inv_auto.
+  - (* transf *)
+    intros. simpl in *. option_inv_auto. unfold compose in *. some_inv.
+    remember (Party.eqb p p0) as b0.
+    destruct b0.
+    + simpl in *. assert (Hmeq0 : m=0) by omega. subst. simpl. some_inv. reflexivity.
+    + simpl in *. assert (Hmeq0 : m=0) by omega. assert (Hneq0 : n = 0 ) by omega. subst. simpl.
+      rewrite plus_0_l in *.
+      assert (Hlt_true : (n0 <? S n0) = true). apply ltb_lt. omega.
+      rewrite Hlt_true in *. some_inv. reflexivity.
+  - (* scale *)
+    intros. simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto.
+    destruct_vals. some_inv. subst. rewrite delay_trace_scale.
+    unfold scale_trace, compose, scale_trans.
+    rewrite summ_list_common_factor. rewrite <- fromVal_RVal_eq. apply fromVal_RVal_f_eq.
+    + erewrite <- cutPayoff_eq_compiled_expr in H5; try eassumption.
+      eapply Exp_translation_sound with (t0':=0) (envT:=tenv) (envC:=envC);
+        try (simpl in *; some_inv; subst); try eassumption.
+      rewrite Z.add_0_r. assumption.
+    + inversion TC. apply cp_Scale_inversion in H.
+      eapply IHc with (envC:=envC); eauto. simpl. autounfold.
+      rewrite H2. reflexivity.
+  - (* translate *)
+    intros. simpl in *. option_inv_auto.
+Admitted.
+
+Theorem cutPayoff_sound_n_steps c n: cutPayoff_sound c n.
+Proof.
+  induction n.
+  - apply cutPayoff_sound_base.
+  - apply cutPayoff_sound_step. apply IHn.
+Qed.
