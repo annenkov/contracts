@@ -1095,6 +1095,18 @@ Lemma cp_Scale_inversion c n e :
 Proof.
 Admitted.
 
+Lemma cp_Translate_inversion c t0 n :
+  cutPayoff_sound (Translate t0 c) n -> cutPayoff_sound c n.
+Proof.
+Admitted.
+
+Lemma sum_delay_n':
+  forall (n n0 : nat) (tr : Trace) (p1 p2 : Party) (curr : Asset) (f : nat -> R) (t0 n1 : nat),
+  sum_list (map (fun t : nat => (f t * delay_trace (n0 + n) tr t p1 p2 curr)%R) (seq (t0 + n0) n1)) =
+  sum_list (map (fun t : nat => (f (n0 + t)%nat * delay_trace n tr t p1 p2 curr)%R) (seq t0 n1)).
+Proof.
+  Admitted.
+
 Lemma cutPayoff_sound_step c n :
   cutPayoff_sound c n -> cutPayoff_sound c (1 + n).
 Proof.
@@ -1127,7 +1139,23 @@ Proof.
       eapply IHc with (envC:=envC); eauto. simpl. autounfold.
       rewrite H2. reflexivity.
   - (* translate *)
-    intros. simpl in *. option_inv_auto.
+    intros.
+    simpl in *. option_inv_auto. rewrite delay_trace_swap.
+    inversion TC. subst. simpl in *.
+    rename n1 into t0.
+    apply cp_Translate_inversion in H.
+    simpl in *.
+    rewrite adv_ext_iter in H2.
+    replace (Z.of_nat n0 + Z.of_nat t0)%Z with (Z.of_nat (t0 + n0)) in *.
+    assert (Hmt0 : t0 < m \/ t0 >= m) by omega.
+    destruct Hmt0.
+    * rewrite <- fromVal_RVal_eq.
+      eapply IHc with (envC:=envC) (tenv:=tenv) (m:=m - t0);eauto.
+      ** simpl. rewrite H2. reflexivity.
+      ** destruct (horizon c tenv) as [|h1].
+         *** simpl in *. destruct m;tryfalse.
+         *** simpl in *. omega.
+      ** replace (S n + (t0 + n0)) with (S (n + n0) + t0) by omega.
 Admitted.
 
 Theorem cutPayoff_sound_n_steps c n: cutPayoff_sound c n.
