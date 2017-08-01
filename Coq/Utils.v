@@ -406,3 +406,27 @@ Definition Req_dec (x y : R) : {x = y} + {x <> y}.
 Proof.
   cases (Reqb x y) as E; [rewrite Reqb_iff in E|rewrite Reqb_iff_false in E]; auto.
 Qed.
+
+(* Some Z <-> nat conversion properties *)
+
+Import Omega.
+
+Lemma of_nat_succ n :
+  Z.of_nat (S n) = (Z.of_nat n + 1)%Z.
+Proof.
+  rewrite Nat2Z.inj_succ. replace (Z.of_nat n + 1)%Z with (Z.succ (Z.of_nat n))%Z.
+  omega. omega.
+Qed.
+
+Lemma of_nat_plus x y:
+  Z.add (Z.of_nat x) (Z.of_nat y) = Z.of_nat (x + y)%nat.
+Proof.
+  generalize dependent y.
+  induction x as [| x'].
+  - intros. reflexivity.
+  - intros.
+    replace (Z.of_nat (S x') + Z.of_nat y)%Z with (Z.of_nat x' + Z.of_nat (S y))%Z.
+    replace (S x' + y)%nat with (x' + S y)%nat.
+    apply IHx'. omega. rewrite of_nat_succ. replace (Z.of_nat x' + (Z.of_nat y + 1))%Z with (Z.of_nat x' + 1 + Z.of_nat y)%Z.
+    rewrite of_nat_succ. reflexivity. omega.
+Qed.

@@ -1,7 +1,7 @@
 Require Export Denotational.
 Require Import TranslateExp.
 Require Import FunctionalExtensionality.
-Require Import Tactics.
+Require Import Tactics Utils.
 
 Require Import DenotationalTyped.
 
@@ -56,4 +56,16 @@ Proof.
     specialize IHn with (ext := adv_ext 1 ext) (t:=Tnum n). simpl in IHn.
     rewrite IHn;eauto. rewrite adv_ext_swap. repeat rewrite liftM_liftM. apply liftM_ext. 
     intros. unfold compose. apply delay_trace_swap. 
+Qed.
+
+Theorem transl_iter (tenv : TEnv) (c : Contr) t1 t2 (env : Env) (ext : ExtEnv) :
+  C[|Translate (Tnum t1) (Translate (Tnum t2) c)|]env ext tenv =
+  C[|Translate (Tnum (t1 + t2)) c|]env ext tenv.
+Proof.
+  simpl. unfold liftM,compose,pure,bind.
+  rewrite adv_ext_iter.
+  replace (Z.of_nat t1 + Z.of_nat t2)%Z with (Z.of_nat (t1 + t2)) by (symmetry; apply of_nat_plus).
+  remember (C[| c|] env (adv_ext (Z.of_nat (t1 + t2)) ext) tenv) as Cs.
+  destruct Cs;auto.
+  rewrite delay_trace_iter. rewrite plus_comm. reflexivity.
 Qed.
