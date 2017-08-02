@@ -1,4 +1,4 @@
-# Certified Symbolic Multi-Party Contracts Management and Compilation
+# Certified Symbolic Multi-Party Contracts Management and Compilation [![Build Status](https://travis-ci.org/annenkov/contracts.svg?branch=master)](https://travis-ci.org/annenkov/contracts)
 
 An extension of the Contract DSL presented in [ICFP 2015 paper](doc/icfp2015.pdf)
 with templating features, and certified compilation to a simple intermediate

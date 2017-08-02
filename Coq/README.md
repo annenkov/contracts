@@ -1,4 +1,4 @@
-# Certified Symbolic Management of Financial Multi-Party Contracts [![Build Status](https://travis-ci.org/HIPERFIT/contracts.svg?branch=master)](https://travis-ci.org/HIPERFIT/contracts)
+# Certified Symbolic Management of Financial Multi-Party Contracts [![Build Status](https://travis-ci.org/annenkov/contracts.svg?branch=master)](https://travis-ci.org/annenkov/contracts)
 
 This directory contains the certified implementation of the financial
 multi-party contract language described in the paper
@@ -98,7 +98,7 @@ types:
 - We assume the type `FMap` of finite mappings given by a standard set
   of operations on finite mappings together with a set of axioms that
   specify their properties (cf. [FinMap.v](FinMap.v)).
-  
+
 ## Technical Details
 
 ### Dependencies
