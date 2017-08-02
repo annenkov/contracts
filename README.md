@@ -18,9 +18,9 @@ The Coq-based certified implementation of the language is
 found in the [Coq](Coq) subdirectory. The [Coq/Payoff](Coq/Payoff) subdirectory
 contains the implementation of payoff expression language and compilation
 from from the Contract DSL to PEL along with soundness proofs.
-The contract language and its verified Coq implementation are documented
-in the accompanying the README file ([readme for Contracts DSL](Coq/README.md),
-[readme for Payoff language](Coq/Payoff/README.md)) provides an overview of the Coq
+The contract language and payoff expression language implementations are documented
+in the accompanying README files ([readme for Contracts DSL](Coq/README.md),
+[readme for Payoff language](Coq/Payoff/README.md)), which provide an overview of the Coq
 proofs. Moreover, this repository also includes earlier prototype
 implementations of the contract language in Haskell (see
 [Haskell](Haskell) subdirectory) and Standard ML (see [SML](SML)
