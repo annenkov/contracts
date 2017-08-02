@@ -25,6 +25,7 @@ Utils.v
 ./Payoff/Days.v
 ./Payoff/ILSyntax.v
 ./Payoff/ILSemantics.v
-./Payoff/ILEquivalence.v
 ./Payoff/ILTranslation.v
+./Payoff/ILEquivalence.v
 ./Payoff/CutPayoff.v
+./Payoff/CutPayoffN.v

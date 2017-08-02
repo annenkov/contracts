@@ -1,5 +1,8 @@
-(* Add LoadPath "..". *)
-
+(* Theorems about cutPayoff transformation, which allows
+   to parametarize the compiled code (code we get by 
+   translating contrtacts to payoff expression language)
+   with "current time" parameter. We prove soundness
+   of cutPayoff wrt. to one-step contract reduction *)
 Require Import Tactics.
 Require Import ILSyntax.
 Require Import ILSemantics.
@@ -39,7 +42,7 @@ Fixpoint cutPayoff (e : ILExpr) : ILExpr :=
     | ILPayoff t' p1 p2 => ILIf (ILBinExpr ILLessN (ILtexpr t') ILNow) (ILFloat 0%R) (ILPayoff t' p1 p2)
   end.
 
-(*Semantic equvivalence of IL expressions*)
+(* Semantic equvivalence of IL expressions *)
 
 Definition ILequiv t_now tenv e1 e2 :=
   forall ext t0 disc p1 p2, IL[|e1|] ext tenv t0 t_now disc p1 p2 = IL[|e2|]ext tenv t0 t_now disc p1 p2.
@@ -71,7 +74,8 @@ Lemma ltb_plus_l_false n1 n2 n3:
   Nat.ltb n1 n2 = false ->
   Nat.ltb (n3 + n1) n2 = false.
 Proof.
-  intros. apply not_true_is_false. apply not_true_iff_false in H. unfold not in *. intros. apply Nat.ltb_lt in H0.
+  intros. apply not_true_is_false. apply not_true_iff_false in H.
+  unfold not in *. intros. apply Nat.ltb_lt in H0.
   apply H. apply ltb_lt.  omega.
 Qed.
 
@@ -161,17 +165,9 @@ Lemma horizon_gt_0_smartScale c e' tenv:
 Proof.
   generalize dependent e'.
   induction c; intros; simpl; unfold smartScale;
-  try (destruct (isZeroLit e') eqn:HisZ; unfold smartScale in H; try (rewrite HisZ in *); simpl in *; inversion H; reflexivity).
+    try (destruct (isZeroLit e') eqn:HisZ;
+         unfold smartScale in H; try (rewrite HisZ in *); simpl in *; inversion H; reflexivity).
 Qed.
-
-(*Lemma exp_not_zero_smartScale c e' tenv:
-  0 < horizon (smartScale e' c) tenv ->
-  horizon c tenv = horizon (smartScale e' c) tenv.
-Proof.
-  generalize dependent e'.
-  induction c; intros; simpl; unfold smartScale;
-  try (destruct (isZeroLit e') eqn:HisZ; unfold smartScale in H; try (rewrite HisZ in ; simpl in *; inversion H; reflexivity).
-Qed.*)
 
 Lemma horizon_eq_0_smartScale c e' tenv:
   horizon c tenv = 0->
@@ -188,10 +184,9 @@ Hint Constructors Red.
 Lemma horizon_smartBoth c1 c2 tenv:
   horizon (Both c1 c2) tenv = horizon (smartBoth c1 c2) tenv.
 Proof.
-  simpl. destruct c1; simpl; try reflexivity; destruct c2; try (rewrite Max.max_0_r); try reflexivity.
+  simpl. destruct c1; simpl; try reflexivity; destruct c2;
+           try (rewrite Max.max_0_r); try reflexivity.
 Qed.
-
-Check within_sem.
 
 Lemma cutPayoff_ILsem_at_n : forall tenv t_now e n extIL disc p1 p2,
   t_now <= n ->
@@ -225,6 +220,11 @@ Proof.
       * rewrite IHnn; eauto.
 Qed.
 
+
+(* -------------------------------------------- *)
+(* Proof of soundness of the cutPayoff function *)
+(* with respect to one-step contract reduction  *)
+(* -------------------------------------------- *)
 
 Theorem cutPayoff_sound_one_step c c' envC extC:
   forall (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
@@ -448,35 +448,8 @@ Proof.
   intros. unfold smartScale in *. rewrite H0 in H. try destruct (isZeroLit e); eauto; cases c'; eauto.
 Qed.
 
-(*Lemma Red_fromContr_exists c c' t envp extp t0 il_e:
-  Red c envp extp c' t ->
-  fromContr c t0 = Some il_e ->
-  exists il_e', fromContr c' t0 = Some il_e'.
-Proof.
-  intro Red.
-  induction Red; intros; tryfalse; subst; eexists; try reflexivity.
-  - subst. simpl in *. option_inv_auto. some_inv. subst. destruct c'; simpl. reflexivity.
-*)
-(*
-Lemma fromContr_smartScale_eq_exists e c il_e extIL tenv disc p1 p2 t0 t r n0:
-  (exists il_e'', fromContr c t0 = Some il_e'') ->
-  fromContr (smartScale e c) t0 = Some il_e ->
-  IL[|il_e|]extIL tenv n0 t disc p1 p2 = Some (ILRVal r) ->
-  exists il_e', fromContr (Scale e c) t0 = Some il_e' /\ IL[|il_e'|]extIL tenv n0 t disc p1 p2 = Some (ILRVal r).
-Proof.
-  intros. inversion_clear H. remember (smartScale e c) as sc. apply smartScale_cases in Heqsc.
-  inversion Heqsc.
-  - inversion H. subst. simpl in *. eexists. some_inv. subst. simpl in *. some_inv. unfold compose,bind,pure. eauto.
-    apply isZeroLit_true in H3. subst. simpl in *.
-    split. rewrite H2. reflexivity. simpl. unfold compose,bind,pure.
-    rewrite H0. rewrite Rplus_0_l. reflexivity.
-  - inversion H1.
-    + inversion H2. subst. simpl in *. rewrite H. unfold compose,bind,pure. eexists. split. reflexivity. simpl. unfold compose,bind,pure.
-      rewrite H0. rewrite Rplus_0_r. reflexivity.
-    + subst. rewrite H. unfold compose,bind,pure. eexists. split. reflexivity. rewrite <- H0. reflexivity.
-Qed.
- *)
 
+(* Compilation to payoff expressions respects constract expressions equivalence *)
 Lemma Esem_ILsem_eq e1 e2 il_e1 il_e2 env ext extIL disc p1 p2 n0 t tenv t0 v1 v2 w1 w2:
   (forall l t, fromVal (ext l t) = extIL l t) ->
   E[|e1|] env (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) = Some w1 ->
@@ -489,13 +462,13 @@ Lemma Esem_ILsem_eq e1 e2 il_e1 il_e2 env ext extIL disc p1 p2 n0 t tenv t0 v1 v
   v1 = v2.
 Proof.
   intros. subst.
-
-  erewrite <- Exp_translation_sound with (v':=v1) (e:=e1) (il_e:=il_e1); eauto.
-  erewrite <- Exp_translation_sound with (v':=v2) (e:=e2) (il_e:=il_e2);eauto.
+  erewrite <- Exp_translation_sound with (v':=v1) (e:=e1) (il_e:=il_e1);eauto.
+  eapply Exp_translation_sound with (v':=v2) (e:=e2) (il_e:=il_e2);eauto.
 Qed.
 
 Import TranslateExp.
 
+(* Compilation to payoff expressions respects constract expression specialization *)
 Lemma specialiseExp_ILsem_sound e il_e1 il_e2 extIL disc p1 p2 n0 t tenv t0 extp envp v1 v2 ext g env ty:
   (forall l t, fromVal (ext l t) = extIL l t) ->
   g |-E e ∶ ty -> TypeEnv g env -> TypeExt (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) ->
@@ -513,6 +486,7 @@ Proof.
   erewrite specialiseExp_sound; eauto.
 Qed.
 
+(* If original expression compiles, then specialized expression compiles as well *)
 Lemma fromExp_specialiseExp_exists e envp extp t0 il_e:
   fromExp t0 e = Some il_e ->
   exists il_e', fromExp t0 (specialiseExp e envp extp) = Some il_e'.
@@ -783,23 +757,6 @@ Proof.
      reflexivity.
 Qed.
 
-(*
-Fixpoint shiftILExpr n e :=
-  match e with
-    | ILIf e1 e2 e3 => ILIf (shiftILExpr n e1) (shiftILExpr n e2) (shiftILExpr n e3)
-    | ILFloat r => ILFloat r
-    | ILNat n => ILNat n
-    | ILBool b => ILBool b
-    | ILtexpr t => ILtexpr t
-    | ILNow  => ILNow
-    | ILModel l t => ILModel l (t+n)
-    | ILUnExpr op e1 => shiftILExpr n e1
-    | ILBinExpr op e1 e2 => ILBinExpr op (shiftILExpr n e1) (shiftILExpr n e2)
-    | ILLoopIf e1 e2 e3 t => ILLoopIf (shiftILExpr n e1) (shiftILExpr n e2) (shiftILExpr n e3) t
-    | ILPayoff t p1 p2 => ILPayoff t p1 p2
-    end.
-*)
-
 Lemma translateExp_specialiseExp_ILsem_sound e il_e1 il_e2 extIL disc p1 p2 n0 t tenv t0 extp envp v1 v2 ext g env ty:
   (forall l t, fromVal (ext l t) = extIL l t) ->
   g |-E e ∶ ty -> TypeEnv g env -> TypeExt (adv_ext (ILTexprSemZ t0 tenv + Z.of_nat n0) ext) ->
@@ -874,7 +831,8 @@ Qed.
 
 Lemma ILsem_adv_ext_n: forall il_e extIL disc p1 p2 tenv n,
   IsCompiled il_e ->
-  IL[|il_e|] (adv_ext (Z.of_nat 1) extIL) tenv n 0 (adv_disc 1 disc) p1 p2 = IL[|il_e|] extIL tenv (S n) 0 disc p1 p2.
+  IL[|il_e|] (adv_ext (Z.of_nat 1) extIL) tenv n 0 (adv_disc 1 disc) p1 p2 =
+  IL[|il_e|] extIL tenv (S n) 0 disc p1 p2.
 Proof.
   intros. generalize dependent n.
   induction H; intros; try (simpl in *; unfold bind,compose,pure; reflexivity).
@@ -910,7 +868,12 @@ Proof.
   rewrite loopif_false_step;eauto. symmetry. apply ILsem_adv_ext_n;eauto.
 Qed.
 
-
+(* --------------------------------------------------------------------------- *)
+(* Given a contract [c] and its compilation into payoff code [il_e],           *)
+(* evaluating [il_e] at time 1 gives us the same result (upto discounting)     *)
+(* as first advancing [c] one step, get a [c'] contract, then compilining [c'] *)
+(* it to payoff code [il_e'], and then evaluating [il_e'] at time 0            *)
+(* --------------------------------------------------------------------------- *)
 Theorem diagram_commutes1 c c' envC extC:
   forall (il_e il_e' : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
          p1 p2 (disc : nat -> R ) tenv tr g r r',
@@ -1007,209 +970,4 @@ Proof.
       eapply specialiseExp_ILsem_sound; eauto. simpl. rewrite adv_ext_0. eassumption.
       unfold fromBLit in H. destruct (specialiseExp b env ext);tryfalse. destruct op;tryfalse. destruct args; tryfalse. some_inv.
       simpl. reflexivity. reflexivity. inversion H0. subst. eauto.
-Qed.
-
-
-(* N step contract reduction *)
-Inductive RedN : nat -> Contr -> EnvP -> ExtEnvP -> Contr ->  Prop :=
-    red_refl c envp extp : RedN O c envp extp c
-  | red_step c c' c'' n envp extp tr : RedN n c envp extp c'' -> Red c'' envp extp c' tr ->
-                             RedN (S n) c envp extp c'.
-
-Hint Constructors RedN Red.
-
-Example RedN_ex1 : forall envp extp cur p1 p2,
-                     RedN 3 (Translate (Tnum 2) (Transfer cur p1 p2)) envp extp Zero.
-Proof.
-  intros. econstructor. econstructor. econstructor. econstructor. econstructor.
-  reflexivity. reflexivity. econstructor.
-  reflexivity. reflexivity.
-  econstructor. econstructor. econstructor. reflexivity.
-Qed.
-
-Lemma adv_disc_0 d:
-  adv_disc 0 d = d.
-Proof.
-  unfold adv_disc. simpl. apply functional_extensionality. reflexivity.
-Qed.
-
-Lemma fromContr_Red_exists c c' t0 tr extp envp il_e:
-  fromContr c t0 = Some il_e ->
-  Red c envp extp c' tr ->
-  exists il_e', fromContr c' t0 = Some il_e'.
-Proof.
-Admitted.
-
-Lemma fromContr_RedN_exists c c' n t0 extp envp il_e:
-  fromContr c t0 = Some il_e ->
-  RedN n c envp extp c' ->
-  exists il_e', fromContr c' t0 = Some il_e'.
-Proof.
-  Admitted.
-
-Lemma fromContr_ILsem_Red_exists c c' t0 tr extp envp il_e il_e' disc p1 p2 extIL tenv r:
-  fromContr c t0 = Some il_e ->
-  Red c envp extp c' tr ->
-  fromContr c' t0 = Some il_e' ->
-  IL[|il_e|]extIL tenv 0 0 disc p1 p2 = Some (ILRVal r) ->
-  exists r', IL[|cutPayoff il_e'|](adv_ext 1 extIL) tenv 0 1 disc p1 p2 = Some (ILRVal r').
-Proof.
-  Admitted.
-
-Lemma fromContr_ILsem_RedN_exists c c' n t0 extp envp il_e il_e' disc p1 p2 extIL tenv r:
-  fromContr c t0 = Some il_e ->
-  RedN n c envp extp c' ->
-  fromContr c' t0 = Some il_e' ->
-  IL[|cutPayoff il_e|]extIL tenv 0 (S n) disc p1 p2 = Some (ILRVal r) ->
-  exists r', IL[|cutPayoff il_e'|](adv_ext (Z.of_nat n) extIL) tenv 0 1 disc p1 p2 = Some (ILRVal r').
-Proof.
-Admitted.
-
-Definition cutPayoff_sound c n :=
-  forall envC extC (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
-         (v' : ILVal) m n0 p1 p2 curr v trace (disc : nat -> R ) tenv,
-  (forall a a', Asset.eqb a a' = true) ->
-  (forall l t, fromVal (extC l t) = extIL l t) ->
-  IsClosedCT c ->
-  fromContr c (ILTexpr (Tnum n0)) = Some il_e ->
-  C[|Translate (Tnum n0) c|] envC extC tenv = Some trace ->
-  m + n = horizon c tenv ->
-  sum_list (map (fun t => (disc t * trace t p1 p2 curr)%R)
-                (seq (n+n0) m)) = v ->
-  IL[|cutPayoff il_e|] extIL tenv 0 (n+n0) disc p1 p2 = Some v'->
-  fromVal (RVal v) = v'.
-
-Hint Resolve delay_empty_trace.
-
-Lemma cutPayoff_sound_base c : cutPayoff_sound c 0.
-Proof.
-  unfold cutPayoff_sound. intros.
-  eapply Contr_translation_sound with (tenv:=tenv) (envC:=envC) (disc:=disc); eauto;
-  try rewrite plus_0_r in *; try rewrite plus_0_l in *; subst; try eassumption; try reflexivity.
-  erewrite ILexpr_eq_cutPayoff_at_n with (c:=c) (t0:=(ILTexpr (Tnum n0))); try eassumption. reflexivity.
-  simpl. apply not_true_is_false. intro. apply ltb_lt in H4. omega.
-Qed.
-
-Lemma cp_Scale_inversion c n e :
-  cutPayoff_sound (Scale e c) n -> cutPayoff_sound c n.
-Proof.
-Admitted.
-
-Lemma cp_Translate_inversion c t0 n :
-  cutPayoff_sound (Translate t0 c) n -> cutPayoff_sound c n.
-Proof.
-Admitted.
-
-Lemma sum_delay_n':
-  forall (n n0 : nat) (tr : Trace) (p1 p2 : Party) (curr : Asset) (f : nat -> R) (t0 n1 : nat),
-  sum_list (map (fun t : nat => (f t * delay_trace (n0 + n) tr t p1 p2 curr)%R) (seq (t0 + n0) n1)) =
-  sum_list (map (fun t : nat => (f (n0 + t)%nat * delay_trace n tr t p1 p2 curr)%R) (seq t0 n1)).
-Proof.
-  Admitted.
-
-Lemma cp_sound_translate_1 c n :
-  cutPayoff_sound c n -> cutPayoff_sound (Translate (Tnum 1) c) (1 + n).
-Proof.
-  unfold cutPayoff_sound.
-  intros until tenv; intros A Xeq TC CC Cs Hor Sm ILs.
-  inversion TC.
-  eapply H with (m:=m) (n0:= S n0);eauto.
-  + rewrite Equivalence.transl_iter in Cs. replace (S n0) with (n0 + 1) by ring.
-    apply Cs.
-  + simpl in *. destruct (horizon c tenv). destruct m;simpl in *;tryfalse.
-    simpl in Hor. omega.
-  + simpl in *. replace (n + S n0) with (S (n + n0)) by ring. eapply Sm.
-  + replace (n + S n0) with (S (n + n0)) by ring. eapply ILs.
-Qed.
-
-Fixpoint transl_one_iter (n : nat) (c : Contr) :=
-  match n with
-  | O => Translate (Tnum 1) c
-  | S n' => Translate (Tnum 1) (transl_one_iter n' c)
-  end.
-
-(* I think, this property is required for the n-step proof *)
-Lemma cp_summ c n :
-  forall envC extC (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
-         (v' : ILVal) m n0 p1 p2 curr v v'' trace (disc : nat -> R ) tenv,
-    (forall a a', Asset.eqb a a' = true) ->
-    (forall l t, fromVal (extC l t) = extIL l t) ->
-    IsClosedCT c ->
-    fromContr c (ILTexpr (Tnum n0)) = Some il_e ->
-    C[|Translate (Tnum n0) c|] envC extC tenv = Some trace ->
-    m + n = horizon c tenv ->
-    sum_list (map (fun t => (disc t * trace t p1 p2 curr)%R)
-                  (seq (n+n0) m)) = v ->
-    IL[|cutPayoff il_e|] extIL tenv 0 (n+n0) disc p1 p2 = Some v' ->
-    fromVal (RVal v) = v' ->
-    IL[|cutPayoff il_e|] extIL tenv 0 (1+n+n0) disc p1 p2 = Some (ILRVal v'') ->
-    v' = ILRVal (trace (n+n0)%nat p1 p2 curr + v'')%R.
-Proof.
-  Admitted.
-  
-Lemma cutPayoff_sound_step c n :
-      cutPayoff_sound c n -> cutPayoff_sound c (1 + n).
-Proof.
-  generalize dependent n.
-  induction c; intros until tenv; intros A Xeq TC CC Cs Hor S ILs.
-  - (* zero *)
-    simpl in *. some_inv. subst. simpl in *.
-    unfold compose,bind,pure in *. some_inv. rewrite sum_of_map_empty_trace; auto.
-  - (* let *)
-    simpl in *. option_inv_auto.
-  - (* transf *)
-    intros. simpl in *. option_inv_auto. unfold compose in *. some_inv.
-    remember (Party.eqb p p0) as b0.
-    destruct b0.
-    + simpl in *. assert (Hmeq0 : m=0) by omega. subst. simpl. some_inv. reflexivity.
-    + simpl in *. assert (Hmeq0 : m=0) by omega. assert (Hneq0 : n = 0 ) by omega. subst. simpl.
-      rewrite plus_0_l in *.
-      assert (Hlt_true : (n0 <? S n0) = true). apply ltb_lt. omega.
-      rewrite Hlt_true in *. some_inv. reflexivity.
-  - (* scale *)
-    intros. simpl in *. option_inv_auto. some_inv. subst. simpl in *. option_inv_auto.
-    destruct_vals. some_inv. subst. rewrite delay_trace_scale.
-    unfold scale_trace, compose, scale_trans.
-    rewrite summ_list_common_factor. rewrite <- fromVal_RVal_eq. apply fromVal_RVal_f_eq.
-    + erewrite <- cutPayoff_eq_compiled_expr in H5; try eassumption.
-      eapply Exp_translation_sound with (t0':=0) (envT:=tenv) (envC:=envC);
-        try (simpl in *; some_inv; subst); try eassumption.
-      rewrite Z.add_0_r. assumption.
-    + inversion TC. apply cp_Scale_inversion in H.
-      eapply IHc with (envC:=envC); eauto. simpl. autounfold.
-      rewrite H2. reflexivity.
-  - (* translate *)
-    intros.
-    simpl in *. option_inv_auto. rewrite delay_trace_swap.
-    inversion TC. subst. simpl in *.
-    rename n1 into t0.
-    simpl in *.
-    rewrite adv_ext_iter in H2.
-    replace (Z.of_nat n0 + Z.of_nat t0)%Z with (Z.of_nat (t0 + n0)) in *.
-    rewrite delay_trace_iter.
-    destruct t0.
-    * apply cp_Translate_inversion in H.
-      rewrite add_0_r. simpl in *. rewrite <- fromVal_RVal_eq.
-      eapply IHc with (envC:=envC);eauto.
-      simpl. autounfold. rewrite H2. reflexivity.
-      destruct (horizon c tenv);destruct m;simpl in *;tryfalse;auto.
-    * apply cp_Translate_inversion in H.
-      destruct t0. unfold cutPayoff_sound in H.
-      ** eapply H with (m:=m) (n0:= S n0);eauto.
-         *** simpl. autounfold.
-             (* replace (Z.of_nat n0 + 1)%Z with (1 + Z.of_nat n0)%Z by ring. *)
-             (* rewrite succ_of_nat with (t:=0%Z). simpl.          *)
-             simpl in H2. rewrite H2. autounfold. reflexivity.
-         *** simpl in *. destruct (horizon c tenv). destruct m;simpl in *; tryfalse.
-             simpl in *. omega.
-         *** simpl. replace (n0 +1) with (S n0) by ring.
-             replace (n + S n0) with (S (n + n0)) by ring. reflexivity.
-         *** replace (n + S n0) with (S (n + n0)) by ring. assumption.
-Admitted.
-
-Theorem cutPayoff_sound_n_steps c n: cutPayoff_sound c n.
-Proof.
-  induction n.
-  - apply cutPayoff_sound_base.
-  - apply cutPayoff_sound_step. apply IHn.
 Qed.

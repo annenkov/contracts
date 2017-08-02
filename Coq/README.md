@@ -103,7 +103,7 @@ types:
 
 ### Dependencies
 
-- To check the proofs: Coq 8.4pl5
+- To check the proofs: Coq 8.6
 - To step through the proofs: GNU Emacs 24.3.1, Proof General 4.2
 - To use extracted Haskell library: GHC 7.8.4
 

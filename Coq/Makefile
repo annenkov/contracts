@@ -127,9 +127,10 @@ VFILES:=Antisymmetry.v\
   Payoff/Days.v\
   Payoff/ILSyntax.v\
   Payoff/ILSemantics.v\
-  Payoff/ILEquivalence.v\
   Payoff/ILTranslation.v\
-  Payoff/CutPayoff.v
+  Payoff/ILEquivalence.v\
+  Payoff/CutPayoff.v\
+  Payoff/CutPayoffN.v
 
 ifneq ($(filter-out archclean clean cleanall printenv,$(MAKECMDGOALS)),)
 -include $(addsuffix .d,$(VFILES))

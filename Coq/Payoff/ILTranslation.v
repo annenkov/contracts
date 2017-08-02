@@ -1,4 +1,5 @@
-(* Add LoadPath "..". *)
+(* Theorems about translation (compilation) from
+   the Contract DSL to payoff expression language *)
 
 Require Import Tactics.
 Require Import ILSyntax.
@@ -94,32 +95,6 @@ Fixpoint fromExp (t0 : ILTExprZ) (e : Exp) :=
     | VarE n => None
     | Acc _ _ _ => None
   end.
-(*
-Fixpoint pushForward (t : nat) (e : ILExpr) : ILExpr :=
-  match e with
-    | ILIf b e1 e2 => ILIf (pushForward t b) (pushForward t e1) (pushForward t e2)
-    | Model s t' => match t' with
-                           | ILTnumZ i :: t'' => Model s (ILTnumZ i :: ILTnumZ (Z.of_nat t) :: t'')
-                           | _ => Model s (ILTnum t :: t')
-                    end
-    | ILUnExpr op e1 => ILUnExpr op (pushForward t e1)
-    | ILBinExpr op e1 e2 => ILBinExpr op (pushForward t e1) (pushForward t e2)
-    | FloatV v => FloatV v
-    | Payoff t' p1 p2 => match t' with
-                           | ILTnumZ i :: t'' => Payoff (ILTnumZ (Z.of_nat t) :: ILTnumZ i :: t'') p1 p2
-                           | _ => Payoff (ILTnumZ (Z.of_nat t) :: t') p1 p2
-                         end
-  end.
-
-Fixpoint nestedIfs (cond : ILExpr) (t' : nat)
-                   (c1 : ILExpr) (c2 : ILExpr) : ILExpr :=
-  match t' with
-    | 0 => ILIf cond c1 c2
-    | S t'' => ILIf cond c1
-                    (nestedIfs (pushForward 1 cond) t'' (pushForward 1 c1) (pushForward 1 c2))
-  end.
- *)
-
 
 Fixpoint fromContr (c : Contr) (t0 : ILTExpr) : option ILExpr:=
   match c with
@@ -238,6 +213,9 @@ Ltac destruct_ILsem := repeat (match goal with
 
 Hint Unfold ILTexprSem.
 
+(* --------------------------------------------- *)
+(* Soundness of contract expressions compilation *)
+(* --------------------------------------------- *)
 Theorem Exp_translation_sound : forall (e : Exp) (il_e : ILExpr) (envC : Env' Val) (extC : ExtEnv' Val)
                                           (extIL : ExtEnv' ILVal) (envT : TEnv)
                                           (v : Val) (v' : ILVal) p1 p2 t0 t0' disc t_now,
@@ -340,53 +318,14 @@ Proof.
     rewrite Rplus_0_l. replace (S (n + t0)) with (n + S t0).
     apply IHn. omega. rewrite <- plus_Sn_m. omega.
 Qed.
-(*
-Lemma delay_trace_zero_before_n_St : forall n tr p1 p2 curr t0 f,
-  sum_list (map (fun t1 : nat => (f t1 * (delay_trace (n + t0) tr t1 p1 p2 curr))%R) (seq (S t0) n)) = tr 1 p1 p2 curr.
-Proof.
-  induction n.
-  + intros. unfold seq. simpl. reflexivity.
-  + intros. simpl. rewrite delay_trace_empty_before_n. unfold empty_trans. rewrite Rmult_0_r.
-    rewrite Rplus_0_l. replace (S (n + t0)) with (n + S t0) by omega.
-    apply IHn. omega. rewrite <- plus_Sn_m. omega.
-Qed.
-*)
+
 Lemma sum_delay t0 t n tr p1 p2 curr f:
   sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq t0 (n + t))) =
   sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq (n + t0) t)).
 Proof.
-  rewrite seq_split. rewrite map_app. rewrite sum_split. rewrite delay_trace_zero_before_n. rewrite Rplus_0_l. rewrite plus_comm. reflexivity.
+  rewrite seq_split. rewrite map_app. rewrite sum_split. rewrite delay_trace_zero_before_n.
+  rewrite Rplus_0_l. rewrite plus_comm. reflexivity.
 Qed.
-(*
-sum_list
-     (map
-        (fun t1 : nat =>
-         (?119669 t1 * delay_trace (t0 + TexprSem t tenv) x0 t1 p1 p2 curr)%R)
-        (seq (S (t0 + TexprSem t tenv)) (S n))) =
-   sum_list
-     (map
-        (fun t1 : nat =>
-         (disc t1 * delay_trace (TexprSem t tenv + t0) x0 t1 p1 p2 curr)%R)
-        (seq (S t0) (TexprSem t tenv + S n)))
- *)
-(*
-Lemma sum_delay_St t0 t n tr p1 p2 curr f:
-  sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq (S t0) (n + t))) =
-  sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq (S (n + t0)) t)).
-Proof.
-  Check seq_split.
-  replace (n + t) with ((n-1) + (t+1)).
-  rewrite seq_split with (n:=n-1). rewrite map_app. rewrite sum_split. rewrite delay_trace_zero_before_n. rewrite Rplus_0_l. rewrite plus_comm. reflexivity.
-Qed.
-*)
-(*Lemma delay_trace_plus n n0 tr t0:
-  delay_trace (n + n0) tr (t0 + n0) = delay_trace n tr t0.
-Proof.
-  destruct n.
-  - simpl. destruct t0.
-    + rewrite Equivalence.delay_trace_at. rewrite delay_trace_0. reflexivity.
-    + simpl. rewrite delay_trace_0. rewrite delay_trace_S.
- *)
 
 Lemma sum_delay' n tr p1 p2 curr f t0 n1:
   sum_list (map (fun t : nat =>(f t * delay_trace (1 + n) tr t p1 p2 curr)%R) (seq (t0 + 1) n1)) =
@@ -425,20 +364,6 @@ Proof.
         rewrite delay_trace_S. replace (n+1) with (S n) by omega. reflexivity.
       * rewrite <- IHn1. simpl. rewrite plus_comm. simpl. reflexivity.
 Qed.
-
-(*
-Lemma sum_delay' n tr p1 p2 curr f t0 n0 n1:
-  sum_list (map (fun t : nat =>(f t * delay_trace (n0 + n) tr t p1 p2 curr)%R) (seq (t0 + n0) (n + n1))) =
-  sum_list (map (fun t : nat => (f (n0 + t)%nat * delay_trace n tr t p1 p2 curr)%R) (seq t0 (n + n1))).
-Proof.
-  generalize dependent t0. generalize dependent n0.
-  induction n.
-  - intros. destruct n0.
-    + simpl. rewrite plus_0_r. reflexivity.
-    + simpl.
-  - intros; simpl. replace (S (n+n0)) with (S n + n0). rewrite delay_trace_S. f_equal. apply IHn.
-Admitted.
-*)
 
 Lemma zero_horizon_empty_trans c t trace env ext tenv:
   horizon c tenv = 0 ->
@@ -543,18 +468,22 @@ Proof.
   - intros. simpl. rewrite delay_trace_n_m. apply f_equal. apply IHn. omega. omega.
 Qed.  
 
-Ltac destruct_option_vals := repeat (match goal with
-                        | [x : match ?X : option Val with _ => _ end = _ |- _] => destruct X; tryfalse
-                        | [x : match ?X : option ILVal with _ => _ end = _ |- _]  => destruct X; tryfalse
-                                     end).
+Ltac destruct_option_vals :=
+  repeat (match goal with
+          | [x : match ?X : option Val with _ => _ end = _ |- _] => destruct X; tryfalse
+          | [x : match ?X : option ILVal with _ => _ end = _ |- _]  => destruct X; tryfalse
+          end).
 
-Ltac rewrite_option := repeat (match goal with
-                        | [H : _ : option ?X  |- match _ : option ?X with _ => _ end = _] => rewrite H
-                      end).
+Ltac rewrite_option :=
+  repeat (match goal with
+          | [H : _ : option ?X  |- match _ : option ?X with _ => _ end = _] => rewrite H
+          end).
 
-Definition translation_sound c envC extC t0 t0' := forall (il_e : ILExpr)
-                                        (extIL : ExtEnv' ILVal)
-                                        (v' : ILVal) p1 p2 curr v trace (disc : nat -> R ) tenv t_now,
+(* Definition of the contract compilation soundness *)
+Definition translation_sound c envC extC t0 t0' :=
+  forall (il_e : ILExpr)
+         (extIL : ExtEnv' ILVal)
+         (v' : ILVal) p1 p2 curr v trace (disc : nat -> R ) tenv t_now,
   (forall a a', Asset.eqb a a' = true) ->
   (forall l t, fromVal (extC l t) = extIL l t) ->
   fromContr c t0 = Some il_e ->
@@ -621,6 +550,11 @@ Lemma fold_unfold_ILTexprSem' t t0 tenv:
               end) tenv = ILTexprSem (tsmartPlus' (ILTexpr t) t0) tenv.
 Proof. reflexivity. Qed.
 
+(* ------------------------------------------------------ *)
+(* Soundness of compilation from the Contact DSL to the   *)
+(* payoff expression language wrt. denotational semantics *)
+(* of the contract language.                              *)
+(* ------------------------------------------------------ *)
 Theorem Contr_translation_sound: forall c envC extC t0 t0',
   translation_sound c envC extC t0 t0'.
 Proof.
@@ -659,7 +593,6 @@ Proof.
     rewrite Nat2Z.inj_add. rewrite Nat2Z.inj_add in H3.
     rewrite Zplus_comm in H3. rewrite Zplus_assoc in H3. rewrite H3.
     reflexivity. simpl. rewrite fold_unfold_ILTexprSem'. rewrite tsmartPlus_sound'. simpl.
-    (*replace (TexprSem t tenv + ILTexprSem t0 tenv + t0') with (ILTexprSem t0 tenv + t0' + TexprSem t tenv) at 1.*)
     rewrite <- plus_assoc. rewrite <- sum_delay. destruct (horizon c tenv) eqn:Hhor.
     * simpl.
       eapply sum_list_zero_horizon with (c:=c) (tenv:=tenv)
@@ -745,7 +678,8 @@ Proof.
         eassumption. omega. eassumption.
         
         unfold plus0. rewrite <- Hhor2.
-        assert (Hh2eq: S n + horizon c2 tenv = horizon c1 tenv + ((horizon c2 tenv - horizon c1 tenv)) + S n) by omega.
+        assert (Hh2eq: S n + horizon c2 tenv =
+                       horizon c1 tenv + ((horizon c2 tenv - horizon c1 tenv)) + S n) by omega.
         rewrite Hh2eq. rewrite <- plus_assoc.
         erewrite sum_before_after_horizon with (t1:=0). reflexivity. eassumption.
         
@@ -758,14 +692,14 @@ Proof.
        destruct (Max.max_dec (horizon c1 tenv) (horizon c2 tenv)) as [Hmax_h1 | Hmax_h2]. simpl.
        (* max = horizon c1 *)
        rewrite Hmax_h1. rewrite Hmax_h1 in IHn.
-       (*destruct (E[|e|] envC (adv_ext (Z.of_nat (ILTexprSem t0 tenv + t0')) extC)) eqn: Hexp; tryfalse.*)
        replace x3 with (fromVal (BVal false)) in H8. simpl in H8. rewrite adv_ext_iter in H6.
        
        option_inv_auto. rewrite delay_trace_at. rewrite delay_trace_empty_before_n.
        unfold empty_trans. rewrite Rmult_0_r. rewrite Rplus_0_l.
        rewrite delay_trace_iter. simpl. rewrite plus_n_Sm.
        eapply IHn with (t:=Tnum n); try eassumption. reflexivity. rewrite <- plus_n_Sm.
-       replace (Z.of_nat (S (ILTexprSem t0 tenv + t0'))) with (Z.of_nat (ILTexprSem t0 tenv + t0') + 1)%Z.
+       replace (Z.of_nat (S (ILTexprSem t0 tenv + t0')))
+         with (Z.of_nat (ILTexprSem t0 tenv + t0') + 1)%Z.
        apply H4. rewrite <- of_nat_succ. apply f_equal. omega. omega.
        eapply Exp_translation_sound; try eassumption. rewrite Nat2Z.inj_add in Hexp; eassumption.
 
@@ -776,14 +710,16 @@ Proof.
        unfold empty_trans. rewrite Rmult_0_r. rewrite Rplus_0_l.
        rewrite delay_trace_iter. simpl. rewrite plus_n_Sm.
        eapply IHn with (t:=Tnum n); try eassumption. reflexivity.
-       replace (Z.of_nat (ILTexprSem t0 tenv + S t0')) with (Z.of_nat (ILTexprSem t0 tenv + t0') + 1)%Z.
+       replace (Z.of_nat (ILTexprSem t0 tenv + S t0'))
+         with (Z.of_nat (ILTexprSem t0 tenv + t0') + 1)%Z.
        apply H4. rewrite <- of_nat_succ. apply f_equal. omega. omega.
        eapply Exp_translation_sound; try eassumption. rewrite Nat2Z.inj_add in Hexp; eassumption.
 
        (* max = 0*)       
        replace x3 with (fromVal (BVal false)) in H8. simpl in H8. rewrite adv_ext_iter in H6.
        option_inv_auto. eapply IHn with (t:=Tnum n); try eassumption; try reflexivity.
-       replace (Z.of_nat (ILTexprSem t0 tenv + S t0')) with (Z.of_nat (ILTexprSem t0 tenv + t0') + 1)%Z.
+       replace (Z.of_nat (ILTexprSem t0 tenv + S t0'))
+         with (Z.of_nat (ILTexprSem t0 tenv + t0') + 1)%Z.
        apply H4. rewrite <- of_nat_succ. apply f_equal. ring.
        eapply Exp_translation_sound; try eassumption. rewrite Nat2Z.inj_add in Hexp; eassumption.
 Qed.
