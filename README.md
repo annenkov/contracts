@@ -10,7 +10,8 @@ from the Contract DSL to PEL, and use Coq's code extraction feature, to obtain
 correct Haskell implementation of the compiler.
 
 The [NWPT'16 abstract](http://dannenkov.me/papers/NWPTPayoffLang.pdf) and
-[presentation slides](http://dannenkov.me/papers/NWPT16Slides.pdf)
+presentation slides([slides 1](http://dannenkov.me/papers/NWPT16Slides.pdf),
+(slides 2)[http://dannenkov.me/papers/HIPERFIT_Workshop_2016.pdf])
 outlining the ideas and motivation for the payoff expression language (PEL).
 
 The Coq-based certified implementation of the language is
