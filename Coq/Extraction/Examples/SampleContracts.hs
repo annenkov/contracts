@@ -41,6 +41,17 @@ european' = translate 365
 composite :: Contr
 composite = european' & (366 ! simple)
 
+-- example of a contract template from Danil's thesis
+templateEx :: Contr
+templateEx = translateT (C.Tvar "t0")
+                 (both (100 # (transfer X Y EUR))
+                       (translateT (C.Tvar "t1")
+                          (if (100 < theObs)
+                           then (theObs * 100) # (transfer X Y EUR)
+                           else zero)))
+  where
+    theObs = rObs (Stock "AAPL") 0
+
 -- worst-off contract on five fixed dates (chain of iff)
 worstOff :: Contr
 worstOff = P.foldr mkDateCheck endCase (P.zip dDiffs premiums)

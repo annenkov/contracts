@@ -5,6 +5,7 @@ import Data.List
 import ContractTranslation
 import Contract
 
+internalFuncName = "payoffInternal"
 funcName = "payoff"
     
 fromBinOp op = case op of
@@ -57,7 +58,6 @@ fromPayoff e = case e of
                  ILPayoff t p1' p2' -> inParens (ifThenElse (show p1' ++ "== p1 && " ++ show p2' ++ "== p2") "1"
                                                                 (ifThenElse (show p1' ++ "== p2 && " ++ show p2' ++ "== p1") "-1" "0"))
 
-ppHaskellCode e = funcName ++ " ext tenv t0 t_now p1 p2 = " ++ fromPayoff e
 lambda v e = "(\\" ++ v ++ "->" ++ e ++ ")"
 -- some helpers for pretty-printing
 inParens s = "(" ++ s ++ ")"
@@ -69,9 +69,16 @@ commaSeparated = intercalate ", "
 surroundBy c s = c ++ s ++ c
 spaced = surroundBy " "
 ifThenElse cond e1 e2 = "if " ++ spaced (inParens cond) ++ "then" ++ spaced e1 ++ "else" ++ spaced e2
+dec name params body = name ++ " " ++ intercalate " " params ++ "=" ++ body
+fcall f args = f ++ " " ++ intercalate " " args
 
 header = "module Examples.PayoffFunction where\nimport qualified Data.Map as Map\nimport BaseTypes\nimport Examples.BasePayoff\n"
-                        
+
+payoffInternalDec e = dec internalFuncName ["ext", "tenv", "t0", "t_now", "p1", "p2"] (fromPayoff e)
+payoffDec = dec funcName  ["ext", "tenv", "t_now", "p1", "p2"] (fcall internalFuncName  ["ext", "tenv", "0", "t_now", "p1", "p2"])
+ppHaskellCode e = payoffInternalDec e ++ newLn payoffDec
+
+
 compileAndWrite exp =
   do
     let out = header ++ ppHaskellCode exp

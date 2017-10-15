@@ -40,6 +40,7 @@ translateEuropean  = fromContr (fromHoas european) tZero
 translateEuropean' = fromContr (fromHoas european') tZero
 translateWorstOff  = fromContr (fromHoas worstOff) tZero
 
+tranlateTemplate = fromContr (fromHoas templateEx) tZero
                      
 advSimple = fst (advance simple (mkExtEnvP [] []) empty_tenv)
 
@@ -51,6 +52,9 @@ trAdvSimple = transC (fromHoas advSimple)
 advTwoCF = fst (advance twoCF (mkExtEnvP [] []) empty_tenv)
 trTwoCF = transC (fromHoas twoCF)
 trAdvTwoCF = transC $ fromHoas advTwoCF
+
+trTemplate = transC (fromHoas templateEx)
+trTemplateCut = cutPayoff (transC (fromHoas templateEx))
 
 eval_empty exp = iLsem exp (\l t -> ILRVal 0) empty_tenv 0 0 (\t -> 1) X Y
 

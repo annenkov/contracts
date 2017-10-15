@@ -549,7 +549,13 @@ Lemma fold_unfold_ILTexprSem' t t0 tenv:
 
               end) tenv = ILTexprSem (tsmartPlus' (ILTexpr t) t0) tenv.
 Proof. reflexivity. Qed.
-
+Check summ_list_common_factor.
+Check sum_list_zero_horizon.
+Check zero_horizon_delay_trace.
+Check delay_scale_trace.
+Check scale_trace.
+Check summ_list_plus.
+Check sum_before_after_horizon.
 (* ------------------------------------------------------ *)
 (* Soundness of compilation from the Contact DSL to the   *)
 (* payoff expression language wrt. denotational semantics *)
@@ -560,8 +566,7 @@ Theorem Contr_translation_sound: forall c envC extC t0 t0',
 Proof.
   intro c. induction c;  unfold translation_sound.
   + (* Zero *)
-    intros. simpl in *. some_inv. subst. simpl in *. some_inv. compute.
-    unfold compose in H2. some_inv.
+    intros. simpl in *. some_inv. subst. simpl in *. some_inv.
     reflexivity.
   + (* Let *)
     intros. tryfalse.
@@ -569,7 +574,7 @@ Proof.
     intros. simpl in *. some_inv. subst. rewrite Rplus_0_r. unfold compose in H2. some_inv.
     rewrite delay_trace_at. unfold singleton_trace, singleton_trans.
     destruct (Party.eqb p p0).
-    - simpl in *. some_inv. subst. rewrite Rmult_0_r. destruct t0; reflexivity. 
+    - simpl in *. rewrite Rmult_0_r. some_inv. subst. reflexivity. 
     - simpl in *. some_inv. unfold eval_payoff.
       destruct (Party.eqb p p1); destruct (Party.eqb p0 p2);
       try (rewrite H; rewrite Rmult_1_r; reflexivity);
@@ -637,15 +642,17 @@ Proof.
       destruct v; tryfalse. destruct b.
       * (* Condition evaluates to true *)      
         replace x3 with (fromVal (BVal true)) in H8. simpl in H8.
-        eapply IHc1 with (envC:=envC); try eassumption. simpl. rewrite H6.
-        reflexivity. rewrite plus0_0_n.
-        destruct (Max.max_dec (horizon c1 tenv) (horizon c2 tenv)) as [Hmax_h1 | Hmax_h2].
-        rewrite Hmax_h1. reflexivity.
-        rewrite Hmax_h2. apply Nat.max_r_iff in Hmax_h2.
-        assert (Hh2eq: horizon c2 tenv = horizon c1 tenv + (horizon c2 tenv - horizon c1 tenv))
-          by omega.
-        rewrite Hh2eq. erewrite sum_before_after_horizon with (t1:=0). reflexivity. eassumption.
-        eapply Exp_translation_sound; rewrite Nat2Z.inj_add in Hexp; try eassumption.
+        eapply IHc1 with (envC:=envC); try eassumption.
+        ** simpl. rewrite H6. reflexivity.
+        ** rewrite plus0_0_n.
+           destruct (Max.max_dec (horizon c1 tenv) (horizon c2 tenv)) as [Hmax_h1 | Hmax_h2].
+           *** rewrite Hmax_h1. reflexivity.
+           *** rewrite Hmax_h2. apply Nat.max_r_iff in Hmax_h2.
+               assert (Hh2eq: horizon c2 tenv = horizon c1 tenv + (horizon c2 tenv - horizon c1 tenv))
+                 by omega.
+               rewrite Hh2eq. erewrite sum_before_after_horizon with (t1:=0). reflexivity.
+               eassumption.
+        ** eapply Exp_translation_sound; rewrite Nat2Z.inj_add in Hexp; try eassumption.
      * (* Condition evaluates to false *)
        replace x3 with (fromVal (BVal false)) in H8. simpl in H8.
        eapply IHc2 with (envC:=envC); try eassumption. simpl. rewrite H6.
@@ -724,3 +731,237 @@ Proof.
        eapply Exp_translation_sound; try eassumption. rewrite Nat2Z.inj_add in Hexp; eassumption.
 Qed.
 
+
+(* Lemma real_exp_compile_sem_total e il ext env tenv p1 p2 t0 G d: *)
+(*   G |-E e ∶ REAL -> fromExp t0 e = Some il -> *)
+(*       exists v, IL[|il|]env ext tenv 0 d p1 p2 = Some (ILRVal v). *)
+(* Proof. *)
+(*   intros T C. *)
+(*   generalize dependent il. *)
+(*   induction T using  TypeExp_ind';intros;tryfalse. *)
+(*   + inversion H;subst; simpl in *;tryfalse. *)
+(*     (* Literals *) *)
+(*     * destruct es; tryfalse; *)
+(*         destruct il; tryfalse; some_inv; subst; simpl in *; eauto. *)
+(*       (* Unary *) *)
+(*     * do 2 try (destruct es; tryfalse); tryfalse. option_inv_auto. *)
+(*       some_inv. subst. inversion_clear H1. destruct (H2 eq_refl x) as [v Hv];auto. *)
+(*       exists (-v)%R. simpl. autounfold. rewrite Hv. reflexivity. *)
+(*     * do 4 try (destruct es; tryfalse); tryfalse. option_inv_auto. *)
+(*       some_inv. subst. inversion_clear H1.  inversion_clear H6. *)
+(*       inversion_clear H7. *)
+(*       destruct (H2 eq_refl x) as [v Hv];auto. *)
+(*       exists (-v)%R. simpl. autounfold. rewrite Hv. reflexivity. *)
+Check ex.
+
+Lemma adv_ext_neg_adv t0 t1 (ext : ExtEnv' ILVal) obs: adv_ext (-t0) ext obs (t1 + t0)%Z = ext obs t1.
+Proof.
+  unfold adv_ext. replace (- t0 + (t1 + t0))%Z with t1 by ring.
+  reflexivity.
+Qed.
+
+Definition consistent_ty : Ty -> ILVal -> Prop :=
+  fun ty v => match ty with
+            | REAL => exists v', v = ILRVal v'
+            | BOOL => exists v', v = ILBVal v'
+            end.
+
+Definition toILExt (ext : ExtEnv) := (fun k t => (fromVal (ext k t)) ).
+
+(* TODO: use more proof automation to get rid of proof code duplication *)
+Theorem typed_exp_compile_sem_total e il p1 p2 ty G d ext tenv t0 t0':
+  G |-E e ∶ ty -> TypeExt ext -> fromExp (ILTexprZ (ILTexpr (Tnum t0))) e = Some il ->
+      exists v, IL[|il|] (toILExt ext) tenv t0' 0 d p1 p2 = Some v
+                /\ consistent_ty ty v.
+Proof.
+  intros T Text C.
+  generalize dependent il.
+  induction T using  TypeExp_ind'; intros; tryfalse.
+  + inversion H;subst; simpl in *.
+    (* Literals *)
+    * destruct es; tryfalse;
+        destruct il; tryfalse; some_inv; subst; simpl in *; eauto.
+    * destruct es; tryfalse;
+        destruct il; tryfalse; some_inv; subst; simpl in *; eauto.
+      (* Unary *)
+    * do 2 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion_clear H1 as [H2| ]. destruct (H2 _ H3) as [v Hv].
+      destruct Hv as [L R]. simpl in *. destruct R.
+      exists (ILRVal (-x0)). autounfold. rewrite L. subst. simpl.
+      split;eauto.
+    * do 2 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion_clear H1 as [H2| ]. destruct (H2 _ H3) as [v Hv].
+      destruct Hv as [L R]. simpl in *. destruct R.
+      exists (ILBVal (negb x0)). autounfold. rewrite L. subst. simpl.
+      split;eauto.
+      (* cond *)
+    * do 4 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion_clear H1 as [H2| ].
+      inversion_clear H6 as [H2'| ].
+      inversion_clear H7 as [H2''| ].
+      destruct (H2 _ H3) as [v Hv]. destruct (H6 _ H4) as [v' Hv'].
+      destruct (H1 _ H5) as [v'' Hv''].
+      intuition.
+      destruct t.
+      ** simpl in *. destruct H9 as [v0 Hv0]. destruct H11 as [v1 Hv1].
+         destruct H13 as [v2 Hv2]. subst.
+         exists (ILRVal (if v0 then v2 else v1)). autounfold. rewrite H7.
+         destruct v0;split;eauto.
+      ** simpl in *. destruct H9 as [v0 Hv0]. destruct H11 as [v1 Hv1].
+         destruct H13 as [v2 Hv2]. subst.
+         exists (ILBVal (if v0 then v2 else v1)). autounfold. rewrite H7.
+         destruct v0;split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILRVal (v0 + v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILRVal (v0 - v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILRVal (v0 * v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILRVal (v0 / v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILBVal (v0 && v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILBVal (v0 || v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILBVal (Rltb v0 v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILBVal (Rleb v0  v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+    * do 3 try (destruct es; tryfalse); tryfalse. option_inv_auto.
+      some_inv. subst. simpl in *.
+      inversion H1 as [H2 | ]. subst. inversion H4 as [| ? ? ? ? H2']. subst.
+      destruct (H2 _ H3) as [v Hv]. destruct (H2' _ H5) as [v' Hv'].
+      destruct Hv as [L R]. destruct Hv' as [L' R']. simpl in *.
+      destruct R as [v0]. destruct R' as [v1]. subst.
+      exists (ILBVal (Reqb v0 v1)). autounfold. rewrite L. rewrite L'.
+      split;eauto.
+  + simpl in *. destruct il;tryfalse. some_inv. subst. simpl. eexists.
+    split;eauto. unfold TypeExt in Text.
+    assert (H' := Text (Z.of_nat t0' + (z + Z.of_nat t0))%Z _ _ H).
+    inversion H';
+    subst; simpl; eexists; unfold toILExt,fromVal; rewrite <- H1; eauto.
+Qed.
+
+Lemma toILExt_adv_ext n ext : toILExt (adv_ext n ext) = (adv_ext n (toILExt ext)).
+Proof.
+  unfold toILExt. apply functional_extensionality.
+  intros l. apply functional_extensionality.
+  intros t. reflexivity.
+Qed.
+
+Theorem typed_contr_compile_sem_total c il ext tenv p1 p2  G d t0 t0':
+      G |-C c ->
+      TypeExt ext ->
+      IsClosedCT c ->
+      fromContr c (ILTexpr (Tnum t0)) = Some il ->
+      exists v, IL[|il|](toILExt ext) tenv t0' 0 d p1 p2 = Some (ILRVal v).
+Proof.
+  intros T Text Cl C.
+  generalize dependent ext.
+  generalize dependent il.
+  generalize dependent t0.
+  generalize dependent t0'.
+  induction T; intros t0' t0 il;intros ;tryfalse.
+  + simpl in *; destruct il; tryfalse; some_inv; subst; simpl; eauto.
+  + simpl in *. some_inv. destruct (Party.eqb p0 p3).
+    * subst. simpl. eauto.
+    * simpl. unfold eval_payoff.
+      destruct (Party.eqb p0 p1),(Party.eqb p3 p2),(Party.eqb p3 p1),(Party.eqb p0 p2); simpl;eauto.
+  + simpl in *. option_inv_auto. some_inv. subst. simpl in *.
+    inversion Cl. subst.
+    destruct (IHT H2 t0' t0 _ H3 ext Text) as [v Hv].
+    eapply typed_exp_compile_sem_total with
+        (t0':=t0')(tenv:=tenv) (p1:=p1) (p2:=p2) (d:=d) in H;eauto.
+    destruct H as [v' Htmp]. destruct Htmp as [Hv' Ht'].
+    simpl in *. destruct Ht' as [r Hr]. subst.
+    exists (r * v)%R. autounfold.
+    rewrite Hv. rewrite Hv'. reflexivity.
+  + simpl in *. inversion Cl. subst.
+    destruct (IHT H0 t0' _ _ C _ Text) as [r Hr].
+    eauto.
+  + inversion Cl. subst.
+    simpl in *. option_inv_auto.
+    edestruct IHT1 as [v Hv];eauto.
+    edestruct IHT2 as [v' Hv'];eauto.
+    some_inv. simpl.
+    exists (v + v')%R.
+    autounfold. rewrite Hv. rewrite Hv'. reflexivity.
+  + simpl in *. option_inv_auto. simpl in *.
+    inversion Cl.
+    generalize dependent t0'.
+    generalize dependent t0. subst.
+    induction n;intros.
+    * simpl.
+      edestruct IHT1 as [v Hv];eauto.
+      edestruct IHT2 as [v' Hv'];eauto.
+      eapply typed_exp_compile_sem_total
+      with (t0':=t0') (tenv:=tenv) (p1:=p1) (p2:=p2) (d:=d) in H2;eauto.
+      destruct H2 as [bv Htmp]. destruct Htmp as [Hbv Ht].
+      simpl in *. destruct Ht as [b Hb]. subst.
+      destruct b.
+      ** exists v. autounfold. rewrite Hbv. eauto.
+      ** exists v'. autounfold. rewrite Hbv. eauto.
+    * simpl.
+      assert (H2':= H2).
+      eapply typed_exp_compile_sem_total
+      with (t0':=t0') (tenv:=tenv) (p1:=p1) (p2:=p2) (d:=d) in H2;eauto.
+      destruct H2 as [bv Htmp]. destruct Htmp as [Hbv Ht].
+      simpl in *. destruct Ht as [b Hb]. subst.
+      destruct b.
+      ** edestruct IHT1 as [v Hv];eauto. exists v. autounfold. rewrite Hbv. eauto.
+      ** assert (Hcl : IsClosedCT (If e (Tnum n) c1 c2)) by auto.
+         edestruct (IHT2 H8 (S t0') t0 x0) as [v' Hv'];eauto.
+         edestruct (IHn Hcl t0 H1 H3 H2' (S t0')) as [v0 Hv0];intros;eauto. 
+         exists v0. autounfold. rewrite Hbv. eauto.
+Qed.

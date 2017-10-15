@@ -1,6 +1,8 @@
 module Examples.BasePayoff where
 import Debug.Trace
-{- 
+
+{-
+Semantics in Coq almost directly translates to a primitive "loopif" in Haskell
 Fixpoint loop_if_sem n t0 b e1 e2 : option ILVal:=
   b t0 >>=
        fun b' => match b' with
@@ -13,9 +15,10 @@ Fixpoint loop_if_sem n t0 b e1 e2 : option ILVal:=
                    | _ => None
                  end. 
 -}
+
 loopif :: Int -> Int -> (Int -> Bool) -> (Int -> a) -> (Int -> a) -> a
 loopif n t0 b e1 e2 = let b' = b t0 in
-                      trace (show b') $ case b' of
+                      case b' of
                         True -> e1 t0
                         False -> case n of
                                    0 -> e2 t0

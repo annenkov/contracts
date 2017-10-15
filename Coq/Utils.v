@@ -111,7 +111,6 @@ Definition liftM2 {A B C} (f : A -> B -> C) (x : option A) (y : option B) : opti
 Definition liftM3 {A B C D} (f : A -> B -> C -> D) (x : option A) (y : option B) (z : option C) : option D :=
  x >>= (fun x' => y >>= fun y' => z >>= pure ∘ f x' y').
 
-
 Fixpoint mapM {A B} (f : A -> option B) (l : list A) : option (list B) :=
   match l with
     | nil => Some nil
@@ -221,6 +220,7 @@ Proof.
   destruct x; simpl; autounfold; intros; inversion H. eexists. split; reflexivity.
 Qed.
 
+Check @bind_some.
 
 Lemma liftM_some {A B} (f : A -> B) x y : liftM f x = Some y -> exists x', x = Some x' /\ y = f x'.
 Proof.

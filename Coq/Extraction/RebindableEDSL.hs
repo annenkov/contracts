@@ -25,6 +25,7 @@ module RebindableEDSL
      ifThenElse,
      within,
      withinT,
+     translateT,
      module EDSL,
 ) where
 

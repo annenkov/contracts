@@ -86,7 +86,8 @@ x !<! y = opE Less [x, y]
 (!<=!) :: ExpHoas exp => exp R -> exp R -> exp B
 x !<=! y = opE Leq [x, y]
 
-
+-- WARNING: this seems to be a workaround because > and >= are not supported
+-- Must be fixed!
 (!>!) :: ExpHoas exp => exp R -> exp R -> exp B
 (!>!) = (!<!)
 
