@@ -95,6 +95,7 @@ Fixpoint ILTexprSemZ t tenv :=
     | ILTexprZ t1 => Z.of_nat (ILTexprSem t1 tenv)
   end.
 
+Check ILTexprSemZ.
 
 Local Close Scope Z.
 

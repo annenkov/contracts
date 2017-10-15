@@ -44,8 +44,6 @@ Parameter TVar : Set.
 Inductive Var : Set := V1 | VS (v:Var).
 
 (* The type of "template" variables. *)
-
-Parameter TVar : Set.
 Inductive TExpr : Set := Tvar (t : TVar) | Tnum (n : nat).
 
 

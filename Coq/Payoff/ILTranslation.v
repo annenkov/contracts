@@ -549,13 +549,7 @@ Lemma fold_unfold_ILTexprSem' t t0 tenv:
 
               end) tenv = ILTexprSem (tsmartPlus' (ILTexpr t) t0) tenv.
 Proof. reflexivity. Qed.
-Check summ_list_common_factor.
-Check sum_list_zero_horizon.
-Check zero_horizon_delay_trace.
-Check delay_scale_trace.
-Check scale_trace.
-Check summ_list_plus.
-Check sum_before_after_horizon.
+
 (* ------------------------------------------------------ *)
 (* Soundness of compilation from the Contact DSL to the   *)
 (* payoff expression language wrt. denotational semantics *)

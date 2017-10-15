@@ -220,8 +220,6 @@ Proof.
   destruct x; simpl; autounfold; intros; inversion H. eexists. split; reflexivity.
 Qed.
 
-Check @bind_some.
-
 Lemma liftM_some {A B} (f : A -> B) x y : liftM f x = Some y -> exists x', x = Some x' /\ y = f x'.
 Proof.
   destruct x; simpl; autounfold; intros; inversion H. eexists. split; reflexivity.
