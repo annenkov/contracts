@@ -100,7 +100,6 @@ Definition singleton_trans (p1 p2 : Party) (a : Asset) r : Trans
 Definition add_trans : Trans -> Trans -> Trans := fun t1 t2 p1 p2 c => (t1 p1 p2 c + t2 p1 p2 c).
 Definition scale_trans : R -> Trans -> Trans := fun s t p1 p2 c => (t p1 p2 c * s).
 
-
 Lemma scale_empty_trans r : scale_trans r empty_trans = empty_trans.
 Proof.
   unfold scale_trans, empty_trans. rewrite Rmult_0_l. reflexivity.
@@ -112,17 +111,26 @@ Proof.
 Qed.
 
 
+Lemma add_trans_comm t1 t2 : add_trans t1 t2 = add_trans t2 t1.
+Proof.
+ do 3 (apply functional_extensionality;intro). unfold add_trans. ring.
+Qed.
 
 Lemma add_empty_trans_l t : add_trans empty_trans t = t.
 Proof.
-  unfold add_trans, empty_trans. do 3 (apply functional_extensionality;intro). rewrite Rplus_0_l. reflexivity.
+  unfold add_trans, empty_trans. do 3 (apply functional_extensionality;intro). ring.
 Qed.
 
 Lemma add_empty_trans_r t : add_trans t empty_trans = t.
 Proof.
-  unfold add_trans, empty_trans. do 3 (apply functional_extensionality;intro). rewrite Rplus_0_r. reflexivity.
+  unfold add_trans, empty_trans. do 3 (apply functional_extensionality;intro). ring.
 Qed.
 
+Lemma add_trans_scale_distr t1 t2 r :
+  scale_trans r (add_trans t1 t2) = (add_trans (scale_trans r t1) (scale_trans r t2)).
+Proof.
+  do 3 (apply functional_extensionality;intro). unfold add_trans,scale_trans. ring.
+Qed.
 
 Hint Resolve scale_empty_trans add_empty_trans_l add_empty_trans_r.
 
@@ -168,6 +176,10 @@ Definition delay_trace (d : nat) (t : Trace) : Trace :=
 Definition add_trace (t1 t2 : Trace) : Trace 
   := fun x => add_trans (t1 x) (t2 x).
 
+Lemma add_trace_comm t1 t2 : add_trace t1 t2 = add_trace t2 t1.
+Proof.
+  apply functional_extensionality;intro. apply add_trans_comm.
+Qed.
 
 Lemma add_empty_trace_l t : add_trace empty_trace t = t.
 Proof.
@@ -177,6 +189,12 @@ Qed.
 Lemma add_empty_trace_r t : add_trace t empty_trace = t.
 Proof.
   unfold add_trace, empty_trace. apply functional_extensionality;intro. apply add_empty_trans_r.
+Qed.
+
+Lemma add_trace_scale_distsr r t1 t2 :
+  scale_trace r (add_trace t1 t2) = (add_trace (scale_trace r t1) (scale_trace r t2)).
+Proof.
+  apply functional_extensionality;intro. apply add_trans_scale_distr.
 Qed.
 
 
@@ -221,6 +239,15 @@ Lemma delay_trace_swap d d' e :
   delay_trace d (delay_trace d' e) = delay_trace d' (delay_trace d e).
 Proof.
   repeat rewrite delay_trace_iter. rewrite plus_comm. reflexivity.
+Qed.
+
+Lemma delay_trace_add d t1 t2 :
+  delay_trace d (add_trace t1 t2) = add_trace (delay_trace d t1) (delay_trace d t2).
+Proof.
+  unfold delay_trace,add_trace. apply functional_extensionality. intro x.
+  destruct (leb d x).
+  reflexivity.
+  symmetry.  auto.
 Qed.
 
 
