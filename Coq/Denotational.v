@@ -253,6 +253,7 @@ Qed.
 
 Lemma delay_trace_scale d r tr : delay_trace d (scale_trace r tr) = scale_trace r (delay_trace d tr).
 Proof.
+  unfold delay_trace.
   unfold delay_trace,scale_trace,compose. apply functional_extensionality. intro x.
   destruct (leb d x).
   reflexivity.

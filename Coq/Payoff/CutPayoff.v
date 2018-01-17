@@ -220,7 +220,6 @@ Proof.
       * rewrite IHnn; eauto.
 Qed.
 
-
 (* -------------------------------------------- *)
 (* Proof of soundness of the cutPayoff function *)
 (* with respect to one-step contract reduction  *)

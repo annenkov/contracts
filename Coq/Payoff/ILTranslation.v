@@ -764,7 +764,7 @@ Definition toILExt (ext : ExtEnv) := (fun k t => (fromVal (ext k t)) ).
 
 (* TODO: use more proof automation to get rid of proof code duplication *)
 Theorem typed_exp_compile_sem_total e il p1 p2 ty G d ext tenv t0 t0':
-  G |-E e ∶ ty -> TypeExt ext -> fromExp (ILTexprZ (ILTexpr (Tnum t0))) e = Some il ->
+  G |-E e ∶ ty -> TypeExt ext -> fromExp t0 e = Some il ->
       exists v, IL[|il|] (toILExt ext) tenv t0' 0 d p1 p2 = Some v
                 /\ consistent_ty ty v.
 Proof.
@@ -882,7 +882,7 @@ Proof.
       split;eauto.
   + simpl in *. destruct il;tryfalse. some_inv. subst. simpl. eexists.
     split;eauto. unfold TypeExt in Text.
-    assert (H' := Text (Z.of_nat t0' + (z + Z.of_nat t0))%Z _ _ H).
+    assert (H' := Text (Z.of_nat t0' + (z + ILTexprSemZ t0 tenv))%Z _ _ H).
     inversion H';
     subst; simpl; eexists; unfold toILExt,fromVal; rewrite <- H1; eauto.
 Qed.
@@ -898,7 +898,7 @@ Theorem typed_contr_compile_sem_total c il ext tenv p1 p2  G d t0 t0':
       G |-C c ->
       TypeExt ext ->
       IsClosedCT c ->
-      fromContr c (ILTexpr (Tnum t0)) = Some il ->
+      fromContr c t0 = Some il ->
       exists v, IL[|il|](toILExt ext) tenv t0' 0 d p1 p2 = Some (ILRVal v).
 Proof.
   intros T Text Cl C.
