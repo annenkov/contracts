@@ -36,11 +36,15 @@ tZeroZ = (ILTexprZ tZero)
 empty_tenv :: String -> Int
 empty_tenv = (\_ -> undefined)
 
+-- Use fromHoas to convert from HOAS representation to the plain AST
 translateEuropean  = fromContr (fromHoas european) tZero
 translateEuropean' = fromContr (fromHoas european') tZero
 translateWorstOff  = fromContr (fromHoas worstOff) tZero
 
 tranlateTemplate = fromContr (fromHoas templateEx) tZero
+
+-- printing the AST
+printEuroOption = putStrLn (show (fromHoas european))
                      
 advSimple = fst (advance simple (mkExtEnvP [] []) empty_tenv)
 

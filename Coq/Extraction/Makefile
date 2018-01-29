@@ -14,17 +14,14 @@ COQ_FILE = Extraction.v
 
 default: $(CONTRACT_TARGET) $(TRANSLATION_TARGET)
 
-Contract.hs: extract
+Contract.hs:
 	cp $(CONTRACT_HEADER) $(CONTRACT_TARGET)
 	sed -n $(CONTRACT_SED_SCRIPT) $(CONTRACT_EXTRACTED) >> $(CONTRACT_TARGET)
 
-ContractTranslation.hs: extract
+ContractTranslation.hs:
 	cp $(TRANSLATION_HEADER) $(TRANSLATION_TARGET)
 	sed -n $(TRANSLATION_SED_SCRIPT) $(TRANSLATION_EXTRACTED) >> $(TRANSLATION_TARGET)
 
-
-extract : $(COQ_FILE)
-	coqc $(COQ_FILE)
 
 clean:
 	rm -rf *~

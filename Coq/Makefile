@@ -130,7 +130,8 @@ VFILES:=Antisymmetry.v\
   Payoff/ILTranslation.v\
   Payoff/ILEquivalence.v\
   Payoff/CutPayoff.v\
-  Payoff/CutPayoffN.v
+  Payoff/CutPayoffN.v\
+  Extraction/Extraction.v
 
 ifneq ($(filter-out archclean clean cleanall printenv,$(MAKECMDGOALS)),)
 -include $(addsuffix .d,$(VFILES))

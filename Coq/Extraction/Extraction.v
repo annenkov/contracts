@@ -1,6 +1,3 @@
-Add LoadPath "..".
-Add LoadPath "../Payoff".
-
 Require Import Denotational.
 Require Import Reduction.
 Require Import Horizon.
@@ -9,6 +6,8 @@ Require Import Specialise.
 Require Import TimedTyping.
 Require Import ILTranslation.
 Require Import ILSemantics.
+Require Import CutPayoff.
+Require Import Nat.
 
 
 
@@ -55,8 +54,8 @@ Extract Inlined Constant R0 => "0".
 Extract Inlined Constant negb => "not".
 Extract Inlined Constant Z.eqb => "(==)".
 
-Extract Inlined Constant NPeano.leb => "(<=)".
-Extract Inlined Constant NPeano.ltb => "(<)".
+Extract Inlined Constant Nat.leb => "(<=)".
+Extract Inlined Constant Nat.ltb => "(<)".
 
 Extract Inductive prod => "(,)" [ "(,)" ].
 Extract Inlined Constant fst => "fst".

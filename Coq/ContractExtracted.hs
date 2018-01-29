@@ -1,21 +1,157 @@
-{-# OPTIONS_GHC -fno-warn-unused-binds -fno-warn-unused-matches #-}
+module ContractExtracted where
 
-module Contract (module Contract, module BaseTypes) where
+import qualified Prelude
 
-import Control.Monad (liftM,liftM2,liftM3)
-import Data.Map (Map)
-import Data.Maybe
-import qualified Data.Map as Map
+compOpp :: Ordering -> Ordering
+compOpp r =
+  case r of {
+   EQ -> EQ;
+   LT -> GT;
+   GT -> LT}
 
-import Prelude hiding (map)
-import qualified Prelude as P
-import BaseTypes
+succ :: Int -> Int
+succ x =
+  case x of {
+   unused p -> unused (succ p);
+   unused p -> unused p;
+   1 -> unused 1}
 
-type List a = [a]
-type FMap = Map ((Party,Party),Asset) Double
+add :: Int -> Int -> Int
+add x y =
+  case x of {
+   unused p ->
+    case y of {
+     unused q -> unused (add_carry p q);
+     unused q -> unused (add p q);
+     1 -> unused (succ p)};
+   unused p ->
+    case y of {
+     unused q -> unused (add p q);
+     unused q -> unused (add p q);
+     1 -> unused p};
+   1 ->
+    case y of {
+     unused q -> unused (succ q);
+     unused q -> unused q;
+     1 -> unused 1}}
 
-unionWith :: Ord k => (a -> a -> Maybe a) -> Map k a -> Map k a -> Map k a
-unionWith f = Map.mergeWithKey (const f) id id
+add_carry :: Int -> Int -> Int
+add_carry x y =
+  case x of {
+   unused p ->
+    case y of {
+     unused q -> unused (add_carry p q);
+     unused q -> unused (add_carry p q);
+     1 -> unused (succ p)};
+   unused p ->
+    case y of {
+     unused q -> unused (add_carry p q);
+     unused q -> unused (add p q);
+     1 -> unused (succ p)};
+   1 ->
+    case y of {
+     unused q -> unused (succ q);
+     unused q -> unused (succ q);
+     1 -> unused 1}}
+
+pred_double :: Int -> Int
+pred_double x =
+  case x of {
+   unused p -> unused (unused p);
+   unused p -> unused (pred_double p);
+   1 -> 1}
+
+compare_cont :: Ordering -> Int -> Int -> Ordering
+compare_cont r x y =
+  case x of {
+   unused p ->
+    case y of {
+     unused q -> compare_cont r p q;
+     unused q -> compare_cont GT p q;
+     1 -> GT};
+   unused p ->
+    case y of {
+     unused q -> compare_cont LT p q;
+     unused q -> compare_cont r p q;
+     1 -> GT};
+   1 ->
+    case y of {
+     1 -> r;
+     _ -> LT}}
+
+compare :: Int -> Int -> Ordering
+compare =
+  compare_cont EQ
+
+of_succ_nat :: Int -> Int
+of_succ_nat n =
+  (\fO fS n -> if n==0 then fO () else fS (n-1))
+    (\_ ->
+    1)
+    (\x ->
+    succ (of_succ_nat x))
+    n
+
+double :: Int -> Int
+double x =
+  case x of {
+   0 -> 0;
+   id p -> id (unused p);
+   negate p -> negate (unused p)}
+
+succ_double :: Int -> Int
+succ_double x =
+  case x of {
+   0 -> id 1;
+   id p -> id (unused p);
+   negate p -> negate (pred_double p)}
+
+pred_double0 :: Int -> Int
+pred_double0 x =
+  case x of {
+   0 -> negate 1;
+   id p -> id (pred_double p);
+   negate p -> negate (unused p)}
+
+pos_sub :: Int -> Int -> Int
+pos_sub x y =
+  case x of {
+   unused p ->
+    case y of {
+     unused q -> double (pos_sub p q);
+     unused q -> succ_double (pos_sub p q);
+     1 -> id (unused p)};
+   unused p ->
+    case y of {
+     unused q -> pred_double0 (pos_sub p q);
+     unused q -> double (pos_sub p q);
+     1 -> id (pred_double p)};
+   1 ->
+    case y of {
+     unused q -> negate (unused q);
+     unused q -> negate (pred_double q);
+     1 -> 0}}
+
+compare0 :: Int -> Int -> Ordering
+compare0 x y =
+  case x of {
+   0 ->
+    case y of {
+     0 -> EQ;
+     id _ -> LT;
+     negate _ -> GT};
+   id x' ->
+    case y of {
+     id y' -> compare x' y';
+     _ -> GT};
+   negate x' ->
+    case y of {
+     negate y' -> compOpp (compare x' y');
+     _ -> LT}}
+
+type TVar
+  = () -- AXIOM TO BE REALIZED
+  
 
 data Var =
    V1
@@ -362,7 +498,8 @@ inst_contr c tenv =
   case c of {
    Let e c' -> Let e (inst_contr c' tenv);
    Scale e c' -> Scale e (inst_contr c' tenv);
-   Translate texp c' -> Translate (Tnum (texprSem texp tenv)) (inst_contr c' tenv);
+   Translate texp c' -> Translate (Tnum (texprSem texp tenv))
+    (inst_contr c' tenv);
    Both c' c'' -> Both (inst_contr c' tenv) (inst_contr c'' tenv);
    If e texp c' c'' -> If e (Tnum (texprSem texp tenv)) (inst_contr c' tenv)
     (inst_contr c'' tenv);
@@ -576,14 +713,16 @@ inferE env e =
   case e of {
    OpE op args ->
     (>>=) (sequence (P.map (inferE env) args)) (\args' ->
-      liftM (\ty -> TimedType ty (tmaxs (P.map time args'))) (inferOp op (P.map type0 args')));
+      liftM (\ty -> TimedType ty (tmaxs (P.map time args')))
+        (inferOp op (P.map type0 args')));
    Obs l i -> Just (TimedType (inferObs l) (Time i));
    VarE v -> lookupEnv v env;
    Acc f d z ->
     (>>=) (inferE (P.map (add_time d) env) z) (\t ->
       (>>=) (inferE ((:) (TimedType (type0 t) TimeBot) env) f) (\t' ->
         case tyeqb (type0 t) (type0 t') of {
-         True -> Just (TimedType (type0 t) (tmax (tsub' d (time t)) (time t')));
+         True -> Just (TimedType (type0 t)
+          (tmax (tsub' d (time t)) (time t')));
          False -> Nothing}))}
 
 data TimeI =
@@ -633,7 +772,8 @@ inferC env tenv c =
          True -> Just t;
          False -> Nothing}));
    Translate d c' ->
-    liftM (iadd (texprSem d tenv)) (inferC (P.map (sub_time (texprSem d tenv)) env) tenv c');
+    liftM (iadd (texprSem d tenv))
+      (inferC (P.map (sub_time (texprSem d tenv)) env) tenv c');
    Both c1 c2 -> liftM2 imin (inferC env tenv c1) (inferC env tenv c2);
    If e d c1 c2 ->
     (>>=) (inferE env e) (\t ->
@@ -843,8 +983,8 @@ lookupEnvP v env =
      [] -> Nothing;
      (:) _ xs -> lookupEnvP v0 xs}}
 
-specialiseFun :: ((List (Maybe Val)) -> (ExtEnv' (Maybe Val)) -> Exp) -> EnvP -> ExtEnvP -> Int
-                 -> (Maybe Val) -> Maybe Val
+specialiseFun :: ((List (Maybe Val)) -> (ExtEnv' (Maybe Val)) -> Exp) -> EnvP
+                 -> ExtEnvP -> Int -> (Maybe Val) -> Maybe Val
 specialiseFun f env ext l r =
   fromLit (f ((:) r env) (adv_ext (id l) ext))
 
@@ -881,7 +1021,8 @@ elimVarE v e =
    OpE op args -> liftM (\x -> OpE op x) (sequence (P.map (elimVarE v) args));
    Obs _ _ -> Just e;
    VarE v' -> liftM (\x -> VarE x) (elimVarV v v');
-   Acc e1 l e2 -> liftM2 (\e1' e2' -> Acc e1' l e2') (elimVarE (VS v) e1) (elimVarE v e2)}
+   Acc e1 l e2 ->
+    liftM2 (\e1' e2' -> Acc e1' l e2') (elimVarE (VS v) e1) (elimVarE v e2)}
 
 elimVarC :: Var -> Contr -> Maybe Contr
 elimVarC v c =
@@ -891,7 +1032,8 @@ elimVarC v c =
    Translate l c' -> liftM (\x -> Translate l x) (elimVarC v c');
    Both c1 c2 -> liftM2 (\x x0 -> Both x x0) (elimVarC v c1) (elimVarC v c2);
    If e l c1 c2 ->
-    liftM3 (\e' c1' c2' -> If e' l c1' c2') (elimVarE v e) (elimVarC v c1) (elimVarC v c2);
+    liftM3 (\e' c1' c2' -> If e' l c1' c2') (elimVarE v e) (elimVarC v c1)
+      (elimVarC v c2);
    _ -> Just c}
 
 smartLet :: Exp -> Contr -> Contr
@@ -929,8 +1071,8 @@ smartTranslate l c =
      _ -> Translate (Tnum l) c})
     l
 
-traverseIf :: EnvP -> ExtEnvP -> Exp -> (ExtEnvP -> Contr) -> (ExtEnvP -> Contr) -> Int -> Int ->
-              Maybe Contr
+traverseIf :: EnvP -> ExtEnvP -> Exp -> (ExtEnvP -> Contr) -> (ExtEnvP ->
+              Contr) -> Int -> Int -> Maybe Contr
 traverseIf env ext e c1 c2 d l =
   case fromBLit (specialiseExp e env ext) of {
    Just b ->
@@ -951,15 +1093,17 @@ specialise c env tenv ext =
    Let e c' ->
     let {e' = specialiseExp e env ext} in
     smartLet e' (specialise c' ((:) (fromLit e') env) tenv ext);
-   Scale e c' -> smartScale (specialiseExp e env ext) (specialise c' env tenv ext);
+   Scale e c' ->
+    smartScale (specialiseExp e env ext) (specialise c' env tenv ext);
    Translate l c' ->
     let {t' = texprSem l tenv} in
     smartTranslate t' (specialise c' env tenv (adv_ext (id t') ext));
-   Both c1 c2 -> smartBoth (specialise c1 env tenv ext) (specialise c2 env tenv ext);
+   Both c1 c2 ->
+    smartBoth (specialise c1 env tenv ext) (specialise c2 env tenv ext);
    If e l c1 c2 ->
     fromMaybe c
-      (traverseIf env ext e (specialise c1 env tenv) (specialise c2 env tenv) 0
-        (texprSem l tenv));
+      (traverseIf env ext e (specialise c1 env tenv) (specialise c2 env tenv)
+        0 (texprSem l tenv));
    _ -> c}
 
 type Key = (,) ((,) Party Party) Asset
@@ -1050,8 +1194,8 @@ redfun c env ext tenv =
       case ct1 of {
        (,) c1' t1 ->
         case ct2 of {
-         (,) c2' t2 -> (,) (smartBoth c1' c2') (union_with (+) t1 t2)}}) (redfun c1 env ext tenv)
-      (redfun c2 env ext tenv);
+         (,) c2' t2 -> (,) (smartBoth c1' c2') (union_with (+) t1 t2)}})
+      (redfun c1 env ext tenv) (redfun c2 env ext tenv);
    If b d c1 c2 ->
     (>>=) (fromBLit (specialiseExp b env ext)) (\b' ->
       case b' of {
@@ -1082,5 +1226,6 @@ horizon c tenv =
    Scale _ c' -> horizon c' tenv;
    Translate v c' -> plus0 (texprSem v tenv) (horizon c' tenv);
    Both c1 c2 -> max (horizon c1 tenv) (horizon c2 tenv);
-   If _ l c1 c2 -> plus0 (texprSem l tenv) (max (horizon c1 tenv) (horizon c2 tenv))}
+   If _ l c1 c2 ->
+    plus0 (texprSem l tenv) (max (horizon c1 tenv) (horizon c2 tenv))}
 
