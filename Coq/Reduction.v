@@ -573,13 +573,14 @@ Definition lift2M {A B C} (f : A -> B -> C) (x : option (A * B)) : option C
 Program Definition scale_trans' (v : option R) (t : SMap) : option SMap :=
   match v with
   | None => if SMap.is_empty t then Some SMap.empty else None
-  | Some v => Some (if Req_dec v 0 then SMap.empty else  SMap.map (fun x => v * x) _ t)
+  | Some v => Some (if Req_dec v 0
+                    then SMap.empty
+                    else SMap.map (fun x => v * x) _ t)
   end.
 
-Next Obligation. 
+Next Obligation.
 apply Rmult_integral in H0. destruct H0. tryfalse. assumption.
-Qed.  
-  
+Qed.
 
 
 

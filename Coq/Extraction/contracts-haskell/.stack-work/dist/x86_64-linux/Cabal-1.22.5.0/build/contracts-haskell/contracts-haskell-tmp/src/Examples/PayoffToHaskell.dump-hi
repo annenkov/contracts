@@ -1,0 +1,634 @@
+
+==================== FINAL INTERFACE ====================
+2018-04-08 09:58:11.350421 UTC
+
+interface main@main:Examples.PayoffToHaskell 7103
+  interface hash: 175d5957a19a5cdee8ee9dded25b2bdd
+  ABI hash: 780e41aa1a80e12efcb7aaeeb1a07101
+  export-list hash: 9e0155aefd5ead34ca5e8877691ebf35
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: 49f57e3d583b2cbe72431b176db3d46c
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  Examples.PayoffToHaskell.commaSeparated
+  Examples.PayoffToHaskell.compileAndWrite
+  Examples.PayoffToHaskell.dec
+  Examples.PayoffToHaskell.fcall
+  Examples.PayoffToHaskell.fromBinOp
+  Examples.PayoffToHaskell.fromILTexpr
+  Examples.PayoffToHaskell.fromILTexprZ
+  Examples.PayoffToHaskell.fromPayoff
+  Examples.PayoffToHaskell.fromTexpr
+  Examples.PayoffToHaskell.fromUnOp
+  Examples.PayoffToHaskell.funcName
+  Examples.PayoffToHaskell.header
+  Examples.PayoffToHaskell.ifThenElse
+  Examples.PayoffToHaskell.inBlock
+  Examples.PayoffToHaskell.inCurlBr
+  Examples.PayoffToHaskell.inParens
+  Examples.PayoffToHaskell.inSqBr
+  Examples.PayoffToHaskell.internalFuncName
+  Examples.PayoffToHaskell.lambda
+  Examples.PayoffToHaskell.newLn
+  Examples.PayoffToHaskell.payoffDec
+  Examples.PayoffToHaskell.payoffInternalDec
+  Examples.PayoffToHaskell.ppHaskellCode
+  Examples.PayoffToHaskell.spaced
+  Examples.PayoffToHaskell.surroundBy
+module dependencies: BaseTypes Contract ContractTranslation
+package dependencies: array-0.5.1.0@array_67iodizgJQIIxYVTp4emlA
+                      base-4.8.2.0* containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU
+                      deepseq-1.4.1.1@deeps_6vMKxt5sPFR0XsbRWvvq59 ghc-prim-0.4.0.0
+                      integer-gmp-1.0.0.0
+orphans: base-4.8.2.0:GHC.Base base-4.8.2.0:GHC.Float
+family instance modules: base-4.8.2.0:Control.Applicative
+                         base-4.8.2.0:Data.Either base-4.8.2.0:Data.Functor.Identity
+                         base-4.8.2.0:Data.Monoid base-4.8.2.0:Data.Type.Equality
+                         base-4.8.2.0:Data.Void base-4.8.2.0:GHC.Exts
+                         base-4.8.2.0:GHC.Generics
+                         containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Map.Base
+                         containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Set.Base
+import  -/  base-4.8.2.0:Data.List 3f0782c8d4bf50eecefcd5ea1798aac8
+import  -/  base-4.8.2.0:Data.OldList d8fd80b0e14aa085ce6219cd89dad356
+import  -/  base-4.8.2.0:GHC.Base 1db77db5dae73d8c424c85b09fbadb89
+import  -/  base-4.8.2.0:GHC.Show 0e1d8380a8fb0cfb07ebeda3b70cbf38
+import  -/  base-4.8.2.0:Prelude 694dcaf039efe62df1c44834e2dbd2fb
+import  -/  base-4.8.2.0:System.IO 0248c1e850b7ea124cf7a2e1669ebf67
+import  -/  BaseTypes 65c5f953f1981ab087685c5da86fba76
+  Stock 072d1222ca60b7277ef5aee0921b438d
+import  -/  Contract a001d2d1dcba9b7dbff93220b44302c9
+  exports: 03296e9aefab777c45a744199fc35678
+  LabR 7cb28ffb686b74dbb1694a608e78429e
+  Tnum 8cb2d18a1db4771f2c9b55a16d715216
+  Tvar 6384254a7faf76e34eb54b2c4dc085fa
+import  -/  ContractTranslation 0c2cd9e21a35e55fae8276ae6940ea24
+  exports: e4218f7cbb4ca60110d47ce9e9efa79a
+  ILAdd 2aca60345d51af7d2b9b0ec09bf4ac76
+  ILAnd 44ddad1796fa19e30254ec8c69f7ffcb
+  ILBinExpr bf2f02af7577c96c67f2c37fd48f71cb
+  ILBool b7f00145319332a27d100950e3d9d2ee
+  ILDiv 51882f4773b215979a28f31f27eb532c
+  ILEqual e55816a60bc9f73b79a0e6f38b0c506c
+  ILFloat ccf6e9741d9833d60890b09013e504a4
+  ILIf 2c959dd0a95998456d6f21fbd95b4354
+  ILLeq 1ac11275172e87c67dde55d64751a243
+  ILLess 2ad7a6cc193b94e374b2aca6ca0d1bce
+  ILLessN 28d8012a6115d4008305649f6cb38209
+  ILLoopIf 4498c91ce97ff6e5504937c468cf4849
+  ILModel 92e28ce6b6d23bef1586dbab56b7a184
+  ILMult 5d64fcb043d703d9977a188cc6d2949b
+  ILNat d85152525fed75651b83e5ac9ff672cf
+  ILNeg 3e9d3affddc60de3ae2339ded12cda4f
+  ILNot d5caaf1bd7175041fe7523444042cc68
+  ILNow 6997c1d427b75182cf323a6c2f8efcc2
+  ILOr e5cad61f2810bd6a6de0e29db05425d2
+  ILPayoff 1d1c9536c810e3ee399d1e077b65f338
+  ILSub cdbaf62c5f24c5c4fdbd747a5b46f365
+  ILTexpr 5ef02270f102408a2f337693f0bf1e17
+  ILTexprZ 2cf277cb49704c089aad6521a482629a
+  ILTnumZ 86a93f9caf3c620c17d3eedae2eadef0
+  ILTplus 804cfc053582d70695ac084a3b2bfb77
+  ILTplusZ 0e8ab737d6e1d56ea920843b5508eacc
+  ILUnExpr 8d671e1fc53515b8e8843db3e13f33a5
+  ILtexpr 05bb987f0ebfc6097ffac566587bb9a1
+0a17081966d967ab97b3fdb2c7369cab
+  commaSeparated :: [[GHC.Types.Char]] -> [GHC.Types.Char]
+  {- Arity: 1,
+     Unfolding: (Data.OldList.intercalate
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.commaSeparated1) -}
+4f70c9e35d904f6aeada67d7bc58f190
+  commaSeparated1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# ", "#) -}
+7464778ac5bbecede4e64c2174ec22d3
+  compileAndWrite :: ContractTranslation.ILExpr -> GHC.Types.IO ()
+  {- Arity: 2, Strictness: <L,1*U><L,U>,
+     Unfolding: InlineRule (0, True, True)
+                Examples.PayoffToHaskell.compileAndWrite1
+                  `cast`
+                (<ContractTranslation.ILExpr>_R
+                 ->_R Sym (GHC.Types.NTCo:IO[0] <()>_R)) -}
+9e65d8cb21fbd0abca485f36b3df2029
+  compileAndWrite1 ::
+    ContractTranslation.ILExpr
+    -> GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
+  {- Arity: 2, Strictness: <L,1*U><L,U>,
+     Unfolding: (\ exp :: ContractTranslation.ILExpr
+                   eta :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
+                 Control.Exception.Base.bracket1
+                   @ GHC.IO.Handle.Types.Handle
+                   @ ()
+                   @ ()
+                   Examples.PayoffToHaskell.compileAndWrite2
+                     `cast`
+                   (Sym (GHC.Types.NTCo:IO[0] <GHC.IO.Handle.Types.Handle>_R))
+                   GHC.IO.Handle.hClose1
+                     `cast`
+                   (<GHC.IO.Handle.Types.Handle>_R
+                    ->_R Sym (GHC.Types.NTCo:IO[0] <()>_R))
+                   (\ hdl :: GHC.IO.Handle.Types.Handle[OneShot]
+                      eta1 :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
+                    GHC.IO.Handle.Text.hPutStr2
+                      hdl
+                      (GHC.Base.++
+                         @ GHC.Types.Char
+                         Examples.PayoffToHaskell.header
+                         (Examples.PayoffToHaskell.ppHaskellCode exp))
+                      GHC.Types.False
+                      eta1)
+                     `cast`
+                   (<GHC.IO.Handle.Types.Handle>_R
+                    ->_R Sym (GHC.Types.NTCo:IO[0] <()>_R))
+                   eta) -}
+f5140d50321db405c7a4591b1dd1a2d6
+  compileAndWrite2 ::
+    GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld,
+          GHC.IO.Handle.Types.Handle #)
+  {- Arity: 1,
+     Unfolding: (GHC.IO.Handle.FD.openFile1
+                   Examples.PayoffToHaskell.compileAndWrite3
+                   GHC.IO.IOMode.WriteMode) -}
+a16099c163095e7db1f8fe3f0cb7811d
+  compileAndWrite3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString#
+                   "./Examples/PayoffFunction.hs"#) -}
+8303725de0c260d497d6d1864025bac9
+  dec ::
+    [GHC.Types.Char]
+    -> [[GHC.Types.Char]] -> [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 3, Strictness: <S,1*U><L,1*U><L,U>,
+     Unfolding: (\ name :: [GHC.Types.Char]
+                   params :: [[GHC.Types.Char]]
+                   body :: [GHC.Types.Char] ->
+                 GHC.Base.++
+                   @ GHC.Types.Char
+                   name
+                   (GHC.CString.unpackAppendCString#
+                      " "#
+                      (case params of wild {
+                         [] -> GHC.CString.unpackAppendCString# "="# body
+                         : x xs1
+                         -> GHC.Base.++
+                              @ GHC.Types.Char
+                              (Data.OldList.intercalate_$spoly_go
+                                 @ GHC.Types.Char
+                                 x
+                                 (Data.OldList.prependToAll
+                                    @ [GHC.Types.Char]
+                                    Examples.PayoffToHaskell.payoffDec18
+                                    xs1))
+                              (GHC.CString.unpackAppendCString# "="# body) }))) -}
+d55f95dfaa1111d72bc5090cbe2853c1
+  fcall :: [GHC.Types.Char] -> [[GHC.Types.Char]] -> [GHC.Types.Char]
+  {- Arity: 2, Strictness: <S,1*U><L,1*U>,
+     Unfolding: (\ f :: [GHC.Types.Char] args :: [[GHC.Types.Char]] ->
+                 GHC.Base.++
+                   @ GHC.Types.Char
+                   f
+                   (GHC.CString.unpackAppendCString#
+                      " "#
+                      (case args of wild {
+                         [] -> GHC.Types.[] @ GHC.Types.Char
+                         : x xs1
+                         -> Data.OldList.intercalate_$spoly_go
+                              @ GHC.Types.Char
+                              x
+                              (Data.OldList.prependToAll
+                                 @ [GHC.Types.Char]
+                                 Examples.PayoffToHaskell.payoffDec18
+                                 xs1) }))) -}
+e0be3c7eeb8c49daa49a8cda0859285d
+  fromBinOp :: ContractTranslation.ILBinOp -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: (\ op :: ContractTranslation.ILBinOp ->
+                 case op of wild {
+                   ContractTranslation.ILAdd -> Examples.PayoffToHaskell.fromBinOp9
+                   ContractTranslation.ILSub -> Examples.PayoffToHaskell.fromBinOp8
+                   ContractTranslation.ILMult -> Examples.PayoffToHaskell.fromBinOp7
+                   ContractTranslation.ILDiv -> Examples.PayoffToHaskell.fromBinOp6
+                   ContractTranslation.ILAnd -> Examples.PayoffToHaskell.fromBinOp5
+                   ContractTranslation.ILOr -> Examples.PayoffToHaskell.fromBinOp4
+                   ContractTranslation.ILLess -> Examples.PayoffToHaskell.fromBinOp3
+                   ContractTranslation.ILLessN -> Examples.PayoffToHaskell.fromBinOp3
+                   ContractTranslation.ILLeq -> Examples.PayoffToHaskell.fromBinOp2
+                   ContractTranslation.ILEqual
+                   -> Examples.PayoffToHaskell.fromBinOp1 }) -}
+a6d05a1d4d940a127355232af0434028
+  fromBinOp1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "=="#) -}
+0b32f44674bbb46320faf60ccaa0ae86
+  fromBinOp2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "<="#) -}
+8e9a0f4550225ac431ff3a544d072336
+  fromBinOp3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "<"#) -}
+c85e54fdd8bfac141dd1c8d20dbcab92
+  fromBinOp4 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "||"#) -}
+7c8ce59886f426009327a162b66c14c3
+  fromBinOp5 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "&&"#) -}
+3569080720b17fb0e189311810b2e198
+  fromBinOp6 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "/"#) -}
+ed41b0681caf4cb1a68726f3e6bb09ef
+  fromBinOp7 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "*"#) -}
+6e12938bf602ccbfdf1ab5540496d7a7
+  fromBinOp8 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "-"#) -}
+f622e52ed5ffc77e8648cf549969cba2
+  fromBinOp9 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "+"#) -}
+7743c5644b1fc874d18902e8a8fbec77
+  fromILTexpr :: ContractTranslation.ILTExpr -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <S,1*U> -}
+4cd1b4afbddaa23625d0b7076f064362
+  fromILTexprZ :: ContractTranslation.ILTExprZ -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <S,1*U> -}
+880832247a7570669a3ef5e81116c9b3
+  fromPayoff :: ContractTranslation.ILExpr -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <S,1*U> -}
+ed5fc7154ccae576a9a6f6859ccd1c19
+  fromTexpr :: Contract.TExpr -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: (\ e :: Contract.TExpr ->
+                 case e of wild {
+                   Contract.Tvar s
+                   -> GHC.CString.unpackAppendCString#
+                        "("#
+                        (GHC.Base.++
+                           @ GHC.Types.Char
+                           (GHC.CString.unpackAppendCString#
+                              "tenv Map.! "#
+                              (GHC.Types.:
+                                 @ GHC.Types.Char
+                                 GHC.Show.shows6
+                                 (GHC.Show.showLitString s Examples.PayoffToHaskell.fromTexpr2)))
+                           Examples.PayoffToHaskell.fromTexpr1)
+                   Contract.Tnum n -> GHC.Show.$fShowInt_$cshow n }) -}
+f3dc7d943cbfddd347c78f0950b242af
+  fromTexpr1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# ")"#) -}
+d5ef5dc1138ccbe0b2b526f5958b145c
+  fromTexpr2 :: [GHC.Types.Char]
+  {- HasNoCafRefs,
+     Unfolding: (GHC.Types.:
+                   @ GHC.Types.Char
+                   GHC.Show.shows6
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+1d64ddfe5c1f5905bcfba60e41f49556
+  fromUnOp :: ContractTranslation.ILUnOp -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ op :: ContractTranslation.ILUnOp ->
+                 case op of wild {
+                   ContractTranslation.ILNot -> Examples.PayoffToHaskell.fromUnOp1
+                   ContractTranslation.ILNeg
+                   -> Examples.PayoffToHaskell.fromBinOp8 }) -}
+044d45b59c2d2dbb5f5c14ea790d1616
+  fromUnOp1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "not"#) -}
+63039436a4a4071a273f30f90a4200e8
+  funcName :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "payoff"#) -}
+92c8809a980a9ec64468523312cae1be
+  header :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString#
+                   "module Examples.PayoffFunction where\n\
+                   \import qualified Data.Map as Map\n\
+                   \import BaseTypes\n\
+                   \import Examples.BasePayoff\n"#) -}
+3823efdb0c64e15adeed186199b98cf0
+  ifThenElse ::
+    [GHC.Types.Char]
+    -> [GHC.Types.Char] -> [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 3, Strictness: <L,1*U><L,1*U><L,1*U>,
+     Unfolding: (\ cond :: [GHC.Types.Char]
+                   e1 :: [GHC.Types.Char]
+                   e2 :: [GHC.Types.Char] ->
+                 GHC.CString.unpackAppendCString#
+                   "if "#
+                   (GHC.Base.++
+                      @ GHC.Types.Char
+                      Examples.PayoffToHaskell.payoffDec18
+                      (GHC.Base.++
+                         @ GHC.Types.Char
+                         (GHC.CString.unpackAppendCString#
+                            "("#
+                            (GHC.Base.++
+                               @ GHC.Types.Char
+                               cond
+                               Examples.PayoffToHaskell.fromTexpr1))
+                         (GHC.Base.++
+                            @ GHC.Types.Char
+                            Examples.PayoffToHaskell.payoffDec18
+                            (GHC.CString.unpackAppendCString#
+                               "then"#
+                               (GHC.Base.++
+                                  @ GHC.Types.Char
+                                  Examples.PayoffToHaskell.payoffDec18
+                                  (GHC.Base.++
+                                     @ GHC.Types.Char
+                                     e1
+                                     (GHC.Base.++
+                                        @ GHC.Types.Char
+                                        Examples.PayoffToHaskell.payoffDec18
+                                        (GHC.CString.unpackAppendCString#
+                                           "else"#
+                                           (GHC.Base.++
+                                              @ GHC.Types.Char
+                                              Examples.PayoffToHaskell.payoffDec18
+                                              (GHC.Base.++
+                                                 @ GHC.Types.Char
+                                                 e2
+                                                 Examples.PayoffToHaskell.payoffDec18))))))))))) -}
+8bff7f4e82f2aa325370bff1f485890b
+  inBlock :: [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: (\ x :: [GHC.Types.Char] ->
+                 GHC.CString.unpackAppendCString#
+                   "\n"#
+                   (GHC.CString.unpackAppendCString#
+                      "{"#
+                      (GHC.Base.++
+                         @ GHC.Types.Char
+                         (GHC.CString.unpackAppendCString# "\n"# x)
+                         Examples.PayoffToHaskell.inBlock1))) -}
+86f228bfdf4ea4ecbe4a03d81812e78c
+  inBlock1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "}"#) -}
+db123f67c86508e9663900d432aafa44
+  inCurlBr :: [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <L,1*U>,
+     Unfolding: (\ s :: [GHC.Types.Char] ->
+                 GHC.CString.unpackAppendCString#
+                   "{"#
+                   (GHC.Base.++
+                      @ GHC.Types.Char
+                      s
+                      Examples.PayoffToHaskell.inBlock1)) -}
+ba1fddac95933bcf08f214fa33f2f82f
+  inParens :: [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <L,1*U>,
+     Unfolding: (\ s :: [GHC.Types.Char] ->
+                 GHC.CString.unpackAppendCString#
+                   "("#
+                   (GHC.Base.++
+                      @ GHC.Types.Char
+                      s
+                      Examples.PayoffToHaskell.fromTexpr1)) -}
+e8798964366e39235550bcbac5f80544
+  inSqBr :: [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <L,1*U>,
+     Unfolding: (\ s :: [GHC.Types.Char] ->
+                 GHC.CString.unpackAppendCString#
+                   "["#
+                   (GHC.Base.++
+                      @ GHC.Types.Char
+                      s
+                      Examples.PayoffToHaskell.inSqBr1)) -}
+a1e11854839bd0bcd4488ca834569c3e
+  inSqBr1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "]"#) -}
+dbd329a8e310b8281df70ed59b7aab8d
+  internalFuncName :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "payoffInternal"#) -}
+6e0847aba3d7d4aab70d7f9351605de8
+  lambda :: [GHC.Types.Char] -> [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 2, Strictness: <L,1*U><L,1*U>,
+     Unfolding: (\ v :: [GHC.Types.Char] e :: [GHC.Types.Char] ->
+                 GHC.CString.unpackAppendCString#
+                   "(\\"#
+                   (GHC.Base.++
+                      @ GHC.Types.Char
+                      v
+                      (GHC.CString.unpackAppendCString#
+                         "->"#
+                         (GHC.Base.++
+                            @ GHC.Types.Char
+                            e
+                            Examples.PayoffToHaskell.fromTexpr1)))) -}
+5a0c8eee9214865d8384259a97ffd3c4
+  newLn :: [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 1, HasNoCafRefs, Strictness: <L,U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ s :: [GHC.Types.Char] ->
+                 GHC.CString.unpackAppendCString# "\n"# s) -}
+ca71e00fdb73de6c32f30d2fdef1cdf5
+  payoffDec :: [GHC.Types.Char]
+  {- Unfolding: (GHC.Base.++
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.funcName
+                   Examples.PayoffToHaskell.payoffDec1) -}
+928697b674d858c430df700d392a0cdd
+  payoffDec1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackAppendCString#
+                   " "#
+                   Examples.PayoffToHaskell.payoffDec2) -}
+b56abf5189ed236c91d58599e59df542
+  payoffDec10 :: [[GHC.Types.Char]]
+  {- Strictness: m2,
+     Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec15
+                   Examples.PayoffToHaskell.payoffDec11) -}
+7cc8a889723f0929e7e7bd7d72e66ace
+  payoffDec11 :: [[GHC.Types.Char]]
+  {- Strictness: m2,
+     Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec14
+                   Examples.PayoffToHaskell.payoffDec12) -}
+ad7ac41d079a11a6b0ca5f222b4af996
+  payoffDec12 :: [[GHC.Types.Char]]
+  {- Strictness: m2,
+     Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec13
+                   (GHC.Types.[] @ [GHC.Types.Char])) -}
+95b531fa47150dedeed196a2d98109f5
+  payoffDec13 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "p2"#) -}
+8207f28a1b829e519f9c95c91dcb5b0c
+  payoffDec14 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "p1"#) -}
+e6d6c31e0a99ea43280947bd17c90fea
+  payoffDec15 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "t_now"#) -}
+8ab93b964fc33f67118045c2b630e0a9
+  payoffDec16 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "0"#) -}
+b262316dd256ec2e305e65d50855b5a1
+  payoffDec17 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "tenv"#) -}
+0f4848f37f134d5582c5950e99635b90
+  payoffDec18 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# " "#) -}
+d53f2c46340248c3d1083ec1d25e459f
+  payoffDec19 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ext"#) -}
+cf2693884a8b4f88bef293e1b047974d
+  payoffDec2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.Base.++
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.payoffDec20
+                   Examples.PayoffToHaskell.payoffDec3) -}
+437e0359bc583dcd6a4efaa31b2ad458
+  payoffDec20 :: [GHC.Types.Char]
+  {- Unfolding: (Data.OldList.intercalate_$spoly_go
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.payoffDec19
+                   Examples.PayoffToHaskell.payoffDec21) -}
+4113b630a894665544adb85ca37f6ff6
+  payoffDec21 :: [[GHC.Types.Char]]
+  {- Unfolding: (Data.OldList.prependToAll
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec18
+                   Examples.PayoffToHaskell.payoffDec22) -}
+3518b663415397a815af0809bc57b2dd
+  payoffDec22 :: [[GHC.Types.Char]]
+  {- Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec17
+                   Examples.PayoffToHaskell.payoffDec10) -}
+55a03c1f3911d0940e0d6c9f47ef6eef
+  payoffDec3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackAppendCString#
+                   "="#
+                   Examples.PayoffToHaskell.payoffDec4) -}
+413513b46e37112dc4e2ecc67846520e
+  payoffDec4 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.Base.++
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.internalFuncName
+                   Examples.PayoffToHaskell.payoffDec5) -}
+7e27270187105f5946d43eef038c3ca5
+  payoffDec5 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackAppendCString#
+                   " "#
+                   Examples.PayoffToHaskell.payoffDec6) -}
+2f65b62336bfd2d60e2c8bb8c30ec9ae
+  payoffDec6 :: [GHC.Types.Char]
+  {- Unfolding: (Data.OldList.intercalate_$spoly_go
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.payoffDec19
+                   Examples.PayoffToHaskell.payoffDec7) -}
+0eebac40813aafed33f4c18462238015
+  payoffDec7 :: [[GHC.Types.Char]]
+  {- Unfolding: (Data.OldList.prependToAll
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec18
+                   Examples.PayoffToHaskell.payoffDec8) -}
+158c6fc284bd3db15aa4c4ad4417adcf
+  payoffDec8 :: [[GHC.Types.Char]]
+  {- Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec17
+                   Examples.PayoffToHaskell.payoffDec9) -}
+20abb49750f2478d896bf592101a7570
+  payoffDec9 :: [[GHC.Types.Char]]
+  {- Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec16
+                   Examples.PayoffToHaskell.payoffDec10) -}
+e3b043171ff249bbc9592d15fbc31731
+  payoffInternalDec :: ContractTranslation.ILExpr -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <L,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ e :: ContractTranslation.ILExpr ->
+                 Examples.PayoffToHaskell.dec
+                   Examples.PayoffToHaskell.internalFuncName
+                   Examples.PayoffToHaskell.payoffInternalDec1
+                   (Examples.PayoffToHaskell.fromPayoff e)) -}
+3cfd7cad2b769929421aadee02843ad9
+  payoffInternalDec1 :: [[GHC.Types.Char]]
+  {- Strictness: m2,
+     Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec19
+                   Examples.PayoffToHaskell.ppHaskellCode4) -}
+f2dfa69035077f3837d330dd731c1c04
+  ppHaskellCode :: ContractTranslation.ILExpr -> [GHC.Types.Char]
+  {- Arity: 1, Strictness: <L,1*U>,
+     Unfolding: (\ e :: ContractTranslation.ILExpr ->
+                 GHC.Base.++
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.internalFuncName
+                   (GHC.CString.unpackAppendCString#
+                      " "#
+                      (GHC.Base.++
+                         @ GHC.Types.Char
+                         Examples.PayoffToHaskell.ppHaskellCode2
+                         (GHC.CString.unpackAppendCString#
+                            "="#
+                            (GHC.Base.++
+                               @ GHC.Types.Char
+                               (Examples.PayoffToHaskell.fromPayoff e)
+                               Examples.PayoffToHaskell.ppHaskellCode1))))) -}
+9fe4e0402758cf4d9451b9c012f45b68
+  ppHaskellCode1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackAppendCString#
+                   "\n"#
+                   Examples.PayoffToHaskell.payoffDec) -}
+dd7e9d102adcc1d3140336d1f0665e42
+  ppHaskellCode2 :: [GHC.Types.Char]
+  {- Unfolding: (Data.OldList.intercalate_$spoly_go
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.payoffDec19
+                   Examples.PayoffToHaskell.ppHaskellCode3) -}
+6aabd6eb903371feeae3bd179073a2b6
+  ppHaskellCode3 :: [[GHC.Types.Char]]
+  {- Unfolding: (Data.OldList.prependToAll
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec18
+                   Examples.PayoffToHaskell.ppHaskellCode4) -}
+12a3f646631136dea870df7202b0e58a
+  ppHaskellCode4 :: [[GHC.Types.Char]]
+  {- Strictness: m2,
+     Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.payoffDec17
+                   Examples.PayoffToHaskell.ppHaskellCode5) -}
+f55bd82b0cf63bbaa9306c5b5195e54d
+  ppHaskellCode5 :: [[GHC.Types.Char]]
+  {- Strictness: m2,
+     Unfolding: (GHC.Types.:
+                   @ [GHC.Types.Char]
+                   Examples.PayoffToHaskell.ppHaskellCode6
+                   Examples.PayoffToHaskell.payoffDec10) -}
+0a404a990c2c5f53a286888e61f00045
+  ppHaskellCode6 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "t0"#) -}
+351431a270d07871b9ca7b32e3fe3369
+  spaced :: [GHC.Types.Char] -> [GHC.Types.Char]
+  {- Arity: 1,
+     Unfolding: (Examples.PayoffToHaskell.surroundBy
+                   @ GHC.Types.Char
+                   Examples.PayoffToHaskell.payoffDec18) -}
+5bd911e9d7b7386c869a969adc57acfc
+  surroundBy :: [a] -> [a] -> [a]
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,U><L,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ a c :: [a] s :: [a] ->
+                 GHC.Base.augment
+                   @ a
+                   (\ @ b c1 :: a -> b -> b[OneShot] n :: b[OneShot] ->
+                    GHC.Base.foldr @ a @ b c1 n c)
+                   (GHC.Base.augment
+                      @ a
+                      (\ @ b c1 :: a -> b -> b[OneShot] n :: b[OneShot] ->
+                       GHC.Base.foldr @ a @ b c1 n s)
+                      c)) -}
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: safe
+require own pkg trusted: False
+

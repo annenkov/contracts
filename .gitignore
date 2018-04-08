@@ -4,3 +4,5 @@
 *.hi
 *.o
 *.bak
+Makefile.coq
+Makefile.conf

@@ -1,0 +1,2177 @@
+
+==================== FINAL INTERFACE ====================
+2018-04-08 09:58:12.305519 UTC
+
+interface main@main:Examples.TranslationExample [orphan module] 7103
+  interface hash: 0e669c8d971acc3f456c20ccc192e25b
+  ABI hash: 887c97e4d4ca37ad9bd29c14aa60eb8f
+  export-list hash: 4af761385a80eba289ddb92056ad04da
+  orphan hash: 35f2f803312ba24607c3866790318fcd
+  flag hash: 921eaeababa24e95b39a7f0cfdbcb158
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  Examples.TranslationExample.advSimple
+  Examples.TranslationExample.advTwoCF
+  Examples.TranslationExample.adv_both
+  Examples.TranslationExample.adv_n
+  Examples.TranslationExample.adv_n'
+  Examples.TranslationExample.advance1
+  Examples.TranslationExample.appProd
+  Examples.TranslationExample.c1_eq1
+  Examples.TranslationExample.c1_eq2
+  Examples.TranslationExample.c1_eq3
+  Examples.TranslationExample.c2_eq1
+  Examples.TranslationExample.c2_eq2
+  Examples.TranslationExample.c2_eq3
+  Examples.TranslationExample.commute
+  Examples.TranslationExample.commute_horizon
+  Examples.TranslationExample.empty_tenv
+  Examples.TranslationExample.eq2
+  Examples.TranslationExample.eq3
+  Examples.TranslationExample.eq_causal
+  Examples.TranslationExample.eval
+  Examples.TranslationExample.eval_empty
+  Examples.TranslationExample.fromJustExtEnv
+  Examples.TranslationExample.nonObviouslyCausal
+  Examples.TranslationExample.obviouslyCausal
+  Examples.TranslationExample.path1
+  Examples.TranslationExample.path2
+  Examples.TranslationExample.printEuroOption
+  Examples.TranslationExample.sampleExt
+  Examples.TranslationExample.sampleILExt
+  Examples.TranslationExample.tZero
+  Examples.TranslationExample.tZeroZ
+  Examples.TranslationExample.trAdvSimple
+  Examples.TranslationExample.trAdvTwoCF
+  Examples.TranslationExample.trSimple
+  Examples.TranslationExample.trTemplate
+  Examples.TranslationExample.trTemplateCut
+  Examples.TranslationExample.trTwoCF
+  Examples.TranslationExample.tranlateTemplate
+  Examples.TranslationExample.transC
+  Examples.TranslationExample.translateEuropean
+  Examples.TranslationExample.translateEuropean'
+  Examples.TranslationExample.translateWorstOff
+module dependencies: BaseTypes Contract ContractTranslation EDSL
+                     Examples.PayoffToHaskell Examples.SampleContracts HOAS
+                     PrettyPrinting RebindableEDSL
+package dependencies: array-0.5.1.0@array_67iodizgJQIIxYVTp4emlA
+                      base-4.8.2.0 containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU
+                      deepseq-1.4.1.1@deeps_6vMKxt5sPFR0XsbRWvvq59 ghc-prim-0.4.0.0
+                      integer-gmp-1.0.0.0 time-1.5.0.1@time_FTheb6LSxyX1UABIbBXRfn
+orphans: base-4.8.2.0:GHC.Base base-4.8.2.0:GHC.Float
+         main@main:HOAS main@main:PrettyPrinting
+         time-1.5.0.1@time_FTheb6LSxyX1UABIbBXRfn:Data.Time.Calendar.Gregorian
+         time-1.5.0.1@time_FTheb6LSxyX1UABIbBXRfn:Data.Time.Format.Parse
+         time-1.5.0.1@time_FTheb6LSxyX1UABIbBXRfn:Data.Time.LocalTime.LocalTime
+family instance modules: base-4.8.2.0:Control.Applicative
+                         base-4.8.2.0:Data.Either base-4.8.2.0:Data.Functor.Identity
+                         base-4.8.2.0:Data.Monoid base-4.8.2.0:Data.Type.Equality
+                         base-4.8.2.0:Data.Void base-4.8.2.0:GHC.Exts
+                         base-4.8.2.0:GHC.Generics
+                         containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Map.Base
+                         containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Set.Base
+import  -/  base-4.8.2.0:Data.Foldable 2ce969969ad5231eb40bd713f94f05ad
+import  -/  base-4.8.2.0:Data.Maybe 1cb58de2b04ee3c0c0a7dc9201184aff
+import  -/  base-4.8.2.0:Data.Tuple 012ad951a59a9d85fe1de36a2f012986
+import  -/  base-4.8.2.0:GHC.Base 1db77db5dae73d8c424c85b09fbadb89
+import  -/  base-4.8.2.0:GHC.Num 9f42750c866f5832ca565146bd660c60
+import  -/  base-4.8.2.0:GHC.Show 0e1d8380a8fb0cfb07ebeda3b70cbf38
+import  -/  base-4.8.2.0:Prelude 694dcaf039efe62df1c44834e2dbd2fb
+import  -/  base-4.8.2.0:System.IO 0248c1e850b7ea124cf7a2e1669ebf67
+import  -/  containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Map 1800ccac43fd924c376b60eac12f4d04
+import  -/  ghc-prim-0.4.0.0:GHC.Classes e1f4ff80f7b5262008a595d29986fb18
+import  -/  BaseTypes 65c5f953f1981ab087685c5da86fba76
+  DKK 704943acbdd4ca583eab9a9df637dffb
+  EUR f5e7aafdef4ba43fb11832949e03491f
+  FX ff896b187dafc0596774425edbf8c85a
+  Stock 072d1222ca60b7277ef5aee0921b438d
+  X d0fa2e26fd9bb1d70762cd30ecc77def
+  Y d2b554c47d69c971910282357174aac8
+import  -/  Contract a001d2d1dcba9b7dbff93220b44302c9
+  exports: 03296e9aefab777c45a744199fc35678
+  BVal 223277297e85585ab21011c112c1ca11
+  Both 37f71d6c3edba0e4c1eed54aef9f22c7
+  Contr 2b7cf2ff7abe4fab650faa1cd601f781
+  ExtEnv' 2c36c4e4f545acd3b3bc6b9a472e6dee
+  ExtEnvP a0cff53ce1a33876a957716e00d9398b
+  LabB 8d7b6ec21f78a7809518abcda9224011
+  LabR 7cb28ffb686b74dbb1694a608e78429e
+  Mult 0fbec099a8f25d1feffb35181cefdceb
+  Obs babd087d9016937058c8437afb05cd51
+  ObsLabel 9eaec7e0150a3d9437c71b1eb0741d47
+  OpE 60a10ff16360d779467c0feb6834d961
+  RLit 9b694dd3701606adfc98afef128d1ede
+  RVal 4e994d352147cec72cc40eef53e6a251
+  Scale 9778f7bc37aa3385d2b8c14453c0de8f
+  TExpr b6d3d122a20c7bad1349187712a593b3
+  Tnum 8cb2d18a1db4771f2c9b55a16d715216
+  Transfer 592bd9ce494fe8e6c632f6f2a93b0d8d
+  Translate cc1de4b5c2c819003fd876e653fa956f
+  Tvar 6384254a7faf76e34eb54b2c4dc085fa
+  Val a65e4f73859840c0849db6d6dc7522c1
+  adv_ext 6c23d3f1ae202f3a150b1730813c7492
+  redfun f230b4423d5106edce535450ff15064f
+import  -/  ContractTranslation 0c2cd9e21a35e55fae8276ae6940ea24
+  exports: e4218f7cbb4ca60110d47ce9e9efa79a
+  ILAdd 2aca60345d51af7d2b9b0ec09bf4ac76
+  ILAnd 44ddad1796fa19e30254ec8c69f7ffcb
+  ILBVal cf7ceaad0476a76064fc205cac5ef863
+  ILBinExpr bf2f02af7577c96c67f2c37fd48f71cb
+  ILBinOp d079be0d364dc0c3547d20671b1e6751
+  ILBool b7f00145319332a27d100950e3d9d2ee
+  ILDiv 51882f4773b215979a28f31f27eb532c
+  ILEqual e55816a60bc9f73b79a0e6f38b0c506c
+  ILExpr 1ffa1d30381fe72b5ea734a0e0192980
+  ILFloat ccf6e9741d9833d60890b09013e504a4
+  ILIf 2c959dd0a95998456d6f21fbd95b4354
+  ILLeq 1ac11275172e87c67dde55d64751a243
+  ILLess 2ad7a6cc193b94e374b2aca6ca0d1bce
+  ILLessN 28d8012a6115d4008305649f6cb38209
+  ILLoopIf 4498c91ce97ff6e5504937c468cf4849
+  ILModel 92e28ce6b6d23bef1586dbab56b7a184
+  ILMult 5d64fcb043d703d9977a188cc6d2949b
+  ILNVal be4d97f259c8c1f495f00fe2d0207eae
+  ILNat d85152525fed75651b83e5ac9ff672cf
+  ILNeg 3e9d3affddc60de3ae2339ded12cda4f
+  ILNot d5caaf1bd7175041fe7523444042cc68
+  ILNow 6997c1d427b75182cf323a6c2f8efcc2
+  ILOr e5cad61f2810bd6a6de0e29db05425d2
+  ILPayoff 1d1c9536c810e3ee399d1e077b65f338
+  ILRVal ab5f072667c0c6c86db884b6cc364c70
+  ILSub cdbaf62c5f24c5c4fdbd747a5b46f365
+  ILTExpr a6e67f120041026a4bfa3391328f0043
+  ILTExprZ ceb76b78f8e0631c00b7cf6483743f1b
+  ILTexpr 5ef02270f102408a2f337693f0bf1e17
+  ILTexprZ 2cf277cb49704c089aad6521a482629a
+  ILTnumZ 86a93f9caf3c620c17d3eedae2eadef0
+  ILTplus 804cfc053582d70695ac084a3b2bfb77
+  ILTplusZ 0e8ab737d6e1d56ea920843b5508eacc
+  ILUnExpr 8d671e1fc53515b8e8843db3e13f33a5
+  ILUnOp 6fbb22c3aeb223ddf6e040bc91ba35a7
+  ILVal f8ce3c66aa291e43a09996bd4218d258
+  ILtexpr 05bb987f0ebfc6097ffac566587bb9a1
+  cutPayoff 876215596446eae40903a32f9b759e58
+  fromContr 018d0423638dd793820f0c371a5fe31f
+  fromExtEnv d420d0e0bd6101549c4d0db28aac4e14
+  iLsem 877c5fd25b3f5c2aee99babba6949a82
+import  -/  EDSL eb30536764a08a94649694935286a5a9
+  exports: 76b05b5ed21f7c54f0406700965e5762
+  advance e7268ffe9f11b54aba56981b8d211f2f
+  horizon fa790f0e267718edab356219018659e8
+  mkExtEnvP 4b07a4e27dbc9de591556e3bff97c1cc
+import  -/  Examples.PayoffToHaskell 780e41aa1a80e12efcb7aaeeb1a07101
+  exports: 9e0155aefd5ead34ca5e8877691ebf35
+import  -/  Examples.SampleContracts 75848cacf0c2b730f50c109f867fa9d3
+  exports: 28ea68b9e87e56fb41601c99e7379f01
+  composite a3fe04fb8c4048dfd70eaa2de5de9f56
+  european 541474eb0c98dd145a4d3569f33260e4
+  european' 9c37ca0154a990493f6ef5b8838177c2
+  simple b97bb7f7bdb4f3b50f6a9ef7300c3337
+  templateEx 5a619290af5dc3fec7b9e65d0c22b18c
+  twoCF b5d269e59d63285835156be9757527c0
+  worstOff 39047a11693125a050e773ef020f3b05
+import  -/  HOAS 30142d8132ad9fdb45a0c9d1ca0fdc65
+  exports: 30836575c2ad86bf46bf191ea76e57ac
+  Contr 41b09272fc4d23d4addccdd83f150c68
+  fromHoas 24c82b570e4ffd5b958cbfeaa2ce5e4f
+  toHoas 0badf4db4e662402d2d29dad7b3bebc6
+import  -/  PrettyPrinting 5ffccb64e48b3cd654647d2ec0df3241
+  exports: d0fedbf2cb7709f3cb2b36b1eb2beca0
+import  -/  RebindableEDSL 1f05f6deb5408b4f1cddcc8c5c740823
+  exports: 5974c7b2497ba37caa197c494e2ec138
+73097a18a2aaa0e5f99d880fd38d0b0c
+  $fEqILBinOp :: GHC.Classes.Eq ContractTranslation.ILBinOp
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILBinOp
+                  Examples.TranslationExample.$fEqILBinOp_$c==
+                  Examples.TranslationExample.$fEqILBinOp_$c/= -}
+154426f24eb40dbeeccf2cdfe7080089
+  $fEqILBinOp_$c/= ::
+    ContractTranslation.ILBinOp
+    -> ContractTranslation.ILBinOp -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: ContractTranslation.ILBinOp
+                   b :: ContractTranslation.ILBinOp ->
+                 case a of wild {
+                   ContractTranslation.ILAdd
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILAdd -> GHC.Types.False }
+                   ContractTranslation.ILSub
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILSub -> GHC.Types.False }
+                   ContractTranslation.ILMult
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILMult -> GHC.Types.False }
+                   ContractTranslation.ILDiv
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILDiv -> GHC.Types.False }
+                   ContractTranslation.ILAnd
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILAnd -> GHC.Types.False }
+                   ContractTranslation.ILOr
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILOr -> GHC.Types.False }
+                   ContractTranslation.ILLess
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILLess -> GHC.Types.False }
+                   ContractTranslation.ILLessN
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILLessN -> GHC.Types.False }
+                   ContractTranslation.ILLeq
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILLeq -> GHC.Types.False }
+                   ContractTranslation.ILEqual
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        ContractTranslation.ILEqual -> GHC.Types.False } }) -}
+a82b2b31d7e1c4e31d6eef1d88310f28
+  $fEqILBinOp_$c== ::
+    ContractTranslation.ILBinOp
+    -> ContractTranslation.ILBinOp -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: ContractTranslation.ILBinOp
+                   ds1 :: ContractTranslation.ILBinOp ->
+                 case ds of wild {
+                   ContractTranslation.ILAdd
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILAdd -> GHC.Types.True }
+                   ContractTranslation.ILSub
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILSub -> GHC.Types.True }
+                   ContractTranslation.ILMult
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILMult -> GHC.Types.True }
+                   ContractTranslation.ILDiv
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILDiv -> GHC.Types.True }
+                   ContractTranslation.ILAnd
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILAnd -> GHC.Types.True }
+                   ContractTranslation.ILOr
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILOr -> GHC.Types.True }
+                   ContractTranslation.ILLess
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILLess -> GHC.Types.True }
+                   ContractTranslation.ILLessN
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILLessN -> GHC.Types.True }
+                   ContractTranslation.ILLeq
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILLeq -> GHC.Types.True }
+                   ContractTranslation.ILEqual
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILEqual -> GHC.Types.True } }) -}
+6bc81dbd544e8cd0592e182c4b204cfa
+  $fEqILExpr :: GHC.Classes.Eq ContractTranslation.ILExpr
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILExpr
+                  Examples.TranslationExample.$fEqILExpr_$c==
+                  Examples.TranslationExample.$fEqILExpr_$c/= -}
+75f4ac342eac8501b2ac60cb002d3cd0
+  $fEqILExpr_$c/= ::
+    ContractTranslation.ILExpr
+    -> ContractTranslation.ILExpr -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ a :: ContractTranslation.ILExpr
+                   b :: ContractTranslation.ILExpr ->
+                 case Examples.TranslationExample.$fEqILExpr_$c== a b of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False }) -}
+9d410c0f0712aa30bb2d552e6fcd464e
+  $fEqILExpr_$c== ::
+    ContractTranslation.ILExpr
+    -> ContractTranslation.ILExpr -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U> -}
+aa9baed5ce97326a18e3d73e3dc150fc
+  $fEqILTExpr :: GHC.Classes.Eq ContractTranslation.ILTExpr
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILTExpr
+                  Examples.TranslationExample.$fEqILTExpr_$c==
+                  Examples.TranslationExample.$fEqILTExpr_$c/= -}
+4cffbaab0c7ea43dceb1444d2decd134
+  $fEqILTExprZ :: GHC.Classes.Eq ContractTranslation.ILTExprZ
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILTExprZ
+                  Examples.TranslationExample.$fEqILTExprZ_$c==
+                  Examples.TranslationExample.$fEqILTExprZ_$c/= -}
+295e2400500de2d948be064a74abcda3
+  $fEqILTExprZ_$c/= ::
+    ContractTranslation.ILTExprZ
+    -> ContractTranslation.ILTExprZ -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ a :: ContractTranslation.ILTExprZ
+                   b :: ContractTranslation.ILTExprZ ->
+                 case Examples.TranslationExample.$fEqILTExprZ_$c== a b of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False }) -}
+78d7acac62e75f56de83c52de6a22875
+  $fEqILTExprZ_$c== ::
+    ContractTranslation.ILTExprZ
+    -> ContractTranslation.ILTExprZ -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U> -}
+97e5649922ed75332671c4cebb6d5b5e
+  $fEqILTExpr_$c/= ::
+    ContractTranslation.ILTExpr
+    -> ContractTranslation.ILTExpr -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ a :: ContractTranslation.ILTExpr
+                   b :: ContractTranslation.ILTExpr ->
+                 case Examples.TranslationExample.$fEqILTExpr_$c== a b of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False }) -}
+0f3f528945a36b714bdd94e8b34baaf9
+  $fEqILTExpr_$c== ::
+    ContractTranslation.ILTExpr
+    -> ContractTranslation.ILTExpr -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U> -}
+3eae8eeb4243a0c98e1df11e845c2202
+  $fEqILUnOp :: GHC.Classes.Eq ContractTranslation.ILUnOp
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILUnOp
+                  Examples.TranslationExample.$fEqILUnOp_$c==
+                  Examples.TranslationExample.$fEqILUnOp_$c/= -}
+f4e93e82a97379a49cadb9ec202fa5ac
+  $fEqILUnOp_$c/= ::
+    ContractTranslation.ILUnOp
+    -> ContractTranslation.ILUnOp -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ a :: ContractTranslation.ILUnOp
+                   b :: ContractTranslation.ILUnOp ->
+                 case a of wild {
+                   ContractTranslation.ILNot
+                   -> case b of wild1 {
+                        ContractTranslation.ILNot -> GHC.Types.False
+                        ContractTranslation.ILNeg -> GHC.Types.True }
+                   ContractTranslation.ILNeg
+                   -> case b of wild1 {
+                        ContractTranslation.ILNot -> GHC.Types.True
+                        ContractTranslation.ILNeg -> GHC.Types.False } }) -}
+e670e0dffbbc90aa581efd6a01683c33
+  $fEqILUnOp_$c== ::
+    ContractTranslation.ILUnOp
+    -> ContractTranslation.ILUnOp -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ ds :: ContractTranslation.ILUnOp
+                   ds1 :: ContractTranslation.ILUnOp ->
+                 case ds of wild {
+                   ContractTranslation.ILNot
+                   -> case ds1 of wild1 {
+                        ContractTranslation.ILNot -> GHC.Types.True
+                        ContractTranslation.ILNeg -> GHC.Types.False }
+                   ContractTranslation.ILNeg
+                   -> case ds1 of wild1 {
+                        ContractTranslation.ILNot -> GHC.Types.False
+                        ContractTranslation.ILNeg -> GHC.Types.True } }) -}
+7fd504986a7a710aeb509a43687373ca
+  $fEqILVal :: GHC.Classes.Eq ContractTranslation.ILVal
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILVal
+                  Examples.TranslationExample.$fEqILVal_$c==
+                  Examples.TranslationExample.$fEqILVal_$c/= -}
+69e2e96fcdaa5a3fba87c24a97012c75
+  $fEqILVal_$c/= ::
+    ContractTranslation.ILVal
+    -> ContractTranslation.ILVal -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ a :: ContractTranslation.ILVal b :: ContractTranslation.ILVal ->
+                 case Examples.TranslationExample.$fEqILVal_$c== a b of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False }) -}
+ea72e4219bb229558a21250a507de836
+  $fEqILVal_$c== ::
+    ContractTranslation.ILVal
+    -> ContractTranslation.ILVal -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: ContractTranslation.ILVal
+                   ds1 :: ContractTranslation.ILVal ->
+                 case ds of wild {
+                   ContractTranslation.ILBVal a1
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILBVal b1 -> GHC.Classes.$fEqBool_$c== a1 b1 }
+                   ContractTranslation.ILRVal a1
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILRVal b1
+                        -> GHC.Classes.$fEqDouble_$c== a1 b1 }
+                   ContractTranslation.ILNVal a1
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        ContractTranslation.ILNVal b1 -> GHC.Classes.eqInt a1 b1 } }) -}
+0e10b2710612a4bf45d574ed11b9b033
+  $fEqObsLabel :: GHC.Classes.Eq Contract.ObsLabel
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ Contract.ObsLabel
+                  Examples.TranslationExample.$fEqObsLabel_$c==
+                  Examples.TranslationExample.$fEqObsLabel_$c/= -}
+36426605ba020952643c5ce805d1ef28
+  $fEqObsLabel_$c/= ::
+    Contract.ObsLabel -> Contract.ObsLabel -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: Contract.ObsLabel b :: Contract.ObsLabel ->
+                 case a of wild {
+                   Contract.LabR a1
+                   -> case b of wild1 {
+                        Contract.LabR b1
+                        -> case BaseTypes.$fEqRealObs_$c== a1 b1 of wild2 {
+                             GHC.Types.False -> GHC.Types.True
+                             GHC.Types.True -> GHC.Types.False }
+                        Contract.LabB ipv -> GHC.Types.True }
+                   Contract.LabB a1
+                   -> case b of wild1 {
+                        Contract.LabR ipv -> GHC.Types.True
+                        Contract.LabB b1
+                        -> case BaseTypes.$fEqBoolObs_$c== a1 b1 of wild2 {
+                             GHC.Types.False -> GHC.Types.True
+                             GHC.Types.True -> GHC.Types.False } } }) -}
+67b4f43ef8ce4a931a85dce912bb0b4c
+  $fEqObsLabel_$c== ::
+    Contract.ObsLabel -> Contract.ObsLabel -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: Contract.ObsLabel ds1 :: Contract.ObsLabel ->
+                 case ds of wild {
+                   Contract.LabR a1
+                   -> case ds1 of wild1 {
+                        Contract.LabR b1 -> BaseTypes.$fEqRealObs_$c== a1 b1
+                        Contract.LabB ipv -> GHC.Types.False }
+                   Contract.LabB a1
+                   -> case ds1 of wild1 {
+                        Contract.LabR ipv -> GHC.Types.False
+                        Contract.LabB b1 -> BaseTypes.$fEqBoolObs_$c== a1 b1 } }) -}
+7c1573eb5b78d46ce6fa01f90233c096
+  $fEqTExpr :: GHC.Classes.Eq Contract.TExpr
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ Contract.TExpr
+                  Examples.TranslationExample.$fEqTExpr_$c==
+                  Examples.TranslationExample.$fEqTExpr_$c/= -}
+59078834954421a35244d8b24ddf792c
+  $fEqTExpr_$c/= ::
+    Contract.TExpr -> Contract.TExpr -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: Contract.TExpr b :: Contract.TExpr ->
+                 case a of wild {
+                   Contract.Tvar a1
+                   -> case b of wild1 {
+                        Contract.Tvar b1
+                        -> case GHC.Base.eqString a1 b1 of wild2 {
+                             GHC.Types.False -> GHC.Types.True
+                             GHC.Types.True -> GHC.Types.False }
+                        Contract.Tnum ipv -> GHC.Types.True }
+                   Contract.Tnum a1
+                   -> case b of wild1 {
+                        Contract.Tvar ipv -> GHC.Types.True
+                        Contract.Tnum b1
+                        -> case a1 of wild2 { GHC.Types.I# x ->
+                           case b1 of wild3 { GHC.Types.I# y ->
+                           case GHC.Prim.tagToEnum#
+                                  @ GHC.Types.Bool
+                                  (GHC.Prim.==# x y) of wild4 {
+                             GHC.Types.False -> GHC.Types.True
+                             GHC.Types.True -> GHC.Types.False } } } } }) -}
+3283f2ece173e8c9bb0f601748882b15
+  $fEqTExpr_$c== ::
+    Contract.TExpr -> Contract.TExpr -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: Contract.TExpr ds1 :: Contract.TExpr ->
+                 case ds of wild {
+                   Contract.Tvar a1
+                   -> case ds1 of wild1 {
+                        Contract.Tvar b1 -> GHC.Base.eqString a1 b1
+                        Contract.Tnum ipv -> GHC.Types.False }
+                   Contract.Tnum a1
+                   -> case ds1 of wild1 {
+                        Contract.Tvar ipv -> GHC.Types.False
+                        Contract.Tnum b1 -> GHC.Classes.eqInt a1 b1 } }) -}
+3705e11971cf696f4ebd323e8a025ced
+  $fShowILBinOp :: GHC.Show.Show ContractTranslation.ILBinOp
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILBinOp
+                  Examples.TranslationExample.$fShowILBinOp_$cshowsPrec
+                  Examples.TranslationExample.$fShowILBinOp_$cshow
+                  Examples.TranslationExample.$fShowILBinOp_$cshowList -}
+3e87a731926e5e1294708b82c7614cce
+  $fShowILBinOp1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILEqual"#) -}
+5501632b971c683c4911596025c8956a
+  $fShowILBinOp10 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILAdd"#) -}
+d7f8a6fc1b43a66bd1175cc38fd3a2fa
+  $fShowILBinOp2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILLeq"#) -}
+62bb0005be84568c450045d2a0f5b026
+  $fShowILBinOp3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILLessN"#) -}
+dc2c90944f44e7abd12e81b7f18d785a
+  $fShowILBinOp4 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILLess"#) -}
+906d78d36ffd589acbf8ac063a763a50
+  $fShowILBinOp5 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILOr"#) -}
+3819a64d06baea04cca373fb6da7eaeb
+  $fShowILBinOp6 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILAnd"#) -}
+076b8d49550505a4437b34c431be6e9d
+  $fShowILBinOp7 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILDiv"#) -}
+ca2f3ee23ce4e7c5fe639542fd45a4c2
+  $fShowILBinOp8 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILMult"#) -}
+71ec245079544a47b15d9d664cb7be76
+  $fShowILBinOp9 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILSub"#) -}
+20e01727a297e94f886032bf303a7087
+  $fShowILBinOp_$cshow ::
+    ContractTranslation.ILBinOp -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: ContractTranslation.ILBinOp ->
+                 Examples.TranslationExample.$fShowILBinOp_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+1a888f62519cff1f7d4c1c93d759ffa0
+  $fShowILBinOp_$cshowList ::
+    [ContractTranslation.ILBinOp] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ ContractTranslation.ILBinOp
+                   Examples.TranslationExample.$w$cshowsPrec) -}
+f324fe9ed9201608304b49ed91d91365
+  $fShowILBinOp_$cshowsPrec ::
+    GHC.Types.Int -> ContractTranslation.ILBinOp -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <L,A><S,1*U><L,1*U>, Inline: INLINE[0],
+     Unfolding: InlineRule (3, True, True)
+                (\ w :: GHC.Types.Int
+                   w1 :: ContractTranslation.ILBinOp
+                   w2 :: GHC.Base.String ->
+                 Examples.TranslationExample.$w$cshowsPrec w1 w2) -}
+959358fe56b0bacecf3b219daf799879
+  $fShowILExpr :: GHC.Show.Show ContractTranslation.ILExpr
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILExpr
+                  Examples.TranslationExample.$fShowILExpr_$cshowsPrec
+                  Examples.TranslationExample.$fShowILExpr_$cshow
+                  Examples.TranslationExample.$fShowILExpr_$cshowList -}
+4f031de78d25e12d07501271edfa9b47
+  $fShowILExpr1 :: ContractTranslation.ILExpr -> GHC.Show.ShowS
+  {- Arity: 1,
+     Unfolding: (Examples.TranslationExample.$fShowILExpr_$cshowsPrec
+                   Examples.TranslationExample.$fShowILExpr2) -}
+850945361fc29b7def52b3b3cd844344
+  $fShowILExpr2 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 0) -}
+e23915645748add7bccd6482869f35ad
+  $fShowILExpr_$cshow ::
+    ContractTranslation.ILExpr -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: ContractTranslation.ILExpr ->
+                 Examples.TranslationExample.$fShowILExpr_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+0f3169cd9e4aa33ed51151fafa02026d
+  $fShowILExpr_$cshowList ::
+    [ContractTranslation.ILExpr] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ ContractTranslation.ILExpr
+                   Examples.TranslationExample.$fShowILExpr1) -}
+ee0b044fdb674c30ba091d2d2e618bd1
+  $fShowILExpr_$cshowsPrec ::
+    GHC.Types.Int -> ContractTranslation.ILExpr -> GHC.Show.ShowS
+  {- Arity: 2, Strictness: <L,1*U(U)><S,1*U> -}
+8c7c70d40b92317ecfbd90c8572cf9dd
+  $fShowILTExpr :: GHC.Show.Show ContractTranslation.ILTExpr
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILTExpr
+                  Examples.TranslationExample.$fShowILTExpr_$cshowsPrec
+                  Examples.TranslationExample.$fShowILTExpr_$cshow
+                  Examples.TranslationExample.$fShowILTExpr_$cshowList -}
+6978b98a06f60425af561ce7883fe3aa
+  $fShowILTExpr1 :: ContractTranslation.ILTExpr -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (\ w :: ContractTranslation.ILTExpr
+                   w1 :: GHC.Base.String ->
+                 Examples.TranslationExample.$w$cshowsPrec1 0 w w1) -}
+8b4841ce054bde9eafe90f42780f9912
+  $fShowILTExprZ :: GHC.Show.Show ContractTranslation.ILTExprZ
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILTExprZ
+                  Examples.TranslationExample.$fShowILTExprZ_$cshowsPrec
+                  Examples.TranslationExample.$fShowILTExprZ_$cshow
+                  Examples.TranslationExample.$fShowILTExprZ_$cshowList -}
+99beb8faecd9a196b9d4e9e025821796
+  $fShowILTExprZ1 :: ContractTranslation.ILTExprZ -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (\ w :: ContractTranslation.ILTExprZ
+                   w1 :: GHC.Base.String ->
+                 Examples.TranslationExample.$w$cshowsPrec2 0 w w1) -}
+099ab2c00c223b5927c05dcf746dab54
+  $fShowILTExprZ_$cshow ::
+    ContractTranslation.ILTExprZ -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: ContractTranslation.ILTExprZ ->
+                 Examples.TranslationExample.$fShowILTExprZ_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+008d43e427f87f170abb48b58786b489
+  $fShowILTExprZ_$cshowList ::
+    [ContractTranslation.ILTExprZ] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ ContractTranslation.ILTExprZ
+                   Examples.TranslationExample.$fShowILTExprZ1) -}
+d45dd8d67245b2dcdabb5ce1479ea360
+  $fShowILTExprZ_$cshowsPrec ::
+    GHC.Types.Int -> ContractTranslation.ILTExprZ -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <S,1*U(U)><S,1*U><L,U>, Inline: INLINE[0],
+     Unfolding: InlineRule (3, True, False)
+                (\ w :: GHC.Types.Int
+                   w1 :: ContractTranslation.ILTExprZ
+                   w2 :: GHC.Base.String ->
+                 case w of ww { GHC.Types.I# ww1 ->
+                 Examples.TranslationExample.$w$cshowsPrec2 ww1 w1 w2 }) -}
+847148d595da2ef8cc710ec95eb20d4c
+  $fShowILTExpr_$cshow ::
+    ContractTranslation.ILTExpr -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: ContractTranslation.ILTExpr ->
+                 Examples.TranslationExample.$fShowILTExpr_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+54e347bdf584ceeb49c45e24c143775d
+  $fShowILTExpr_$cshowList ::
+    [ContractTranslation.ILTExpr] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ ContractTranslation.ILTExpr
+                   Examples.TranslationExample.$fShowILTExpr1) -}
+6392fa3e46ca7dc91a848cd632de95f2
+  $fShowILTExpr_$cshowsPrec ::
+    GHC.Types.Int -> ContractTranslation.ILTExpr -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <S,1*U(U)><S,1*U><L,U>, Inline: INLINE[0],
+     Unfolding: InlineRule (3, True, False)
+                (\ w :: GHC.Types.Int
+                   w1 :: ContractTranslation.ILTExpr
+                   w2 :: GHC.Base.String ->
+                 case w of ww { GHC.Types.I# ww1 ->
+                 Examples.TranslationExample.$w$cshowsPrec1 ww1 w1 w2 }) -}
+551618cd4e2ef2c0466a15c38e47c809
+  $fShowILUnOp :: GHC.Show.Show ContractTranslation.ILUnOp
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILUnOp
+                  Examples.TranslationExample.$fShowILUnOp_$cshowsPrec
+                  Examples.TranslationExample.$fShowILUnOp_$cshow
+                  Examples.TranslationExample.$fShowILUnOp_$cshowList -}
+9e541cadee513fc1b1d0b2dbc8d308d1
+  $fShowILUnOp1 :: ContractTranslation.ILUnOp -> GHC.Show.ShowS
+  {- Arity: 2, Strictness: <S,1*U><L,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ ds :: ContractTranslation.ILUnOp eta :: GHC.Base.String ->
+                 case ds of wild {
+                   ContractTranslation.ILNot
+                   -> GHC.Base.augment
+                        @ GHC.Types.Char
+                        (\ @ b c :: GHC.Types.Char -> b -> b[OneShot] n :: b[OneShot] ->
+                         GHC.Base.foldr
+                           @ GHC.Types.Char
+                           @ b
+                           c
+                           n
+                           Examples.TranslationExample.$fShowILUnOp3)
+                        eta
+                   ContractTranslation.ILNeg
+                   -> GHC.Base.augment
+                        @ GHC.Types.Char
+                        (\ @ b c :: GHC.Types.Char -> b -> b[OneShot] n :: b[OneShot] ->
+                         GHC.Base.foldr
+                           @ GHC.Types.Char
+                           @ b
+                           c
+                           n
+                           Examples.TranslationExample.$fShowILUnOp2)
+                        eta }) -}
+ca7e49e80d433a3d2c47b0bd3ed2e75a
+  $fShowILUnOp2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILNeg"#) -}
+f7107666c0a6ece8a9f8e266f87d9cff
+  $fShowILUnOp3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILNot"#) -}
+02c6b59ce2c18de7b842ba9a57600be3
+  $fShowILUnOp_$cshow ::
+    ContractTranslation.ILUnOp -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: ContractTranslation.ILUnOp ->
+                 case x of wild {
+                   ContractTranslation.ILNot
+                   -> Examples.TranslationExample.$fShowILUnOp3
+                   ContractTranslation.ILNeg
+                   -> Examples.TranslationExample.$fShowILUnOp2 }) -}
+99ac58152cb06b22d6f90deb9b212210
+  $fShowILUnOp_$cshowList ::
+    [ContractTranslation.ILUnOp] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ ContractTranslation.ILUnOp
+                   Examples.TranslationExample.$fShowILUnOp1) -}
+2b44ee0ece9f42e506908077b05dd369
+  $fShowILUnOp_$cshowsPrec ::
+    GHC.Types.Int -> ContractTranslation.ILUnOp -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <L,A><S,1*U><L,1*U>,
+     Unfolding: InlineRule (3, True, False)
+                (\ ds :: GHC.Types.Int
+                   ds1 :: ContractTranslation.ILUnOp
+                   eta :: GHC.Base.String ->
+                 case ds1 of wild {
+                   ContractTranslation.ILNot
+                   -> GHC.Base.augment
+                        @ GHC.Types.Char
+                        (\ @ b c :: GHC.Types.Char -> b -> b[OneShot] n :: b[OneShot] ->
+                         GHC.Base.foldr
+                           @ GHC.Types.Char
+                           @ b
+                           c
+                           n
+                           Examples.TranslationExample.$fShowILUnOp3)
+                        eta
+                   ContractTranslation.ILNeg
+                   -> GHC.Base.augment
+                        @ GHC.Types.Char
+                        (\ @ b c :: GHC.Types.Char -> b -> b[OneShot] n :: b[OneShot] ->
+                         GHC.Base.foldr
+                           @ GHC.Types.Char
+                           @ b
+                           c
+                           n
+                           Examples.TranslationExample.$fShowILUnOp2)
+                        eta }) -}
+31a4ac0452605548652467212bc7ecaa
+  $fShowILVal :: GHC.Show.Show ContractTranslation.ILVal
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ ContractTranslation.ILVal
+                  Examples.TranslationExample.$fShowILVal_$cshowsPrec
+                  Examples.TranslationExample.$fShowILVal_$cshow
+                  Examples.TranslationExample.$fShowILVal_$cshowList -}
+18cbfaae7e40780fbb7233e4e51ccc08
+  $fShowILVal1 :: ContractTranslation.ILVal -> GHC.Show.ShowS
+  {- Arity: 1,
+     Unfolding: (\ w :: ContractTranslation.ILVal ->
+                 Examples.TranslationExample.$w$cshowsPrec3 0 w) -}
+7d09d038213875a9138de9b6a631a7d6
+  $fShowILVal2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILNVal "#) -}
+02ee41fac44a60cee14186776b8b2673
+  $fShowILVal3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILRVal "#) -}
+7159173f865763d532021b1587be33ab
+  $fShowILVal4 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 11) -}
+93ae6266a1bd757fc6a5c698282ca74c
+  $fShowILVal5 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "ILBVal "#) -}
+4175276e2ae39078acbbdb49aa1ce5f9
+  $fShowILVal6 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.Base.++
+                   @ GHC.Types.Char
+                   GHC.Show.shows16
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+1a741e2c3714102032d4b2293d7cbd4e
+  $fShowILVal7 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.Base.++
+                   @ GHC.Types.Char
+                   GHC.Show.shows17
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+512969af34bcc804145ff967f57fa92e
+  $fShowILVal_$cshow :: ContractTranslation.ILVal -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: (\ x :: ContractTranslation.ILVal ->
+                 case x of wild {
+                   ContractTranslation.ILBVal b1
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILVal5
+                        (case b1 of wild1 {
+                           GHC.Types.False -> Examples.TranslationExample.$fShowILVal7
+                           GHC.Types.True -> Examples.TranslationExample.$fShowILVal6 })
+                   ContractTranslation.ILRVal b1
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILVal3
+                        (case b1 of ww { GHC.Types.D# ww1 ->
+                         GHC.Float.$w$sshowSignedFloat
+                           GHC.Float.$fShowDouble_$sshowFloat
+                           Examples.TranslationExample.$fShowILVal4
+                           ww1
+                           (GHC.Types.[] @ GHC.Types.Char) })
+                   ContractTranslation.ILNVal b1
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILVal2
+                        (case b1 of ww2 { GHC.Types.I# ww3 ->
+                         case GHC.Show.$wshowSignedInt
+                                11
+                                ww3
+                                (GHC.Types.[] @ GHC.Types.Char) of ww4 { (#,#) ww5 ww6 ->
+                         GHC.Types.: @ GHC.Types.Char ww5 ww6 } }) }) -}
+46405b055640d94c817fe264ab815b36
+  $fShowILVal_$cshowList ::
+    [ContractTranslation.ILVal] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ ContractTranslation.ILVal
+                   Examples.TranslationExample.$fShowILVal1) -}
+8ca331997ed4f000bc06e2adcd338f8a
+  $fShowILVal_$cshowsPrec ::
+    GHC.Types.Int -> ContractTranslation.ILVal -> GHC.Show.ShowS
+  {- Arity: 2, Strictness: <S,1*U(U)><S,1*U>, Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ w :: GHC.Types.Int w1 :: ContractTranslation.ILVal ->
+                 case w of ww { GHC.Types.I# ww1 ->
+                 Examples.TranslationExample.$w$cshowsPrec3 ww1 w1 }) -}
+5da82fff7cf4394ce51ce2945f7e06b3
+  $fShowTExpr :: GHC.Show.Show Contract.TExpr
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ Contract.TExpr
+                  Examples.TranslationExample.$fShowTExpr_$cshowsPrec
+                  Examples.TranslationExample.$fShowTExpr_$cshow
+                  Examples.TranslationExample.$fShowTExpr_$cshowList -}
+58d402b1cdc199e6172ec28ba35074ec
+  $fShowTExpr1 :: Contract.TExpr -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (\ w :: Contract.TExpr w1 :: GHC.Base.String ->
+                 Examples.TranslationExample.$w$cshowsPrec4 0 w w1) -}
+164d0e721da782d9bff4646328736928
+  $fShowTExpr2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "Tnum "#) -}
+6f1b1247aeea1078b3cfe06fc1681dcf
+  $fShowTExpr3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "Tvar "#) -}
+e92e3b70c02047648615c8c926e7af9f
+  $fShowTExpr_$cshow :: Contract.TExpr -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: Contract.TExpr ->
+                 Examples.TranslationExample.$fShowTExpr_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+c4e1509223c7bf947d5a45d7b1217521
+  $fShowTExpr_$cshowList :: [Contract.TExpr] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ Contract.TExpr
+                   Examples.TranslationExample.$fShowTExpr1) -}
+915bc5d18614b591903e9aa7d737ff6b
+  $fShowTExpr_$cshowsPrec ::
+    GHC.Types.Int -> Contract.TExpr -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <S,1*U(U)><S,1*U><L,U>, Inline: INLINE[0],
+     Unfolding: InlineRule (3, True, False)
+                (\ w :: GHC.Types.Int w1 :: Contract.TExpr w2 :: GHC.Base.String ->
+                 case w of ww { GHC.Types.I# ww1 ->
+                 Examples.TranslationExample.$w$cshowsPrec4 ww1 w1 w2 }) -}
+5a39b2284b8a503d96c6797bcc6cd8fa
+  $fShowVal :: GHC.Show.Show Contract.Val
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ Contract.Val
+                  Examples.TranslationExample.$fShowVal_$cshowsPrec
+                  Examples.TranslationExample.$fShowVal_$cshow
+                  Examples.TranslationExample.$fShowVal_$cshowList -}
+f054ac62308eeeaa8c0715f5ba97329c
+  $fShowVal1 :: Contract.Val -> GHC.Show.ShowS
+  {- Arity: 1,
+     Unfolding: (\ w :: Contract.Val ->
+                 Examples.TranslationExample.$w$cshowsPrec5 0 w) -}
+05e1f94567abe1ffa260c2d39fb36554
+  $fShowVal2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "RVal "#) -}
+2b92eecdf2bde44f31480668d222adeb
+  $fShowVal3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "BVal "#) -}
+5b6cf83d1c87d206a385415af6896f10
+  $fShowVal_$cshow :: Contract.Val -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: (\ x :: Contract.Val ->
+                 case x of wild {
+                   Contract.BVal b1
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowVal3
+                        (case b1 of wild1 {
+                           GHC.Types.False -> Examples.TranslationExample.$fShowILVal7
+                           GHC.Types.True -> Examples.TranslationExample.$fShowILVal6 })
+                   Contract.RVal b1
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowVal2
+                        (case b1 of ww { GHC.Types.D# ww1 ->
+                         GHC.Float.$w$sshowSignedFloat
+                           GHC.Float.$fShowDouble_$sshowFloat
+                           Examples.TranslationExample.$fShowILVal4
+                           ww1
+                           (GHC.Types.[] @ GHC.Types.Char) }) }) -}
+20d1c84eb480ccffcee6cd7f64926ac0
+  $fShowVal_$cshowList :: [Contract.Val] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ Contract.Val
+                   Examples.TranslationExample.$fShowVal1) -}
+b2c314037e023704740a8b18a00bf3c2
+  $fShowVal_$cshowsPrec ::
+    GHC.Types.Int -> Contract.Val -> GHC.Show.ShowS
+  {- Arity: 2, Strictness: <S,1*U(U)><S,1*U>, Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ w :: GHC.Types.Int w1 :: Contract.Val ->
+                 case w of ww { GHC.Types.I# ww1 ->
+                 Examples.TranslationExample.$w$cshowsPrec5 ww1 w1 }) -}
+e02cb60bf993730a59c4cc23f9599a17
+  $w$cshowsPrec ::
+    ContractTranslation.ILBinOp -> GHC.Base.String -> GHC.Base.String
+  {- Arity: 2, Strictness: <S,1*U><L,1*U>, Inline: [0],
+     Unfolding: (\ w :: ContractTranslation.ILBinOp
+                   w1 :: GHC.Base.String ->
+                 case w of wild {
+                   ContractTranslation.ILAdd
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp10
+                        w1
+                   ContractTranslation.ILSub
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp9
+                        w1
+                   ContractTranslation.ILMult
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp8
+                        w1
+                   ContractTranslation.ILDiv
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp7
+                        w1
+                   ContractTranslation.ILAnd
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp6
+                        w1
+                   ContractTranslation.ILOr
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp5
+                        w1
+                   ContractTranslation.ILLess
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp4
+                        w1
+                   ContractTranslation.ILLessN
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp3
+                        w1
+                   ContractTranslation.ILLeq
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp2
+                        w1
+                   ContractTranslation.ILEqual
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        Examples.TranslationExample.$fShowILBinOp1
+                        w1 }) -}
+798c48b9b657c2c343b795c05f19f6ae
+  $w$cshowsPrec1 ::
+    GHC.Prim.Int#
+    -> ContractTranslation.ILTExpr
+    -> GHC.Base.String
+    -> GHC.Base.String
+  {- Arity: 3, Strictness: <L,U><S,1*U><L,U>, Inline: [0] -}
+80ba1e58fe9d2f25cb49d5b8ad92d489
+  $w$cshowsPrec2 ::
+    GHC.Prim.Int#
+    -> ContractTranslation.ILTExprZ
+    -> GHC.Base.String
+    -> GHC.Base.String
+  {- Arity: 3, Strictness: <L,U><S,1*U><L,U>, Inline: [0] -}
+ba621282dc5e4a7e1b6f67fd43e887eb
+  $w$cshowsPrec3 ::
+    GHC.Prim.Int# -> ContractTranslation.ILVal -> GHC.Show.ShowS
+  {- Arity: 2, Strictness: <L,U><S,1*U>, Inline: [0],
+     Unfolding: (\ ww :: GHC.Prim.Int# w :: ContractTranslation.ILVal ->
+                 case w of wild {
+                   ContractTranslation.ILBVal b1
+                   -> let {
+                        p :: GHC.Show.ShowS {- Arity: 1, Strictness: <L,1*U> -}
+                        = \ x :: GHC.Base.String ->
+                          GHC.Base.++
+                            @ GHC.Types.Char
+                            Examples.TranslationExample.$fShowILVal5
+                            (case b1 of wild1 {
+                               GHC.Types.False -> GHC.Base.++ @ GHC.Types.Char GHC.Show.shows17 x
+                               GHC.Types.True
+                               -> GHC.Base.++ @ GHC.Types.Char GHC.Show.shows16 x })
+                      } in
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False -> p
+                        GHC.Types.True
+                        -> \ x :: GHC.Base.String ->
+                           GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (p (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 x)) }
+                   ContractTranslation.ILRVal b1
+                   -> let {
+                        g :: GHC.Base.String -> GHC.Base.String
+                        = case b1 of ww1 { GHC.Types.D# ww2 ->
+                          GHC.Float.$w$sshowSignedFloat
+                            GHC.Float.$fShowDouble_$sshowFloat
+                            Examples.TranslationExample.$fShowILVal4
+                            ww2 }
+                      } in
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False
+                        -> \ x :: GHC.Base.String ->
+                           GHC.Base.++
+                             @ GHC.Types.Char
+                             Examples.TranslationExample.$fShowILVal3
+                             (g x)
+                        GHC.Types.True
+                        -> \ x :: GHC.Base.String ->
+                           GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (GHC.Base.++
+                                @ GHC.Types.Char
+                                Examples.TranslationExample.$fShowILVal3
+                                (g (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 x))) }
+                   ContractTranslation.ILNVal b1
+                   -> case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False
+                        -> \ x :: GHC.Base.String ->
+                           GHC.Base.++
+                             @ GHC.Types.Char
+                             Examples.TranslationExample.$fShowILVal2
+                             (case b1 of ww2 { GHC.Types.I# ww3 ->
+                              case GHC.Show.$wshowSignedInt 11 ww3 x of ww4 { (#,#) ww5 ww6 ->
+                              GHC.Types.: @ GHC.Types.Char ww5 ww6 } })
+                        GHC.Types.True
+                        -> \ x :: GHC.Base.String ->
+                           GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (GHC.Base.++
+                                @ GHC.Types.Char
+                                Examples.TranslationExample.$fShowILVal2
+                                (case b1 of ww2 { GHC.Types.I# ww3 ->
+                                 case GHC.Show.$wshowSignedInt
+                                        11
+                                        ww3
+                                        (GHC.Types.:
+                                           @ GHC.Types.Char
+                                           GHC.Show.shows8
+                                           x) of ww4 { (#,#) ww5 ww6 ->
+                                 GHC.Types.: @ GHC.Types.Char ww5 ww6 } })) } }) -}
+8ca4e1ca1a2d80ad121b5b638ec7852f
+  $w$cshowsPrec4 ::
+    GHC.Prim.Int#
+    -> Contract.TExpr -> GHC.Base.String -> GHC.Base.String
+  {- Arity: 3, Strictness: <L,U><S,1*U><L,U>, Inline: [0],
+     Unfolding: (\ ww :: GHC.Prim.Int#
+                   w :: Contract.TExpr
+                   w1 :: GHC.Base.String ->
+                 case w of wild {
+                   Contract.Tvar b1
+                   -> case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False
+                        -> GHC.Base.++
+                             @ GHC.Types.Char
+                             Examples.TranslationExample.$fShowTExpr3
+                             (GHC.Types.:
+                                @ GHC.Types.Char
+                                GHC.Show.shows6
+                                (GHC.Show.showLitString
+                                   b1
+                                   (GHC.Types.: @ GHC.Types.Char GHC.Show.shows6 w1)))
+                        GHC.Types.True
+                        -> GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (GHC.Base.++
+                                @ GHC.Types.Char
+                                Examples.TranslationExample.$fShowTExpr3
+                                (GHC.Types.:
+                                   @ GHC.Types.Char
+                                   GHC.Show.shows6
+                                   (GHC.Show.showLitString
+                                      b1
+                                      (GHC.Types.:
+                                         @ GHC.Types.Char
+                                         GHC.Show.shows6
+                                         (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 w1))))) }
+                   Contract.Tnum b1
+                   -> case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False
+                        -> GHC.Base.++
+                             @ GHC.Types.Char
+                             Examples.TranslationExample.$fShowTExpr2
+                             (case b1 of ww2 { GHC.Types.I# ww3 ->
+                              case GHC.Show.$wshowSignedInt 11 ww3 w1 of ww4 { (#,#) ww5 ww6 ->
+                              GHC.Types.: @ GHC.Types.Char ww5 ww6 } })
+                        GHC.Types.True
+                        -> GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (GHC.Base.++
+                                @ GHC.Types.Char
+                                Examples.TranslationExample.$fShowTExpr2
+                                (case b1 of ww2 { GHC.Types.I# ww3 ->
+                                 case GHC.Show.$wshowSignedInt
+                                        11
+                                        ww3
+                                        (GHC.Types.:
+                                           @ GHC.Types.Char
+                                           GHC.Show.shows8
+                                           w1) of ww4 { (#,#) ww5 ww6 ->
+                                 GHC.Types.: @ GHC.Types.Char ww5 ww6 } })) } }) -}
+6194c52cc8bce4555680ddb94270eec3
+  $w$cshowsPrec5 :: GHC.Prim.Int# -> Contract.Val -> GHC.Show.ShowS
+  {- Arity: 2, Strictness: <L,U><S,1*U>, Inline: [0],
+     Unfolding: (\ ww :: GHC.Prim.Int# w :: Contract.Val ->
+                 case w of wild {
+                   Contract.BVal b1
+                   -> let {
+                        p :: GHC.Show.ShowS {- Arity: 1, Strictness: <L,1*U> -}
+                        = \ x :: GHC.Base.String ->
+                          GHC.Base.++
+                            @ GHC.Types.Char
+                            Examples.TranslationExample.$fShowVal3
+                            (case b1 of wild1 {
+                               GHC.Types.False -> GHC.Base.++ @ GHC.Types.Char GHC.Show.shows17 x
+                               GHC.Types.True
+                               -> GHC.Base.++ @ GHC.Types.Char GHC.Show.shows16 x })
+                      } in
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False -> p
+                        GHC.Types.True
+                        -> \ x :: GHC.Base.String ->
+                           GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (p (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 x)) }
+                   Contract.RVal b1
+                   -> let {
+                        g :: GHC.Base.String -> GHC.Base.String
+                        = case b1 of ww1 { GHC.Types.D# ww2 ->
+                          GHC.Float.$w$sshowSignedFloat
+                            GHC.Float.$fShowDouble_$sshowFloat
+                            Examples.TranslationExample.$fShowILVal4
+                            ww2 }
+                      } in
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False
+                        -> \ x :: GHC.Base.String ->
+                           GHC.Base.++
+                             @ GHC.Types.Char
+                             Examples.TranslationExample.$fShowVal2
+                             (g x)
+                        GHC.Types.True
+                        -> \ x :: GHC.Base.String ->
+                           GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (GHC.Base.++
+                                @ GHC.Types.Char
+                                Examples.TranslationExample.$fShowVal2
+                                (g (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 x))) } }) -}
+117c750d92723617d8efff763e94fd0b
+  $wadv_both ::
+    GHC.Prim.Int#
+    -> HOAS.Contr
+    -> Contract.ExtEnvP
+    -> (# HOAS.Contr, Contract.ExtEnvP #)
+  {- Arity: 3, Strictness: <S,1*U><L,U><L,U>, Inline: [0] -}
+3a017080ec7e2b77b45c42c70e7e93f2
+  $wadv_n ::
+    Contract.ExtEnvP
+    -> GHC.Prim.Int#
+    -> HOAS.Contr
+    -> forall (exp :: * -> *) contr. HOAS.ContrHoas exp contr => contr
+  {- Arity: 4, Strictness: <L,C(C1(U))><S,1*U><L,1*C1(U)><L,U>,
+     Inline: [0] -}
+b0af867309c11e98d2c4b59d2264c364
+  $wadv_n' ::
+    GHC.Types.Int
+    -> HOAS.Contr
+    -> Contract.ExtEnvP
+    -> (# Contract.Contr, Contract.ExtEnv' ContractTranslation.ILVal #)
+  {- Arity: 3, Strictness: <L,1*U(1*U)><L,U><L,U>, Inline: [0],
+     Unfolding: (\ w :: GHC.Types.Int
+                   ww :: HOAS.Contr
+                   ww1 :: Contract.ExtEnvP ->
+                 let {
+                   ds :: (HOAS.Contr, Contract.ExtEnvP)
+                   = case w of ww2 { GHC.Types.I# ww3 ->
+                     case Examples.TranslationExample.$wadv_both
+                            ww3
+                            ww
+                            ww1 of ww4 { (#,#) ww5 ww6 ->
+                     (ww5, ww6) } }
+                 } in
+                 (# case ds of wild { (,) c' ext' ->
+                    (c' @ HOAS.DB @ HOAS.CDB HOAS.$fContrHoasDBCDB)
+                      `cast`
+                    (HOAS.NTCo:CDB[0])
+                      HOAS.$fShowContr2 },
+                    \ l :: Contract.ObsLabel t :: GHC.Types.Int ->
+                    case ds of wild { (,) c' ext' ->
+                    case ext' l t of wild1 {
+                      GHC.Base.Nothing
+                      -> case Data.Maybe.fromJust1 ret_ty ContractTranslation.ILVal of {}
+                      GHC.Base.Just x
+                      -> case x of wild2 {
+                           Contract.BVal b -> ContractTranslation.ILBVal b
+                           Contract.RVal r -> ContractTranslation.ILRVal r } } } #)) -}
+0ebfde007b4913c885f7552ee63884ea
+  $weval ::
+    GHC.Types.Int
+    -> ContractTranslation.ILExpr
+    -> Contract.ExtEnv' ContractTranslation.ILVal
+    -> GHC.Base.Maybe ContractTranslation.ILVal
+  {- Arity: 3, Strictness: <L,U><S,1*U><L,C(C1(U))>, Inline: [0],
+     Unfolding: (\ w :: GHC.Types.Int
+                   ww :: ContractTranslation.ILExpr
+                   ww1 :: Contract.ExtEnv' ContractTranslation.ILVal ->
+                 ContractTranslation.iLsem
+                   ww
+                   ww1
+                   Examples.TranslationExample.empty_tenv
+                   Examples.TranslationExample.$fShowILExpr2
+                   w
+                   Examples.TranslationExample.commute1
+                   BaseTypes.X
+                   BaseTypes.Y) -}
+1ee1d8555ca23bad99292a77f2b3a653
+  $wpath1 ::
+    GHC.Types.Int
+    -> HOAS.Contr
+    -> Contract.ExtEnvP
+    -> GHC.Base.Maybe ContractTranslation.ILVal
+  {- Arity: 3, Strictness: <L,1*U(1*U)><L,U><L,U>, Inline: [0],
+     Unfolding: (\ w :: GHC.Types.Int
+                   ww :: HOAS.Contr
+                   ww1 :: Contract.ExtEnvP ->
+                 case Examples.TranslationExample.$wadv_n'
+                        w
+                        ww
+                        ww1 of ww2 { (#,#) ww3 ww4 ->
+                 ContractTranslation.iLsem
+                   (Examples.TranslationExample.transC ww3)
+                   ww4
+                   Examples.TranslationExample.empty_tenv
+                   Examples.TranslationExample.$fShowILExpr2
+                   Examples.TranslationExample.$fShowILExpr2
+                   Examples.TranslationExample.commute1
+                   BaseTypes.X
+                   BaseTypes.Y }) -}
+64341ba5cad9dcfd3308221ee7f92c99
+  $wpath2 ::
+    GHC.Types.Int
+    -> HOAS.Contr
+    -> Contract.ExtEnvP
+    -> GHC.Base.Maybe ContractTranslation.ILVal
+  {- Arity: 3, Strictness: <L,U><C(S),1*C1(U)><L,C(C1(U))>,
+     Inline: [0],
+     Unfolding: (\ w :: GHC.Types.Int
+                   ww :: HOAS.Contr
+                   ww1 :: Contract.ExtEnvP ->
+                 case ContractTranslation.fromContr
+                        (HOAS.fromHoas ww)
+                        Examples.TranslationExample.tZero of wild {
+                   GHC.Base.Nothing
+                   -> case Examples.TranslationExample.commute3
+                      ret_ty (GHC.Base.Maybe ContractTranslation.ILVal)
+                      of {}
+                   GHC.Base.Just v
+                   -> ContractTranslation.iLsem
+                        (ContractTranslation.cutPayoff v)
+                        (\ l :: Contract.ObsLabel t :: GHC.Types.Int[OneShot] ->
+                         case ww1 l t of wild1 {
+                           GHC.Base.Nothing
+                           -> case Data.Maybe.fromJust1 ret_ty ContractTranslation.ILVal of {}
+                           GHC.Base.Just x
+                           -> case x of wild2 {
+                                Contract.BVal b -> ContractTranslation.ILBVal b
+                                Contract.RVal r -> ContractTranslation.ILRVal r } })
+                        Examples.TranslationExample.empty_tenv
+                        Examples.TranslationExample.$fShowILExpr2
+                        w
+                        Examples.TranslationExample.commute1
+                        BaseTypes.X
+                        BaseTypes.Y }) -}
+b1e02750bacb5910baf19b900acc2182
+  advSimple :: HOAS.Contr
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ (exp :: * -> *)
+                   @ contr
+                   $dContrHoas :: HOAS.ContrHoas exp contr ->
+                 case Examples.TranslationExample.advSimple1 of wild { (,) x ds1 ->
+                 x @ exp @ contr $dContrHoas }) -}
+06155f330ccc819cc50df5300d59b0be
+  advSimple1 :: (HOAS.Contr, Contract.FMap)
+  {- Unfolding: (case EDSL.$wadvance
+                        Examples.SampleContracts.simple
+                        Examples.TranslationExample.advSimple2
+                        Examples.TranslationExample.empty_tenv of ww { (#,#) ww1 ww2 ->
+                 (ww1, ww2) }) -}
+e073acfd44391671adcac3d6a5a6adee
+  advSimple2 :: Contract.ExtEnvP
+  {- Unfolding: (EDSL.mkExtEnvP
+                   (GHC.Types.[]
+                      @ (BaseTypes.RealObs, GHC.Types.Int, GHC.Types.Double))
+                   (GHC.Types.[]
+                      @ (BaseTypes.BoolObs, GHC.Types.Int, GHC.Types.Bool))) -}
+f30db3613ad5b96b19d988a31aa4faf1
+  advTwoCF :: HOAS.Contr
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ (exp :: * -> *)
+                   @ contr
+                   $dContrHoas :: HOAS.ContrHoas exp contr ->
+                 case Examples.TranslationExample.advTwoCF1 of wild { (,) x ds1 ->
+                 x @ exp @ contr $dContrHoas }) -}
+73c449985486ea74170f870627d2751c
+  advTwoCF1 :: (HOAS.Contr, Contract.FMap)
+  {- Unfolding: (case EDSL.$wadvance
+                        Examples.SampleContracts.twoCF
+                        Examples.TranslationExample.advSimple2
+                        Examples.TranslationExample.empty_tenv of ww { (#,#) ww1 ww2 ->
+                 (ww1, ww2) }) -}
+48f5e07cc33dba33c8eed171ee1ef083
+  adv_both ::
+    GHC.Types.Int
+    -> (HOAS.Contr, Contract.ExtEnvP) -> (HOAS.Contr, Contract.ExtEnvP)
+  {- Arity: 2, Strictness: <S(S),1*U(1*U)><S,1*U(U,U)>m,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ w :: GHC.Types.Int w1 :: (HOAS.Contr, Contract.ExtEnvP) ->
+                 case w of ww { GHC.Types.I# ww1 ->
+                 case w1 of ww2 { (,) ww3 ww4 ->
+                 case Examples.TranslationExample.$wadv_both
+                        ww1
+                        ww3
+                        ww4 of ww5 { (#,#) ww6 ww7 ->
+                 (ww6, ww7) } } }) -}
+21ad8b2e384cddaeb28fec6c03bfd887
+  adv_n ::
+    Contract.ExtEnvP -> GHC.Types.Int -> HOAS.Contr -> HOAS.Contr
+  {- Arity: 4,
+     Strictness: <L,C(C1(U))><S(S),1*U(1*U)><L,1*C1(U)><L,U>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (4, True, False)
+                (\ w :: Contract.ExtEnvP
+                   w1 :: GHC.Types.Int
+                   w2 :: HOAS.Contr
+                   @ (exp :: * -> *)
+                   @ contr
+                   w3 :: HOAS.ContrHoas exp contr ->
+                 case w1 of ww { GHC.Types.I# ww1 ->
+                 Examples.TranslationExample.$wadv_n w ww1 w2 @ exp @ contr w3 }) -}
+e35f4d28db49111c6c643dced50106a9
+  adv_n' ::
+    GHC.Types.Int
+    -> (HOAS.Contr, Contract.ExtEnvP)
+    -> (Contract.Contr, Contract.ExtEnv' ContractTranslation.ILVal)
+  {- Arity: 2, Strictness: <L,1*U(1*U)><S,1*U(U,U)>m,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ w :: GHC.Types.Int w1 :: (HOAS.Contr, Contract.ExtEnvP) ->
+                 case w1 of ww { (,) ww1 ww2 ->
+                 case Examples.TranslationExample.$wadv_n'
+                        w
+                        ww1
+                        ww2 of ww3 { (#,#) ww4 ww5 ->
+                 (ww4, ww5) } }) -}
+e15f13e82b9dc6d52b453bae97466222
+  advance1 :: HOAS.Contr -> Contract.ExtEnvP -> HOAS.Contr
+  {- Arity: 3,
+     Strictness: <L,1*C1(U)><L,C(C1(U))><S(LLLLLLLLLLC(S)),1*U(A,A,A,A,A,A,A,A,A,A,1*C1(U))>,
+     Unfolding: (\ dk :: HOAS.Contr
+                   dk1 :: Contract.ExtEnvP
+                   @ (exp :: * -> *)
+                   @ contr
+                   $dContrHoas :: HOAS.ContrHoas exp contr ->
+                 HOAS.fromClosed
+                   @ exp
+                   @ contr
+                   $dContrHoas
+                   (case Contract.redfun
+                           (HOAS.fromHoas dk)
+                           (GHC.Types.[] @ (GHC.Base.Maybe Contract.Val))
+                           dk1
+                           Examples.TranslationExample.empty_tenv of wild {
+                      GHC.Base.Nothing
+                      -> case Data.Maybe.fromJust1 ret_ty Contract.Contr of {}
+                      GHC.Base.Just x -> case x of wild1 { (,) c' ds -> c' } })) -}
+6464480356385f2c79e9c860b002475e
+  appProd :: (t -> t2, t1 -> t3) -> (t, t1) -> (t2, t3)
+  {- Arity: 2, HasNoCafRefs,
+     Strictness: <S,1*U(1*C1(U),1*C1(U))><S,1*U(U,U)>m,
+     Unfolding: InlineRule (2, True, False)
+                (\ @ t @ t1 @ t2 @ t3 ds :: (t -> t2, t1 -> t3) ds1 :: (t, t1) ->
+                 case ds of wild { (,) f g ->
+                 case ds1 of wild1 { (,) x y -> (f x, g y) } }) -}
+c8d50e0cd21d93b6d3ea2ef657c34718
+  c1_eq1 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m4,
+     Unfolding: (Contract.Scale
+                   Examples.TranslationExample.c1_eq9
+                   Examples.TranslationExample.c1_eq4) -}
+c28c8616196fa78742a050381eaa8685
+  c1_eq10 :: Contract.Op
+  {- HasNoCafRefs, Strictness: m13,
+     Unfolding: (Contract.RLit Examples.TranslationExample.c1_eq11) -}
+042365179cb9610a0e3f2b2c5954ddb6
+  c1_eq11 :: GHC.Types.Double
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.D# 2.0) -}
+84bcec9797458dafc74f40d41acd244a
+  c1_eq12 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m5,
+     Unfolding: (Contract.Translate
+                   Examples.TranslationExample.c1_eq13
+                   Examples.TranslationExample.c1_eq5) -}
+81f78661683f1e88bd504e19fe3b2f4a
+  c1_eq13 :: Contract.TExpr
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (Contract.Tnum Examples.TranslationExample.c1_eq14) -}
+7cf4e46411587ea7339bde17e09b9bd2
+  c1_eq14 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 3) -}
+73e64cd03e50100b3fd2b86b8b8e82c2
+  c1_eq15 :: Contract.TExpr
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (Contract.Tnum Examples.TranslationExample.c1_eq16) -}
+becb21cb1f0299721f5c405eb966b85e
+  c1_eq16 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 2) -}
+373f63b490d552d13510b0de2a86d696
+  c1_eq17 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m6,
+     Unfolding: (Contract.Both
+                   Examples.TranslationExample.c1_eq5
+                   Examples.TranslationExample.c1_eq5) -}
+1259c8a9e6bed7e9e0f41a947a83038f
+  c1_eq18 :: Contract.TExpr
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (Contract.Tnum Examples.TranslationExample.c1_eq19) -}
+f1554f03975384e062e099c13eaba625
+  c1_eq19 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 5) -}
+7076b732c6038bb67b87141379dfbdbb
+  c1_eq2 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m5,
+     Unfolding: (Contract.Translate
+                   Examples.TranslationExample.c1_eq15
+                   Examples.TranslationExample.c1_eq12) -}
+09ea30b51d486369e286a37a51c818fe
+  c1_eq3 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m5,
+     Unfolding: (Contract.Translate
+                   Examples.TranslationExample.c1_eq18
+                   Examples.TranslationExample.c1_eq17) -}
+e0d8a3722e7f671a13fe15f42e9f4462
+  c1_eq4 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m4,
+     Unfolding: (Contract.Scale
+                   Examples.TranslationExample.c1_eq6
+                   Examples.TranslationExample.c1_eq5) -}
+8b41953f6ec51a7aabbf82665d83d12d
+  c1_eq5 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m3,
+     Unfolding: (Contract.Transfer
+                   BaseTypes.X
+                   BaseTypes.Y
+                   BaseTypes.EUR) -}
+c062503c02e2ddce48d7ad08a6f0dd87
+  c1_eq6 :: Contract.Exp
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (Contract.OpE
+                   Examples.TranslationExample.c1_eq7
+                   (GHC.Types.[] @ Contract.Exp)) -}
+c86fbb6a5eaf842de9fb29b8ca596d4d
+  c1_eq7 :: Contract.Op
+  {- HasNoCafRefs, Strictness: m13,
+     Unfolding: (Contract.RLit Examples.TranslationExample.c1_eq8) -}
+2a24559a359c90910788acce5f92fd6a
+  c1_eq8 :: GHC.Types.Double
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.D# 3.0) -}
+59659b9672a8b2a607ef4fb6a4fe466b
+  c1_eq9 :: Contract.Exp
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (Contract.OpE
+                   Examples.TranslationExample.c1_eq10
+                   (GHC.Types.[] @ Contract.Exp)) -}
+adeb34dee5629ad00c21eee40c02fb4b
+  c2_eq1 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m4,
+     Unfolding: (Contract.Scale
+                   Examples.TranslationExample.c2_eq4
+                   Examples.TranslationExample.c1_eq5) -}
+51fd0f2e680eb43b4bf27a88b47bf0c8
+  c2_eq2 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m5,
+     Unfolding: (Contract.Translate
+                   Examples.TranslationExample.c1_eq18
+                   Examples.TranslationExample.c1_eq5) -}
+04d20440004aed6a99f73a12a65031e8
+  c2_eq3 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m6,
+     Unfolding: (Contract.Both
+                   Examples.TranslationExample.c2_eq2
+                   Examples.TranslationExample.c2_eq2) -}
+d0b7268d4c71bd895868627fc2c73572
+  c2_eq4 :: Contract.Exp
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (Contract.OpE
+                   Contract.Mult
+                   Examples.TranslationExample.c2_eq5) -}
+773c7d08d3a9af6bbe3652b04679e5fe
+  c2_eq5 :: [Contract.Exp]
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (GHC.Types.:
+                   @ Contract.Exp
+                   Examples.TranslationExample.c1_eq9
+                   Examples.TranslationExample.c2_eq6) -}
+81ee8747c01b0e2c771f8b92076a4216
+  c2_eq6 :: [Contract.Exp]
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (GHC.Types.:
+                   @ Contract.Exp
+                   Examples.TranslationExample.c1_eq6
+                   (GHC.Types.[] @ Contract.Exp)) -}
+a4cc50e28acbd992fedf687f1e0d1871
+  commute :: GHC.Types.Int -> GHC.Types.Bool
+  {- Arity: 1, Strictness: <L,U(U)>,
+     Unfolding: (\ k :: GHC.Types.Int ->
+                 case Examples.TranslationExample.$wpath1
+                        k
+                        Examples.SampleContracts.composite
+                        Examples.TranslationExample.sampleExt of wild {
+                   GHC.Base.Nothing
+                   -> case Examples.TranslationExample.$wpath2
+                             k
+                             Examples.SampleContracts.composite
+                             Examples.TranslationExample.sampleExt of wild1 {
+                        GHC.Base.Nothing -> GHC.Types.True
+                        GHC.Base.Just ipv -> GHC.Types.False }
+                   GHC.Base.Just a1
+                   -> case Examples.TranslationExample.$wpath2
+                             k
+                             Examples.SampleContracts.composite
+                             Examples.TranslationExample.sampleExt of wild1 {
+                        GHC.Base.Nothing -> GHC.Types.False
+                        GHC.Base.Just b1
+                        -> Examples.TranslationExample.$fEqILVal_$c== a1 b1 } }) -}
+67dcce0e9c0fe2c474d152e5b2293d9d
+  commute1 :: GHC.Types.Int -> GHC.Types.Double
+  {- Arity: 1, HasNoCafRefs, Strictness: <L,A>m,
+     Unfolding: InlineRule (1, True, True)
+                (\ t :: GHC.Types.Int -> Examples.TranslationExample.commute2) -}
+a056c5ae72251f61e11f2c9a3edb4b02
+  commute2 :: GHC.Types.Double
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.D# 1.0) -}
+6ef05ca01bdeae6667cb72220906c1e0
+  commute3 :: ContractTranslation.ILExpr
+  {- Strictness: b -}
+275baddc2d51d9afe40a31ec6f4cfc0f
+  commute_horizon :: GHC.Types.Bool
+  {- Unfolding: InlineRule (0, True, True)
+                Examples.TranslationExample.commute_horizon1
+                  `cast`
+                (Data.Monoid.NTCo:All[0]) -}
+140d2f95d5a75bda8221d97d6a6caed2
+  commute_horizon1 :: Data.Monoid.All
+  {- Unfolding: (case Contract.$whorizon
+                        Examples.TranslationExample.commute_horizon2
+                        Examples.TranslationExample.empty_tenv of ww { DEFAULT ->
+                 case GHC.Prim.tagToEnum#
+                        @ GHC.Types.Bool
+                        (GHC.Prim.># 0 ww) of wild {
+                   GHC.Types.False
+                   -> letrec {
+                        go :: GHC.Prim.Int# -> [GHC.Types.Bool]
+                          {- Arity: 1, Strictness: <L,U> -}
+                        = \ x :: GHC.Prim.Int# ->
+                          GHC.Types.:
+                            @ GHC.Types.Bool
+                            (Examples.TranslationExample.commute (GHC.Types.I# x))
+                            (case GHC.Prim.tagToEnum#
+                                    @ GHC.Types.Bool
+                                    (GHC.Prim.==# x ww) of wild1 {
+                               GHC.Types.False -> go (GHC.Prim.+# x 1)
+                               GHC.Types.True -> GHC.Types.[] @ GHC.Types.Bool })
+                      } in
+                      Examples.TranslationExample.commute_horizon_go (go 0)
+                   GHC.Types.True
+                   -> Examples.TranslationExample.commute_horizon_go
+                        (GHC.Types.[] @ GHC.Types.Bool) } }) -}
+bdd2b1e7ebe7274fd5ba96ba913f72c7
+  commute_horizon2 :: Contract.Contr
+  {- Unfolding: (Contract.Both
+                   Examples.TranslationExample.commute_horizon9
+                   Examples.TranslationExample.commute_horizon3) -}
+a98d8ea634160a82cc1ed6dd1d24543c
+  commute_horizon3 :: Contract.Contr
+  {- HasNoCafRefs,
+     Unfolding: (Contract.Translate
+                   Examples.TranslationExample.commute_horizon8
+                   Examples.TranslationExample.commute_horizon4) -}
+181cb3a3930748da71cd87ed1caeeb75
+  commute_horizon4 :: Contract.Contr
+  {- HasNoCafRefs,
+     Unfolding: (Contract.Scale
+                   Examples.TranslationExample.commute_horizon5
+                   Examples.TranslationExample.c1_eq5) -}
+6af2355c6f7801b5f99ed2481cdc38a6
+  commute_horizon5 :: Contract.Exp
+  {- HasNoCafRefs,
+     Unfolding: (Contract.OpE
+                   Examples.TranslationExample.commute_horizon6
+                   (GHC.Types.[] @ Contract.Exp)) -}
+507c54553592fa71eef77546fb055930
+  commute_horizon6 :: Contract.Op
+  {- HasNoCafRefs,
+     Unfolding: (Contract.RLit
+                   Examples.TranslationExample.commute_horizon7) -}
+9a6bde835890d3c3f65d0791c4bc719a
+  commute_horizon7 :: GHC.Types.Double
+  {- HasNoCafRefs, Unfolding: (GHC.Types.D# 100.0) -}
+f4d171f46224da186736a379c29aee24
+  commute_horizon8 :: Contract.TExpr
+  {- HasNoCafRefs,
+     Unfolding: (Contract.Tnum Examples.SampleContracts.composite1) -}
+df005f5a0a55c787a142a4b402ab92ba
+  commute_horizon9 :: Contract.Contr
+  {- Unfolding: ((Examples.SampleContracts.european'
+                    @ HOAS.DB
+                    @ HOAS.CDB
+                    HOAS.$fContrHoasDBCDB)
+                   `cast`
+                 (HOAS.NTCo:CDB[0])
+                   HOAS.$fShowContr2) -}
+09ff53a32452016d97dc8996eeab9e24
+  commute_horizon_go :: [GHC.Types.Bool] -> Data.Monoid.All
+  {- Arity: 1, HasNoCafRefs, Strictness: <S,1*U> -}
+5d92785357d65eff2ecf789cf62d0de2
+  empty_tenv :: GHC.Base.String -> GHC.Types.Int
+  {- Arity: 1, Strictness: <B,A>b,
+     Unfolding: InlineRule (1, True, True)
+                (\ ds :: GHC.Base.String -> GHC.Err.undefined @ GHC.Types.Int) -}
+a334a8334bb6762d4e8cf3b941b10b4a
+  eq2 :: GHC.Types.Bool
+  {- Unfolding: (case ContractTranslation.fromContr
+                        Examples.TranslationExample.c1_eq2
+                        Examples.TranslationExample.tZero of wild {
+                   GHC.Base.Nothing
+                   -> case Examples.TranslationExample.commute3
+                      ret_ty GHC.Types.Bool
+                      of {}
+                   GHC.Base.Just v
+                   -> case ContractTranslation.fromContr
+                             Examples.TranslationExample.c2_eq2
+                             Examples.TranslationExample.tZero of wild1 {
+                        GHC.Base.Nothing
+                        -> case Examples.TranslationExample.commute3
+                           ret_ty GHC.Types.Bool
+                           of {}
+                        GHC.Base.Just v1
+                        -> Examples.TranslationExample.$fEqILExpr_$c== v v1 } }) -}
+3f3bc7175b38fb548c6c51375616bb48
+  eq3 :: GHC.Types.Bool
+  {- Unfolding: (case ContractTranslation.fromContr
+                        Examples.TranslationExample.c1_eq3
+                        Examples.TranslationExample.tZero of wild {
+                   GHC.Base.Nothing
+                   -> case Examples.TranslationExample.commute3
+                      ret_ty GHC.Types.Bool
+                      of {}
+                   GHC.Base.Just v
+                   -> case ContractTranslation.fromContr
+                             Examples.TranslationExample.c2_eq3
+                             Examples.TranslationExample.tZero of wild1 {
+                        GHC.Base.Nothing
+                        -> case Examples.TranslationExample.commute3
+                           ret_ty GHC.Types.Bool
+                           of {}
+                        GHC.Base.Just v1
+                        -> Examples.TranslationExample.$fEqILExpr_$c== v v1 } }) -}
+1d07ec4299594ed8c5df866d76b29f63
+  eq_causal :: GHC.Types.Bool
+  {- Unfolding: (case ContractTranslation.fromContr
+                        Examples.TranslationExample.nonObviouslyCausal
+                        Examples.TranslationExample.tZero of wild {
+                   GHC.Base.Nothing
+                   -> case Examples.TranslationExample.commute3
+                      ret_ty GHC.Types.Bool
+                      of {}
+                   GHC.Base.Just v
+                   -> case ContractTranslation.fromContr
+                             Examples.TranslationExample.obviouslyCausal
+                             Examples.TranslationExample.tZero of wild1 {
+                        GHC.Base.Nothing
+                        -> case Examples.TranslationExample.commute3
+                           ret_ty GHC.Types.Bool
+                           of {}
+                        GHC.Base.Just v1
+                        -> Examples.TranslationExample.$fEqILExpr_$c== v v1 } }) -}
+afe676c7296213800dfacb2d91e0342b
+  eval ::
+    GHC.Types.Int
+    -> (ContractTranslation.ILExpr,
+        Contract.ExtEnv' ContractTranslation.ILVal)
+    -> GHC.Base.Maybe ContractTranslation.ILVal
+  {- Arity: 2, Strictness: <L,U><S(SL),1*U(1*U,C(C1(U)))>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ w :: GHC.Types.Int
+                   w1 :: (ContractTranslation.ILExpr,
+                          Contract.ExtEnv' ContractTranslation.ILVal) ->
+                 case w1 of ww { (,) ww1 ww2 ->
+                 Examples.TranslationExample.$weval w ww1 ww2 }) -}
+59c4f879765291c1bd23cde5e379867b
+  eval_empty ::
+    ContractTranslation.ILExpr
+    -> GHC.Base.Maybe ContractTranslation.ILVal
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: (\ exp :: ContractTranslation.ILExpr ->
+                 ContractTranslation.iLsem
+                   exp
+                   Examples.TranslationExample.eval_empty1
+                   Examples.TranslationExample.empty_tenv
+                   Examples.TranslationExample.$fShowILExpr2
+                   Examples.TranslationExample.$fShowILExpr2
+                   Examples.TranslationExample.commute1
+                   BaseTypes.X
+                   BaseTypes.Y) -}
+5034c7d5db9adbeb86ecdd490d0ed721
+  eval_empty1 ::
+    Contract.ObsLabel -> GHC.Types.Int -> ContractTranslation.ILVal
+  {- Arity: 2, HasNoCafRefs, Strictness: <L,A><L,A>m2,
+     Unfolding: InlineRule (2, True, True)
+                (\ l :: Contract.ObsLabel t :: GHC.Types.Int[OneShot] ->
+                 Examples.TranslationExample.eval_empty2) -}
+6663e063ebd60bc3db436a3ed4427d36
+  eval_empty2 :: ContractTranslation.ILVal
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (ContractTranslation.ILRVal
+                   Examples.TranslationExample.eval_empty3) -}
+1ce8103237ec6afc22b30953b7b4a219
+  eval_empty3 :: GHC.Types.Double
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.D# 0.0) -}
+c7798203c5aebe21603225f065e0ade5
+  fromJustExtEnv :: (t -> t1 -> GHC.Base.Maybe a) -> t -> t1 -> a
+  {- Arity: 3, Strictness: <C(C(S)),1*C1(C1(U))><L,U><L,U>,
+     Unfolding: InlineRule (3, True, False)
+                (\ @ a
+                   @ t
+                   @ t1
+                   ext :: t -> t1 -> GHC.Base.Maybe a
+                   l :: t
+                   t2 :: t1 ->
+                 case ext l t2 of wild {
+                   GHC.Base.Nothing -> Data.Maybe.fromJust1 @ a
+                   GHC.Base.Just x -> x }) -}
+8d88c89cd6de0dffaaa42f604e8d03a7
+  nonObviouslyCausal :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m4,
+     Unfolding: (Contract.Scale
+                   Examples.TranslationExample.nonObviouslyCausal2
+                   Examples.TranslationExample.nonObviouslyCausal1) -}
+879e34b9a0e4434023d847ff6550d470
+  nonObviouslyCausal1 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m5,
+     Unfolding: (Contract.Translate
+                   Examples.TranslationExample.obviouslyCausal5
+                   Examples.TranslationExample.c1_eq5) -}
+e00abb0ac32b9051a14b0bd25507c02b
+  nonObviouslyCausal2 :: Contract.Exp
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (Contract.Obs
+                   Examples.TranslationExample.obviouslyCausal3
+                   Examples.TranslationExample.obviouslyCausal6) -}
+0b62f5f42f957df061490696b6ecb241
+  obviouslyCausal :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m5,
+     Unfolding: (Contract.Translate
+                   Examples.TranslationExample.obviouslyCausal5
+                   Examples.TranslationExample.obviouslyCausal1) -}
+2f98e3659a370e902c7ab50ca0676eb9
+  obviouslyCausal1 :: Contract.Contr
+  {- HasNoCafRefs, Strictness: m4,
+     Unfolding: (Contract.Scale
+                   Examples.TranslationExample.obviouslyCausal2
+                   Examples.TranslationExample.c1_eq5) -}
+7d8a85a885fe7b1910c9ceed09f045db
+  obviouslyCausal2 :: Contract.Exp
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (Contract.Obs
+                   Examples.TranslationExample.obviouslyCausal3
+                   Examples.TranslationExample.$fShowILExpr2) -}
+6d939ec686590554f3d57b43192ec33e
+  obviouslyCausal3 :: Contract.ObsLabel
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (Contract.LabR
+                   Examples.TranslationExample.obviouslyCausal4) -}
+cc326371799d8179f99fe2b9a72e248b
+  obviouslyCausal4 :: BaseTypes.RealObs
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (BaseTypes.FX BaseTypes.EUR BaseTypes.DKK) -}
+f4bfeba6b4960d5884445bb2f673ffdc
+  obviouslyCausal5 :: Contract.TExpr
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (Contract.Tnum
+                   Examples.TranslationExample.obviouslyCausal6) -}
+ae3e4f2f053b02afdf1324b442306cf9
+  obviouslyCausal6 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 1) -}
+a9bd132fa30276b810f2bb6179f06cbd
+  path1 ::
+    GHC.Types.Int
+    -> (HOAS.Contr, Contract.ExtEnvP)
+    -> GHC.Base.Maybe ContractTranslation.ILVal
+  {- Arity: 2, Strictness: <L,1*U(1*U)><S,1*U(U,U)>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ w :: GHC.Types.Int w1 :: (HOAS.Contr, Contract.ExtEnvP) ->
+                 case w1 of ww { (,) ww1 ww2 ->
+                 Examples.TranslationExample.$wpath1 w ww1 ww2 }) -}
+469aaba59982b516e6c8cc2c1d488f1f
+  path2 ::
+    GHC.Types.Int
+    -> (HOAS.Contr, Contract.ExtEnvP)
+    -> GHC.Base.Maybe ContractTranslation.ILVal
+  {- Arity: 2, Strictness: <L,U><S(C(S)L),1*U(1*C1(U),C(C1(U)))>,
+     Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ w :: GHC.Types.Int w1 :: (HOAS.Contr, Contract.ExtEnvP) ->
+                 case w1 of ww { (,) ww1 ww2 ->
+                 Examples.TranslationExample.$wpath2 w ww1 ww2 }) -}
+06bc4b3e0b76c55dd0a27eb7618027e4
+  printEuroOption :: GHC.Types.IO ()
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: InlineRule (0, True, True)
+                Examples.TranslationExample.printEuroOption1
+                  `cast`
+                (Sym (GHC.Types.NTCo:IO[0] <()>_R)) -}
+88aae25c1e04d7cfa9e477140b40f0fc
+  printEuroOption1 ::
+    GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: (\ eta :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
+                 GHC.IO.Handle.Text.hPutStr2
+                   GHC.IO.Handle.FD.stdout
+                   Examples.TranslationExample.printEuroOption2
+                   GHC.Types.True
+                   eta) -}
+8f1c68ddf61bee511d883507322a7025
+  printEuroOption2 :: GHC.Base.String
+  {- Unfolding: (PrettyPrinting.ppContr
+                   HOAS.$fShowContr2
+                   (GHC.Types.[] @ GHC.Types.Int)
+                   Examples.TranslationExample.printEuroOption3) -}
+f5833a6d1bdb88e3fd4f2fe1e2dae258
+  printEuroOption3 :: Contract.Contr
+  {- Unfolding: ((Examples.SampleContracts.european
+                    @ HOAS.DB
+                    @ HOAS.CDB
+                    HOAS.$fContrHoasDBCDB)
+                   `cast`
+                 (HOAS.NTCo:CDB[0])
+                   HOAS.$fShowContr2) -}
+47fadfbe729f28efc68b21cae79ad87d
+  sampleExt :: Contract.ExtEnvP
+  {- Unfolding: (EDSL.mkExtEnvP
+                   Examples.TranslationExample.sampleExt1
+                   (GHC.Types.[]
+                      @ (BaseTypes.BoolObs, GHC.Types.Int, GHC.Types.Bool))) -}
+f0bb4d3e04150e7e96c9ad07ce504ff0
+  sampleExt1 ::
+    [(BaseTypes.RealObs, GHC.Types.Int, GHC.Types.Double)]
+  {- Unfolding: (GHC.Types.:
+                   @ (BaseTypes.RealObs, GHC.Types.Int, GHC.Types.Double)
+                   Examples.TranslationExample.sampleExt2
+                   (GHC.Types.[]
+                      @ (BaseTypes.RealObs, GHC.Types.Int, GHC.Types.Double))) -}
+16513223dcbc8229813a14ebbef5b0ec
+  sampleExt2 :: (BaseTypes.RealObs, GHC.Types.Int, GHC.Types.Double)
+  {- Unfolding: ((Examples.TranslationExample.sampleExt5,
+                  Examples.TranslationExample.sampleExt4,
+                  Examples.TranslationExample.sampleExt3)) -}
+422923ded2961b0d0f4313b8dc024565
+  sampleExt3 :: GHC.Types.Double
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.D# 4100.0) -}
+b4706ca957ef55d15b642802d9b47b0f
+  sampleExt4 :: GHC.Types.Int
+  {- HasNoCafRefs, Unfolding: (GHC.Types.I# 365) -}
+0d53fe67268f5b6db7c5c07be47dce95
+  sampleExt5 :: BaseTypes.RealObs
+  {- Unfolding: (BaseTypes.Stock
+                   Examples.TranslationExample.sampleExt6) -}
+de7df62aaa168d506681e13c3214cc22
+  sampleExt6 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "DJ_Eurostoxx_50"#) -}
+2a40c9fe45fe6a80265a29f31e37263c
+  sampleILExt :: Contract.ExtEnv' ContractTranslation.ILVal
+  {- Arity: 2, HasNoCafRefs, Strictness: <L,A><S(S),1*U(1*U)>m2,
+     Unfolding: InlineRule (2, True, False)
+                (\ l :: Contract.ObsLabel t :: GHC.Types.Int ->
+                 case t of wild { GHC.Types.I# x ->
+                 case x of wild1 {
+                   DEFAULT -> Examples.TranslationExample.eval_empty2
+                   365 -> Examples.TranslationExample.sampleILExt1 } }) -}
+8b50a04e44d83075f107e1fb0e553927
+  sampleILExt1 :: ContractTranslation.ILVal
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (ContractTranslation.ILRVal
+                   Examples.TranslationExample.sampleExt3) -}
+2f7695c37433d795aff04f62492a67aa
+  tZero :: ContractTranslation.ILTExpr
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (ContractTranslation.ILTexpr
+                   Examples.TranslationExample.tZero1) -}
+948b0ec4fd0c6d334fef26888f1ab041
+  tZero1 :: Contract.TExpr
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (Contract.Tnum
+                   Examples.TranslationExample.$fShowILExpr2) -}
+15b32fd9473b61bc451f7d88628d7f2c
+  tZeroZ :: ContractTranslation.ILTExprZ
+  {- HasNoCafRefs, Strictness: m2,
+     Unfolding: (ContractTranslation.ILTexprZ
+                   Examples.TranslationExample.tZero) -}
+82b9e0a7a1411ddde426b9c59de6a5e9
+  trAdvSimple :: ContractTranslation.ILExpr
+  {- Unfolding: (case Examples.TranslationExample.advSimple1 of wild { (,) x ds1 ->
+                 case ContractTranslation.fromContr
+                        ((x @ HOAS.DB @ HOAS.CDB HOAS.$fContrHoasDBCDB)
+                           `cast`
+                         (HOAS.NTCo:CDB[0])
+                           HOAS.$fShowContr2)
+                        Examples.TranslationExample.tZero of wild1 {
+                   GHC.Base.Nothing -> Examples.TranslationExample.commute3
+                   GHC.Base.Just v -> v } }) -}
+73bcfd835dcef6101de7ad54d5172acd
+  trAdvTwoCF :: ContractTranslation.ILExpr
+  {- Unfolding: (case Examples.TranslationExample.advTwoCF1 of wild { (,) x ds1 ->
+                 case ContractTranslation.fromContr
+                        ((x @ HOAS.DB @ HOAS.CDB HOAS.$fContrHoasDBCDB)
+                           `cast`
+                         (HOAS.NTCo:CDB[0])
+                           HOAS.$fShowContr2)
+                        Examples.TranslationExample.tZero of wild1 {
+                   GHC.Base.Nothing -> Examples.TranslationExample.commute3
+                   GHC.Base.Just v -> v } }) -}
+24c3cadde04f8bb1ea695f359bf53872
+  trSimple :: ContractTranslation.ILExpr
+  {- Unfolding: (case ContractTranslation.fromContr
+                        Examples.TranslationExample.commute_horizon4
+                        Examples.TranslationExample.tZero of wild {
+                   GHC.Base.Nothing -> Examples.TranslationExample.commute3
+                   GHC.Base.Just v -> v }) -}
+b8f8fb62cf06827ed4086ef53848aa1d
+  trTemplate :: ContractTranslation.ILExpr
+  {- Unfolding: (case Examples.TranslationExample.tranlateTemplate of wild {
+                   GHC.Base.Nothing -> Examples.TranslationExample.commute3
+                   GHC.Base.Just v -> v }) -}
+6c0b262bbc4b848e71edea04b49e7c7a
+  trTemplateCut :: ContractTranslation.ILExpr
+  {- Unfolding: (case Examples.TranslationExample.tranlateTemplate of wild {
+                   GHC.Base.Nothing -> Examples.TranslationExample.commute3
+                   GHC.Base.Just v -> ContractTranslation.cutPayoff v }) -}
+53ef1e5caca91b0a844c7a0391b3554e
+  trTwoCF :: ContractTranslation.ILExpr
+  {- Unfolding: (case ContractTranslation.fromContr
+                        Examples.TranslationExample.trTwoCF1
+                        Examples.TranslationExample.tZero of wild {
+                   GHC.Base.Nothing -> Examples.TranslationExample.commute3
+                   GHC.Base.Just v -> v }) -}
+b28a21933880fe722ad66e10d3266db8
+  trTwoCF1 :: Contract.Contr
+  {- Unfolding: ((Examples.SampleContracts.twoCF
+                    @ HOAS.DB
+                    @ HOAS.CDB
+                    HOAS.$fContrHoasDBCDB)
+                   `cast`
+                 (HOAS.NTCo:CDB[0])
+                   HOAS.$fShowContr2) -}
+cfb1d11e995b7c0cc270085a1c5546e0
+  tranlateTemplate :: GHC.Base.Maybe ContractTranslation.ILExpr
+  {- Unfolding: (ContractTranslation.fromContr
+                   Examples.TranslationExample.tranlateTemplate1
+                   Examples.TranslationExample.tZero) -}
+b2a362b1e781c997992f73928702a3cb
+  tranlateTemplate1 :: Contract.Contr
+  {- Unfolding: ((Examples.SampleContracts.templateEx
+                    @ HOAS.DB
+                    @ HOAS.CDB
+                    HOAS.$fContrHoasDBCDB)
+                   `cast`
+                 (HOAS.NTCo:CDB[0])
+                   HOAS.$fShowContr2) -}
+a2b8a1a45b618c17cbb194600a004880
+  transC :: Contract.Contr -> ContractTranslation.ILExpr
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ c :: Contract.Contr ->
+                 case ContractTranslation.fromContr
+                        c
+                        Examples.TranslationExample.tZero of wild {
+                   GHC.Base.Nothing -> Examples.TranslationExample.commute3
+                   GHC.Base.Just v -> v }) -}
+adda374958e1616702736288f37361bf
+  translateEuropean :: GHC.Base.Maybe ContractTranslation.ILExpr
+  {- Unfolding: (ContractTranslation.fromContr
+                   Examples.TranslationExample.printEuroOption3
+                   Examples.TranslationExample.tZero) -}
+ce17f835193e8a28e321d08e65450e96
+  translateEuropean' :: GHC.Base.Maybe ContractTranslation.ILExpr
+  {- Unfolding: (ContractTranslation.fromContr
+                   Examples.TranslationExample.commute_horizon9
+                   Examples.TranslationExample.tZero) -}
+15209d3f191c0e81cfdf46f724ac4004
+  translateWorstOff :: GHC.Base.Maybe ContractTranslation.ILExpr
+  {- Unfolding: (ContractTranslation.fromContr
+                   Examples.TranslationExample.translateWorstOff1
+                   Examples.TranslationExample.tZero) -}
+9f241070363278d17f4f964c3cc0f79a
+  translateWorstOff1 :: Contract.Contr
+  {- Unfolding: ((Examples.SampleContracts.worstOff
+                    @ HOAS.DB
+                    @ HOAS.CDB
+                    HOAS.$fContrHoasDBCDB)
+                   `cast`
+                 (HOAS.NTCo:CDB[0])
+                   HOAS.$fShowContr2) -}
+instance GHC.Classes.Eq [ContractTranslation.ILBinOp]
+  = Examples.TranslationExample.$fEqILBinOp
+instance GHC.Classes.Eq [ContractTranslation.ILExpr]
+  = Examples.TranslationExample.$fEqILExpr
+instance GHC.Classes.Eq [ContractTranslation.ILTExpr]
+  = Examples.TranslationExample.$fEqILTExpr
+instance GHC.Classes.Eq [ContractTranslation.ILTExprZ]
+  = Examples.TranslationExample.$fEqILTExprZ
+instance GHC.Classes.Eq [ContractTranslation.ILUnOp]
+  = Examples.TranslationExample.$fEqILUnOp
+instance GHC.Classes.Eq [ContractTranslation.ILVal]
+  = Examples.TranslationExample.$fEqILVal
+instance GHC.Classes.Eq [Contract.ObsLabel]
+  = Examples.TranslationExample.$fEqObsLabel
+instance GHC.Classes.Eq [Contract.TExpr]
+  = Examples.TranslationExample.$fEqTExpr
+instance GHC.Show.Show [ContractTranslation.ILBinOp]
+  = Examples.TranslationExample.$fShowILBinOp
+instance GHC.Show.Show [ContractTranslation.ILExpr]
+  = Examples.TranslationExample.$fShowILExpr
+instance GHC.Show.Show [ContractTranslation.ILTExpr]
+  = Examples.TranslationExample.$fShowILTExpr
+instance GHC.Show.Show [ContractTranslation.ILTExprZ]
+  = Examples.TranslationExample.$fShowILTExprZ
+instance GHC.Show.Show [ContractTranslation.ILUnOp]
+  = Examples.TranslationExample.$fShowILUnOp
+instance GHC.Show.Show [ContractTranslation.ILVal]
+  = Examples.TranslationExample.$fShowILVal
+instance GHC.Show.Show [Contract.TExpr]
+  = Examples.TranslationExample.$fShowTExpr
+instance GHC.Show.Show [Contract.Val]
+  = Examples.TranslationExample.$fShowVal
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: none
+require own pkg trusted: False
+

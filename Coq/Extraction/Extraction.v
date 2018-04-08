@@ -110,7 +110,7 @@ Extract Inlined Constant compare => "compare".
 
 Extract Inductive comparison => "Ordering" [ "EQ" "LT" "GT"].
 
-Extraction "ContractExtracted.hs" 
+Extraction "Extraction/contracts-haskell/src/Contracts/ContractExtracted.hs" 
   lookupEnv
   Contr
   horizon
@@ -119,7 +119,7 @@ Extraction "ContractExtracted.hs"
   has_type
   inst_contr.
 
-Extraction "ContractTranslationExtracted.hs"
+Extraction "Extraction/contracts-haskell/src/Contracts/ContractTranslationExtracted.hs"
            fromExp
            fromContr
            fromExtEnv

@@ -1,0 +1,1677 @@
+
+==================== FINAL INTERFACE ====================
+2018-04-08 09:58:09.389247 UTC
+
+interface main@main:BaseTypes 7103
+  interface hash: 2a0d436899929efbdf5c9094acb51881
+  ABI hash: 65c5f953f1981ab087685c5da86fba76
+  export-list hash: 23778ad265b8e00b4976c7375a9c4325
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: e08a1e695a3d5701efe398d91e65cc68
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  BaseTypes.Asset{BaseTypes.CHF BaseTypes.DKK BaseTypes.EUR BaseTypes.JPY BaseTypes.USD}
+  BaseTypes.BoolObs{BaseTypes.Decision BaseTypes.Default}
+  BaseTypes.Party{BaseTypes.P1 BaseTypes.P2 BaseTypes.P3 BaseTypes.X BaseTypes.Y BaseTypes.Z}
+  BaseTypes.RealObs{BaseTypes.Clock BaseTypes.FX BaseTypes.Stock}
+  BaseTypes.TVar
+module dependencies:
+package dependencies: base-4.8.2.0* ghc-prim-0.4.0.0
+                      integer-gmp-1.0.0.0
+orphans: base-4.8.2.0:GHC.Base base-4.8.2.0:GHC.Float
+family instance modules: base-4.8.2.0:Control.Applicative
+                         base-4.8.2.0:Data.Either base-4.8.2.0:Data.Monoid
+                         base-4.8.2.0:Data.Type.Equality base-4.8.2.0:GHC.Generics
+import  -/  base-4.8.2.0:GHC.Base 1db77db5dae73d8c424c85b09fbadb89
+import  -/  base-4.8.2.0:GHC.Show 0e1d8380a8fb0cfb07ebeda3b70cbf38
+import  -/  base-4.8.2.0:Prelude 694dcaf039efe62df1c44834e2dbd2fb
+import  -/  ghc-prim-0.4.0.0:GHC.Classes e1f4ff80f7b5262008a595d29986fb18
+import  -/  ghc-prim-0.4.0.0:GHC.Types 6b27fb3fdbd0e3f0925a4496c66513bb
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fEqAsset :: GHC.Classes.Eq BaseTypes.Asset
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.Asset
+                  BaseTypes.$fEqAsset_$c==
+                  BaseTypes.$fEqAsset_$c/= -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fEqAsset_$c/= ::
+    BaseTypes.Asset -> BaseTypes.Asset -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Asset b :: BaseTypes.Asset ->
+                 case a of wild {
+                   BaseTypes.EUR
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.EUR -> GHC.Types.False }
+                   BaseTypes.DKK
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.DKK -> GHC.Types.False }
+                   BaseTypes.USD
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.USD -> GHC.Types.False }
+                   BaseTypes.JPY
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.JPY -> GHC.Types.False }
+                   BaseTypes.CHF
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.CHF -> GHC.Types.False } }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fEqAsset_$c== ::
+    BaseTypes.Asset -> BaseTypes.Asset -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: BaseTypes.Asset ds1 :: BaseTypes.Asset ->
+                 case ds of wild {
+                   BaseTypes.EUR
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.EUR -> GHC.Types.True }
+                   BaseTypes.DKK
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.DKK -> GHC.Types.True }
+                   BaseTypes.USD
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.USD -> GHC.Types.True }
+                   BaseTypes.JPY
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.JPY -> GHC.Types.True }
+                   BaseTypes.CHF
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.CHF -> GHC.Types.True } }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fEqBoolObs :: GHC.Classes.Eq BaseTypes.BoolObs
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.BoolObs
+                  BaseTypes.$fEqBoolObs_$c==
+                  BaseTypes.$fEqBoolObs_$c/= -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fEqBoolObs_$c/= ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ a :: BaseTypes.BoolObs b :: BaseTypes.BoolObs ->
+                 case BaseTypes.$fEqBoolObs_$c== a b of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fEqBoolObs_$c== ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: BaseTypes.BoolObs ds1 :: BaseTypes.BoolObs ->
+                 case ds of wild {
+                   BaseTypes.Decision a1 a2
+                   -> case ds1 of wild1 {
+                        BaseTypes.Decision b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.X
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.X -> GHC.Base.eqString a2 b2 }
+                             BaseTypes.Y
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.Y -> GHC.Base.eqString a2 b2 }
+                             BaseTypes.Z
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.Z -> GHC.Base.eqString a2 b2 }
+                             BaseTypes.P1
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P1 -> GHC.Base.eqString a2 b2 }
+                             BaseTypes.P2
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Base.eqString a2 b2 }
+                             BaseTypes.P3
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Base.eqString a2 b2 } }
+                        BaseTypes.Default ipv -> GHC.Types.False }
+                   BaseTypes.Default a1
+                   -> case ds1 of wild1 {
+                        BaseTypes.Decision ipv ipv1 -> GHC.Types.False
+                        BaseTypes.Default b1 -> BaseTypes.$fEqBoolObs_$c==1 a1 b1 } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fEqBoolObs_$c==1 ::
+    BaseTypes.Party -> BaseTypes.Party -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: BaseTypes.Party ds1 :: BaseTypes.Party ->
+                 case ds of wild {
+                   BaseTypes.X
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.X -> GHC.Types.True }
+                   BaseTypes.Y
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.Y -> GHC.Types.True }
+                   BaseTypes.Z
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.Z -> GHC.Types.True }
+                   BaseTypes.P1
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.P1 -> GHC.Types.True }
+                   BaseTypes.P2
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.P2 -> GHC.Types.True }
+                   BaseTypes.P3
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.P3 -> GHC.Types.True } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fEqParty :: GHC.Classes.Eq BaseTypes.Party
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.Party
+                  BaseTypes.$fEqBoolObs_$c==1
+                  BaseTypes.$fEqParty_$c/= -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fEqParty_$c/= ::
+    BaseTypes.Party -> BaseTypes.Party -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Party b :: BaseTypes.Party ->
+                 case a of wild {
+                   BaseTypes.X
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.X -> GHC.Types.False }
+                   BaseTypes.Y
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.Y -> GHC.Types.False }
+                   BaseTypes.Z
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.Z -> GHC.Types.False }
+                   BaseTypes.P1
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.P1 -> GHC.Types.False }
+                   BaseTypes.P2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.P2 -> GHC.Types.False }
+                   BaseTypes.P3
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.P3 -> GHC.Types.False } }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fEqRealObs :: GHC.Classes.Eq BaseTypes.RealObs
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.RealObs
+                  BaseTypes.$fEqRealObs_$c==
+                  BaseTypes.$fEqRealObs_$c/= -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fEqRealObs_$c/= ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ a :: BaseTypes.RealObs b :: BaseTypes.RealObs ->
+                 case BaseTypes.$fEqRealObs_$c== a b of wild {
+                   GHC.Types.False -> GHC.Types.True
+                   GHC.Types.True -> GHC.Types.False }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fEqRealObs_$c== ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ ds :: BaseTypes.RealObs ds1 :: BaseTypes.RealObs ->
+                 case ds of wild {
+                   BaseTypes.FX a1 a2
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.FX b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.EUR
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.EUR -> BaseTypes.$fEqAsset_$c== a2 b2 }
+                             BaseTypes.DKK
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.DKK -> BaseTypes.$fEqAsset_$c== a2 b2 }
+                             BaseTypes.USD
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.USD -> BaseTypes.$fEqAsset_$c== a2 b2 }
+                             BaseTypes.JPY
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.JPY -> BaseTypes.$fEqAsset_$c== a2 b2 }
+                             BaseTypes.CHF
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.CHF -> BaseTypes.$fEqAsset_$c== a2 b2 } } }
+                   BaseTypes.Stock a1
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.Stock b1 -> GHC.Base.eqString a1 b1 }
+                   BaseTypes.Clock
+                   -> case ds1 of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.Clock -> GHC.Types.True } }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fOrdAsset :: GHC.Classes.Ord BaseTypes.Asset
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.Asset
+                  BaseTypes.$fEqAsset
+                  BaseTypes.$fOrdAsset_$ccompare
+                  BaseTypes.$fOrdAsset_$c<
+                  BaseTypes.$fOrdAsset_$c<=
+                  BaseTypes.$fOrdAsset_$c>
+                  BaseTypes.$fOrdAsset_$c>=
+                  BaseTypes.$fOrdAsset_$cmax
+                  BaseTypes.$fOrdAsset_$cmin -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fOrdAsset_$c< ::
+    BaseTypes.Asset -> BaseTypes.Asset -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Asset b :: BaseTypes.Asset ->
+                 case a of wild {
+                   BaseTypes.EUR
+                   -> case b of wild1 {
+                        BaseTypes.EUR -> GHC.Types.False
+                        BaseTypes.DKK -> GHC.Types.True
+                        BaseTypes.USD -> GHC.Types.True
+                        BaseTypes.JPY -> GHC.Types.True
+                        BaseTypes.CHF -> GHC.Types.True }
+                   BaseTypes.DKK
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.USD -> GHC.Types.True
+                        BaseTypes.JPY -> GHC.Types.True
+                        BaseTypes.CHF -> GHC.Types.True }
+                   BaseTypes.USD
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.JPY -> GHC.Types.True
+                        BaseTypes.CHF -> GHC.Types.True }
+                   BaseTypes.JPY
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.CHF -> GHC.Types.True }
+                   BaseTypes.CHF
+                   -> case b of wild1 { DEFAULT -> GHC.Types.False } }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fOrdAsset_$c<= ::
+    BaseTypes.Asset -> BaseTypes.Asset -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Asset b :: BaseTypes.Asset ->
+                 case a of wild {
+                   BaseTypes.EUR -> case b of wild1 { DEFAULT -> GHC.Types.True }
+                   BaseTypes.DKK
+                   -> case b of wild1 {
+                        BaseTypes.EUR -> GHC.Types.False
+                        BaseTypes.DKK -> GHC.Types.True
+                        BaseTypes.USD -> GHC.Types.True
+                        BaseTypes.JPY -> GHC.Types.True
+                        BaseTypes.CHF -> GHC.Types.True }
+                   BaseTypes.USD
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.USD -> GHC.Types.True
+                        BaseTypes.JPY -> GHC.Types.True
+                        BaseTypes.CHF -> GHC.Types.True }
+                   BaseTypes.JPY
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.JPY -> GHC.Types.True
+                        BaseTypes.CHF -> GHC.Types.True }
+                   BaseTypes.CHF
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.CHF -> GHC.Types.True } }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fOrdAsset_$c> ::
+    BaseTypes.Asset -> BaseTypes.Asset -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Asset b :: BaseTypes.Asset ->
+                 case a of wild {
+                   BaseTypes.EUR -> case b of wild1 { DEFAULT -> GHC.Types.False }
+                   BaseTypes.DKK
+                   -> case b of wild1 {
+                        BaseTypes.EUR -> GHC.Types.True
+                        BaseTypes.DKK -> GHC.Types.False
+                        BaseTypes.USD -> GHC.Types.False
+                        BaseTypes.JPY -> GHC.Types.False
+                        BaseTypes.CHF -> GHC.Types.False }
+                   BaseTypes.USD
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.USD -> GHC.Types.False
+                        BaseTypes.JPY -> GHC.Types.False
+                        BaseTypes.CHF -> GHC.Types.False }
+                   BaseTypes.JPY
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.JPY -> GHC.Types.False
+                        BaseTypes.CHF -> GHC.Types.False }
+                   BaseTypes.CHF
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.CHF -> GHC.Types.False } }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fOrdAsset_$c>= ::
+    BaseTypes.Asset -> BaseTypes.Asset -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Asset b :: BaseTypes.Asset ->
+                 case a of wild {
+                   BaseTypes.EUR
+                   -> case b of wild1 {
+                        BaseTypes.EUR -> GHC.Types.True
+                        BaseTypes.DKK -> GHC.Types.False
+                        BaseTypes.USD -> GHC.Types.False
+                        BaseTypes.JPY -> GHC.Types.False
+                        BaseTypes.CHF -> GHC.Types.False }
+                   BaseTypes.DKK
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.USD -> GHC.Types.False
+                        BaseTypes.JPY -> GHC.Types.False
+                        BaseTypes.CHF -> GHC.Types.False }
+                   BaseTypes.USD
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.JPY -> GHC.Types.False
+                        BaseTypes.CHF -> GHC.Types.False }
+                   BaseTypes.JPY
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.CHF -> GHC.Types.False }
+                   BaseTypes.CHF
+                   -> case b of wild1 { DEFAULT -> GHC.Types.True } }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fOrdAsset_$ccompare ::
+    BaseTypes.Asset -> BaseTypes.Asset -> GHC.Types.Ordering
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Asset b :: BaseTypes.Asset ->
+                 case a of wild {
+                   BaseTypes.EUR
+                   -> case b of wild1 {
+                        BaseTypes.EUR -> GHC.Types.EQ
+                        BaseTypes.DKK -> GHC.Types.LT
+                        BaseTypes.USD -> GHC.Types.LT
+                        BaseTypes.JPY -> GHC.Types.LT
+                        BaseTypes.CHF -> GHC.Types.LT }
+                   BaseTypes.DKK
+                   -> case b of wild1 {
+                        BaseTypes.EUR -> GHC.Types.GT
+                        BaseTypes.DKK -> GHC.Types.EQ
+                        BaseTypes.USD -> GHC.Types.LT
+                        BaseTypes.JPY -> GHC.Types.LT
+                        BaseTypes.CHF -> GHC.Types.LT }
+                   BaseTypes.USD
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.GT
+                        BaseTypes.USD -> GHC.Types.EQ
+                        BaseTypes.JPY -> GHC.Types.LT
+                        BaseTypes.CHF -> GHC.Types.LT }
+                   BaseTypes.JPY
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.GT
+                        BaseTypes.JPY -> GHC.Types.EQ
+                        BaseTypes.CHF -> GHC.Types.LT }
+                   BaseTypes.CHF
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.GT BaseTypes.CHF -> GHC.Types.EQ } }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fOrdAsset_$cmax ::
+    BaseTypes.Asset -> BaseTypes.Asset -> BaseTypes.Asset
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ x :: BaseTypes.Asset y :: BaseTypes.Asset ->
+                 case x of wild {
+                   BaseTypes.EUR -> y
+                   BaseTypes.DKK
+                   -> case y of wild1 {
+                        DEFAULT -> BaseTypes.DKK
+                        BaseTypes.USD -> BaseTypes.USD
+                        BaseTypes.JPY -> BaseTypes.JPY
+                        BaseTypes.CHF -> BaseTypes.CHF }
+                   BaseTypes.USD
+                   -> case y of wild1 {
+                        DEFAULT -> BaseTypes.USD
+                        BaseTypes.JPY -> BaseTypes.JPY
+                        BaseTypes.CHF -> BaseTypes.CHF }
+                   BaseTypes.JPY
+                   -> case y of wild1 {
+                        DEFAULT -> BaseTypes.JPY BaseTypes.CHF -> BaseTypes.CHF }
+                   BaseTypes.CHF -> case y of wild1 { DEFAULT -> BaseTypes.CHF } }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fOrdAsset_$cmin ::
+    BaseTypes.Asset -> BaseTypes.Asset -> BaseTypes.Asset
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ x :: BaseTypes.Asset y :: BaseTypes.Asset ->
+                 case x of wild {
+                   BaseTypes.EUR -> case y of wild1 { DEFAULT -> BaseTypes.EUR }
+                   BaseTypes.DKK
+                   -> case y of wild1 {
+                        BaseTypes.EUR -> BaseTypes.EUR
+                        BaseTypes.DKK -> BaseTypes.DKK
+                        BaseTypes.USD -> BaseTypes.DKK
+                        BaseTypes.JPY -> BaseTypes.DKK
+                        BaseTypes.CHF -> BaseTypes.DKK }
+                   BaseTypes.USD
+                   -> case y of wild1 {
+                        DEFAULT -> wild1
+                        BaseTypes.USD -> BaseTypes.USD
+                        BaseTypes.JPY -> BaseTypes.USD
+                        BaseTypes.CHF -> BaseTypes.USD }
+                   BaseTypes.JPY
+                   -> case y of wild1 {
+                        DEFAULT -> wild1
+                        BaseTypes.JPY -> BaseTypes.JPY
+                        BaseTypes.CHF -> BaseTypes.JPY }
+                   BaseTypes.CHF -> y }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fOrdBoolObs :: GHC.Classes.Ord BaseTypes.BoolObs
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.BoolObs
+                  BaseTypes.$fEqBoolObs
+                  BaseTypes.$fOrdBoolObs_$ccompare
+                  BaseTypes.$fOrdBoolObs_$c<
+                  BaseTypes.$fOrdBoolObs_$c<=
+                  BaseTypes.$fOrdBoolObs_$c>
+                  BaseTypes.$fOrdBoolObs_$c>=
+                  BaseTypes.$fOrdBoolObs_$cmax
+                  BaseTypes.$fOrdBoolObs_$cmin -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fOrdBoolObs_$c< ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.BoolObs b :: BaseTypes.BoolObs ->
+                 case a of wild {
+                   BaseTypes.Decision a1 a2
+                   -> case b of wild1 {
+                        BaseTypes.Decision b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.X
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Classes.$fOrd[]_$s$c<1 a2 b2
+                                  BaseTypes.Y -> GHC.Types.True
+                                  BaseTypes.Z -> GHC.Types.True
+                                  BaseTypes.P1 -> GHC.Types.True
+                                  BaseTypes.P2 -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.Y
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Types.False
+                                  BaseTypes.Y -> GHC.Classes.$fOrd[]_$s$c<1 a2 b2
+                                  BaseTypes.Z -> GHC.Types.True
+                                  BaseTypes.P1 -> GHC.Types.True
+                                  BaseTypes.P2 -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.Z
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.Z -> GHC.Classes.$fOrd[]_$s$c<1 a2 b2
+                                  BaseTypes.P1 -> GHC.Types.True
+                                  BaseTypes.P2 -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.P1
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P1 -> GHC.Classes.$fOrd[]_$s$c<1 a2 b2
+                                  BaseTypes.P2 -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.P2
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Classes.$fOrd[]_$s$c<1 a2 b2
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.P3
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Classes.$fOrd[]_$s$c<1 a2 b2 } }
+                        BaseTypes.Default ipv -> GHC.Types.True }
+                   BaseTypes.Default a1
+                   -> case b of wild1 {
+                        BaseTypes.Decision ipv ipv1 -> GHC.Types.False
+                        BaseTypes.Default b1 -> BaseTypes.$fOrdBoolObs_$c<1 a1 b1 } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fOrdBoolObs_$c<1 ::
+    BaseTypes.Party -> BaseTypes.Party -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Party b :: BaseTypes.Party ->
+                 case a of wild {
+                   BaseTypes.X
+                   -> case b of wild1 {
+                        BaseTypes.X -> GHC.Types.False
+                        BaseTypes.Y -> GHC.Types.True
+                        BaseTypes.Z -> GHC.Types.True
+                        BaseTypes.P1 -> GHC.Types.True
+                        BaseTypes.P2 -> GHC.Types.True
+                        BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.Y
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.Z -> GHC.Types.True
+                        BaseTypes.P1 -> GHC.Types.True
+                        BaseTypes.P2 -> GHC.Types.True
+                        BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.Z
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.P1 -> GHC.Types.True
+                        BaseTypes.P2 -> GHC.Types.True
+                        BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.P1
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.P2 -> GHC.Types.True
+                        BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.P2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.P3
+                   -> case b of wild1 { DEFAULT -> GHC.Types.False } }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fOrdBoolObs_$c<= ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.BoolObs b :: BaseTypes.BoolObs ->
+                 case a of wild {
+                   BaseTypes.Decision a1 a2
+                   -> case b of wild1 {
+                        BaseTypes.Decision b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.X
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Classes.$fOrd[]_$s$c<=1 a2 b2
+                                  BaseTypes.Y -> GHC.Types.True
+                                  BaseTypes.Z -> GHC.Types.True
+                                  BaseTypes.P1 -> GHC.Types.True
+                                  BaseTypes.P2 -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.Y
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Types.False
+                                  BaseTypes.Y -> GHC.Classes.$fOrd[]_$s$c<=1 a2 b2
+                                  BaseTypes.Z -> GHC.Types.True
+                                  BaseTypes.P1 -> GHC.Types.True
+                                  BaseTypes.P2 -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.Z
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.Z -> GHC.Classes.$fOrd[]_$s$c<=1 a2 b2
+                                  BaseTypes.P1 -> GHC.Types.True
+                                  BaseTypes.P2 -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.P1
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P1 -> GHC.Classes.$fOrd[]_$s$c<=1 a2 b2
+                                  BaseTypes.P2 -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.P2
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Classes.$fOrd[]_$s$c<=1 a2 b2
+                                  BaseTypes.P3 -> GHC.Types.True }
+                             BaseTypes.P3
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Classes.$fOrd[]_$s$c<=1 a2 b2 } }
+                        BaseTypes.Default ipv -> GHC.Types.True }
+                   BaseTypes.Default a1
+                   -> case b of wild1 {
+                        BaseTypes.Decision ipv ipv1 -> GHC.Types.False
+                        BaseTypes.Default b1 -> BaseTypes.$fOrdBoolObs_$c<=1 a1 b1 } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fOrdBoolObs_$c<=1 ::
+    BaseTypes.Party -> BaseTypes.Party -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Party b :: BaseTypes.Party ->
+                 case a of wild {
+                   BaseTypes.X -> case b of wild1 { DEFAULT -> GHC.Types.True }
+                   BaseTypes.Y
+                   -> case b of wild1 {
+                        BaseTypes.X -> GHC.Types.False
+                        BaseTypes.Y -> GHC.Types.True
+                        BaseTypes.Z -> GHC.Types.True
+                        BaseTypes.P1 -> GHC.Types.True
+                        BaseTypes.P2 -> GHC.Types.True
+                        BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.Z
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.Z -> GHC.Types.True
+                        BaseTypes.P1 -> GHC.Types.True
+                        BaseTypes.P2 -> GHC.Types.True
+                        BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.P1
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.P1 -> GHC.Types.True
+                        BaseTypes.P2 -> GHC.Types.True
+                        BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.P2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.P2 -> GHC.Types.True
+                        BaseTypes.P3 -> GHC.Types.True }
+                   BaseTypes.P3
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False BaseTypes.P3 -> GHC.Types.True } }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fOrdBoolObs_$c> ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.BoolObs b :: BaseTypes.BoolObs ->
+                 case a of wild {
+                   BaseTypes.Decision a1 a2
+                   -> case b of wild1 {
+                        BaseTypes.Decision b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.X
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Classes.$fOrd[]_$s$c>1 a2 b2
+                                  BaseTypes.Y -> GHC.Types.False
+                                  BaseTypes.Z -> GHC.Types.False
+                                  BaseTypes.P1 -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.Y
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Types.True
+                                  BaseTypes.Y -> GHC.Classes.$fOrd[]_$s$c>1 a2 b2
+                                  BaseTypes.Z -> GHC.Types.False
+                                  BaseTypes.P1 -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.Z
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.Z -> GHC.Classes.$fOrd[]_$s$c>1 a2 b2
+                                  BaseTypes.P1 -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.P1
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.P1 -> GHC.Classes.$fOrd[]_$s$c>1 a2 b2
+                                  BaseTypes.P2 -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.P2
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.P2 -> GHC.Classes.$fOrd[]_$s$c>1 a2 b2
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.P3
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Classes.$fOrd[]_$s$c>1 a2 b2 } }
+                        BaseTypes.Default ipv -> GHC.Types.False }
+                   BaseTypes.Default a1
+                   -> case b of wild1 {
+                        BaseTypes.Decision ipv ipv1 -> GHC.Types.True
+                        BaseTypes.Default b1 -> BaseTypes.$fOrdBoolObs_$c>1 a1 b1 } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fOrdBoolObs_$c>1 ::
+    BaseTypes.Party -> BaseTypes.Party -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Party b :: BaseTypes.Party ->
+                 case a of wild {
+                   BaseTypes.X -> case b of wild1 { DEFAULT -> GHC.Types.False }
+                   BaseTypes.Y
+                   -> case b of wild1 {
+                        BaseTypes.X -> GHC.Types.True
+                        BaseTypes.Y -> GHC.Types.False
+                        BaseTypes.Z -> GHC.Types.False
+                        BaseTypes.P1 -> GHC.Types.False
+                        BaseTypes.P2 -> GHC.Types.False
+                        BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.Z
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.Z -> GHC.Types.False
+                        BaseTypes.P1 -> GHC.Types.False
+                        BaseTypes.P2 -> GHC.Types.False
+                        BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.P1
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.P1 -> GHC.Types.False
+                        BaseTypes.P2 -> GHC.Types.False
+                        BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.P2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.P2 -> GHC.Types.False
+                        BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.P3
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.P3 -> GHC.Types.False } }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fOrdBoolObs_$c>= ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.BoolObs b :: BaseTypes.BoolObs ->
+                 case a of wild {
+                   BaseTypes.Decision a1 a2
+                   -> case b of wild1 {
+                        BaseTypes.Decision b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.X
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Classes.$fOrd[]_$s$c>=1 a2 b2
+                                  BaseTypes.Y -> GHC.Types.False
+                                  BaseTypes.Z -> GHC.Types.False
+                                  BaseTypes.P1 -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.Y
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Types.True
+                                  BaseTypes.Y -> GHC.Classes.$fOrd[]_$s$c>=1 a2 b2
+                                  BaseTypes.Z -> GHC.Types.False
+                                  BaseTypes.P1 -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.Z
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.Z -> GHC.Classes.$fOrd[]_$s$c>=1 a2 b2
+                                  BaseTypes.P1 -> GHC.Types.False
+                                  BaseTypes.P2 -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.P1
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.P1 -> GHC.Classes.$fOrd[]_$s$c>=1 a2 b2
+                                  BaseTypes.P2 -> GHC.Types.False
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.P2
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.P2 -> GHC.Classes.$fOrd[]_$s$c>=1 a2 b2
+                                  BaseTypes.P3 -> GHC.Types.False }
+                             BaseTypes.P3
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.P3 -> GHC.Classes.$fOrd[]_$s$c>=1 a2 b2 } }
+                        BaseTypes.Default ipv -> GHC.Types.False }
+                   BaseTypes.Default a1
+                   -> case b of wild1 {
+                        BaseTypes.Decision ipv ipv1 -> GHC.Types.True
+                        BaseTypes.Default b1 -> BaseTypes.$fOrdBoolObs_$c>=1 a1 b1 } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fOrdBoolObs_$c>=1 ::
+    BaseTypes.Party -> BaseTypes.Party -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Party b :: BaseTypes.Party ->
+                 case a of wild {
+                   BaseTypes.X
+                   -> case b of wild1 {
+                        BaseTypes.X -> GHC.Types.True
+                        BaseTypes.Y -> GHC.Types.False
+                        BaseTypes.Z -> GHC.Types.False
+                        BaseTypes.P1 -> GHC.Types.False
+                        BaseTypes.P2 -> GHC.Types.False
+                        BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.Y
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.Z -> GHC.Types.False
+                        BaseTypes.P1 -> GHC.Types.False
+                        BaseTypes.P2 -> GHC.Types.False
+                        BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.Z
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.P1 -> GHC.Types.False
+                        BaseTypes.P2 -> GHC.Types.False
+                        BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.P1
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.P2 -> GHC.Types.False
+                        BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.P2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True BaseTypes.P3 -> GHC.Types.False }
+                   BaseTypes.P3 -> case b of wild1 { DEFAULT -> GHC.Types.True } }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fOrdBoolObs_$ccompare ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> GHC.Types.Ordering
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.BoolObs b :: BaseTypes.BoolObs ->
+                 case a of wild {
+                   BaseTypes.Decision a1 a2
+                   -> case b of wild1 {
+                        BaseTypes.Decision b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.X
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Classes.$fOrd[]_$s$ccompare1 a2 b2
+                                  BaseTypes.Y -> GHC.Types.LT
+                                  BaseTypes.Z -> GHC.Types.LT
+                                  BaseTypes.P1 -> GHC.Types.LT
+                                  BaseTypes.P2 -> GHC.Types.LT
+                                  BaseTypes.P3 -> GHC.Types.LT }
+                             BaseTypes.Y
+                             -> case b1 of wild3 {
+                                  BaseTypes.X -> GHC.Types.GT
+                                  BaseTypes.Y -> GHC.Classes.$fOrd[]_$s$ccompare1 a2 b2
+                                  BaseTypes.Z -> GHC.Types.LT
+                                  BaseTypes.P1 -> GHC.Types.LT
+                                  BaseTypes.P2 -> GHC.Types.LT
+                                  BaseTypes.P3 -> GHC.Types.LT }
+                             BaseTypes.Z
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.GT
+                                  BaseTypes.Z -> GHC.Classes.$fOrd[]_$s$ccompare1 a2 b2
+                                  BaseTypes.P1 -> GHC.Types.LT
+                                  BaseTypes.P2 -> GHC.Types.LT
+                                  BaseTypes.P3 -> GHC.Types.LT }
+                             BaseTypes.P1
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.GT
+                                  BaseTypes.P1 -> GHC.Classes.$fOrd[]_$s$ccompare1 a2 b2
+                                  BaseTypes.P2 -> GHC.Types.LT
+                                  BaseTypes.P3 -> GHC.Types.LT }
+                             BaseTypes.P2
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.GT
+                                  BaseTypes.P2 -> GHC.Classes.$fOrd[]_$s$ccompare1 a2 b2
+                                  BaseTypes.P3 -> GHC.Types.LT }
+                             BaseTypes.P3
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.GT
+                                  BaseTypes.P3 -> GHC.Classes.$fOrd[]_$s$ccompare1 a2 b2 } }
+                        BaseTypes.Default ipv -> GHC.Types.LT }
+                   BaseTypes.Default a1
+                   -> case b of wild1 {
+                        BaseTypes.Decision ipv ipv1 -> GHC.Types.GT
+                        BaseTypes.Default b1
+                        -> BaseTypes.$fOrdBoolObs_$ccompare1 a1 b1 } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fOrdBoolObs_$ccompare1 ::
+    BaseTypes.Party -> BaseTypes.Party -> GHC.Types.Ordering
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.Party b :: BaseTypes.Party ->
+                 case a of wild {
+                   BaseTypes.X
+                   -> case b of wild1 {
+                        BaseTypes.X -> GHC.Types.EQ
+                        BaseTypes.Y -> GHC.Types.LT
+                        BaseTypes.Z -> GHC.Types.LT
+                        BaseTypes.P1 -> GHC.Types.LT
+                        BaseTypes.P2 -> GHC.Types.LT
+                        BaseTypes.P3 -> GHC.Types.LT }
+                   BaseTypes.Y
+                   -> case b of wild1 {
+                        BaseTypes.X -> GHC.Types.GT
+                        BaseTypes.Y -> GHC.Types.EQ
+                        BaseTypes.Z -> GHC.Types.LT
+                        BaseTypes.P1 -> GHC.Types.LT
+                        BaseTypes.P2 -> GHC.Types.LT
+                        BaseTypes.P3 -> GHC.Types.LT }
+                   BaseTypes.Z
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.GT
+                        BaseTypes.Z -> GHC.Types.EQ
+                        BaseTypes.P1 -> GHC.Types.LT
+                        BaseTypes.P2 -> GHC.Types.LT
+                        BaseTypes.P3 -> GHC.Types.LT }
+                   BaseTypes.P1
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.GT
+                        BaseTypes.P1 -> GHC.Types.EQ
+                        BaseTypes.P2 -> GHC.Types.LT
+                        BaseTypes.P3 -> GHC.Types.LT }
+                   BaseTypes.P2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.GT
+                        BaseTypes.P2 -> GHC.Types.EQ
+                        BaseTypes.P3 -> GHC.Types.LT }
+                   BaseTypes.P3
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.GT BaseTypes.P3 -> GHC.Types.EQ } }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fOrdBoolObs_$cmax ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> BaseTypes.BoolObs
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,U><S,U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ x :: BaseTypes.BoolObs y :: BaseTypes.BoolObs ->
+                 case BaseTypes.$fOrdBoolObs_$c<= x y of wild {
+                   GHC.Types.False -> x GHC.Types.True -> y }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fOrdBoolObs_$cmin ::
+    BaseTypes.BoolObs -> BaseTypes.BoolObs -> BaseTypes.BoolObs
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,U><S,U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ x :: BaseTypes.BoolObs y :: BaseTypes.BoolObs ->
+                 case BaseTypes.$fOrdBoolObs_$c<= x y of wild {
+                   GHC.Types.False -> y GHC.Types.True -> x }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fOrdParty :: GHC.Classes.Ord BaseTypes.Party
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.Party
+                  BaseTypes.$fEqParty
+                  BaseTypes.$fOrdBoolObs_$ccompare1
+                  BaseTypes.$fOrdBoolObs_$c<1
+                  BaseTypes.$fOrdBoolObs_$c<=1
+                  BaseTypes.$fOrdBoolObs_$c>1
+                  BaseTypes.$fOrdBoolObs_$c>=1
+                  BaseTypes.$fOrdParty_$cmax
+                  BaseTypes.$fOrdParty_$cmin -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fOrdParty_$cmax ::
+    BaseTypes.Party -> BaseTypes.Party -> BaseTypes.Party
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ x :: BaseTypes.Party y :: BaseTypes.Party ->
+                 case x of wild {
+                   BaseTypes.X -> y
+                   BaseTypes.Y
+                   -> case y of wild1 {
+                        DEFAULT -> BaseTypes.Y
+                        BaseTypes.Z -> BaseTypes.Z
+                        BaseTypes.P1 -> BaseTypes.P1
+                        BaseTypes.P2 -> BaseTypes.P2
+                        BaseTypes.P3 -> BaseTypes.P3 }
+                   BaseTypes.Z
+                   -> case y of wild1 {
+                        DEFAULT -> BaseTypes.Z
+                        BaseTypes.P1 -> BaseTypes.P1
+                        BaseTypes.P2 -> BaseTypes.P2
+                        BaseTypes.P3 -> BaseTypes.P3 }
+                   BaseTypes.P1
+                   -> case y of wild1 {
+                        DEFAULT -> BaseTypes.P1
+                        BaseTypes.P2 -> BaseTypes.P2
+                        BaseTypes.P3 -> BaseTypes.P3 }
+                   BaseTypes.P2
+                   -> case y of wild1 {
+                        DEFAULT -> BaseTypes.P2 BaseTypes.P3 -> BaseTypes.P3 }
+                   BaseTypes.P3 -> case y of wild1 { DEFAULT -> BaseTypes.P3 } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fOrdParty_$cmin ::
+    BaseTypes.Party -> BaseTypes.Party -> BaseTypes.Party
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ x :: BaseTypes.Party y :: BaseTypes.Party ->
+                 case x of wild {
+                   BaseTypes.X -> case y of wild1 { DEFAULT -> BaseTypes.X }
+                   BaseTypes.Y
+                   -> case y of wild1 {
+                        BaseTypes.X -> BaseTypes.X
+                        BaseTypes.Y -> BaseTypes.Y
+                        BaseTypes.Z -> BaseTypes.Y
+                        BaseTypes.P1 -> BaseTypes.Y
+                        BaseTypes.P2 -> BaseTypes.Y
+                        BaseTypes.P3 -> BaseTypes.Y }
+                   BaseTypes.Z
+                   -> case y of wild1 {
+                        DEFAULT -> wild1
+                        BaseTypes.Z -> BaseTypes.Z
+                        BaseTypes.P1 -> BaseTypes.Z
+                        BaseTypes.P2 -> BaseTypes.Z
+                        BaseTypes.P3 -> BaseTypes.Z }
+                   BaseTypes.P1
+                   -> case y of wild1 {
+                        DEFAULT -> wild1
+                        BaseTypes.P1 -> BaseTypes.P1
+                        BaseTypes.P2 -> BaseTypes.P1
+                        BaseTypes.P3 -> BaseTypes.P1 }
+                   BaseTypes.P2
+                   -> case y of wild1 {
+                        DEFAULT -> wild1
+                        BaseTypes.P2 -> BaseTypes.P2
+                        BaseTypes.P3 -> BaseTypes.P2 }
+                   BaseTypes.P3 -> y }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fOrdRealObs :: GHC.Classes.Ord BaseTypes.RealObs
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.RealObs
+                  BaseTypes.$fEqRealObs
+                  BaseTypes.$fOrdRealObs_$ccompare
+                  BaseTypes.$fOrdRealObs_$c<
+                  BaseTypes.$fOrdRealObs_$c<=
+                  BaseTypes.$fOrdRealObs_$c>
+                  BaseTypes.$fOrdRealObs_$c>=
+                  BaseTypes.$fOrdRealObs_$cmax
+                  BaseTypes.$fOrdRealObs_$cmin -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fOrdRealObs_$c< ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.RealObs b :: BaseTypes.RealObs ->
+                 case a of wild {
+                   BaseTypes.FX a1 a2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.FX b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.EUR
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> BaseTypes.$fOrdAsset_$c< a2 b2
+                                  BaseTypes.DKK -> GHC.Types.True
+                                  BaseTypes.USD -> GHC.Types.True
+                                  BaseTypes.JPY -> GHC.Types.True
+                                  BaseTypes.CHF -> GHC.Types.True }
+                             BaseTypes.DKK
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> GHC.Types.False
+                                  BaseTypes.DKK -> BaseTypes.$fOrdAsset_$c< a2 b2
+                                  BaseTypes.USD -> GHC.Types.True
+                                  BaseTypes.JPY -> GHC.Types.True
+                                  BaseTypes.CHF -> GHC.Types.True }
+                             BaseTypes.USD
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.USD -> BaseTypes.$fOrdAsset_$c< a2 b2
+                                  BaseTypes.JPY -> GHC.Types.True
+                                  BaseTypes.CHF -> GHC.Types.True }
+                             BaseTypes.JPY
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.JPY -> BaseTypes.$fOrdAsset_$c< a2 b2
+                                  BaseTypes.CHF -> GHC.Types.True }
+                             BaseTypes.CHF
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.CHF -> BaseTypes.$fOrdAsset_$c< a2 b2 } } }
+                   BaseTypes.Stock a1
+                   -> case b of wild1 {
+                        BaseTypes.FX ds ds1 -> GHC.Types.False
+                        BaseTypes.Stock b1 -> GHC.Classes.$fOrd[]_$s$c<1 a1 b1
+                        BaseTypes.Clock -> GHC.Types.True }
+                   BaseTypes.Clock
+                   -> case b of wild1 { DEFAULT -> GHC.Types.False } }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fOrdRealObs_$c<= ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.RealObs b :: BaseTypes.RealObs ->
+                 case a of wild {
+                   BaseTypes.FX a1 a2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.FX b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.EUR
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> BaseTypes.$fOrdAsset_$c<= a2 b2
+                                  BaseTypes.DKK -> GHC.Types.True
+                                  BaseTypes.USD -> GHC.Types.True
+                                  BaseTypes.JPY -> GHC.Types.True
+                                  BaseTypes.CHF -> GHC.Types.True }
+                             BaseTypes.DKK
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> GHC.Types.False
+                                  BaseTypes.DKK -> BaseTypes.$fOrdAsset_$c<= a2 b2
+                                  BaseTypes.USD -> GHC.Types.True
+                                  BaseTypes.JPY -> GHC.Types.True
+                                  BaseTypes.CHF -> GHC.Types.True }
+                             BaseTypes.USD
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.USD -> BaseTypes.$fOrdAsset_$c<= a2 b2
+                                  BaseTypes.JPY -> GHC.Types.True
+                                  BaseTypes.CHF -> GHC.Types.True }
+                             BaseTypes.JPY
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.JPY -> BaseTypes.$fOrdAsset_$c<= a2 b2
+                                  BaseTypes.CHF -> GHC.Types.True }
+                             BaseTypes.CHF
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.False
+                                  BaseTypes.CHF -> BaseTypes.$fOrdAsset_$c<= a2 b2 } } }
+                   BaseTypes.Stock a1
+                   -> case b of wild1 {
+                        BaseTypes.FX ds ds1 -> GHC.Types.False
+                        BaseTypes.Stock b1 -> GHC.Classes.$fOrd[]_$s$c<=1 a1 b1
+                        BaseTypes.Clock -> GHC.Types.True }
+                   BaseTypes.Clock
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.Clock -> GHC.Types.True } }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fOrdRealObs_$c> ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.RealObs b :: BaseTypes.RealObs ->
+                 case a of wild {
+                   BaseTypes.FX a1 a2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.FX b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.EUR
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> BaseTypes.$fOrdAsset_$c> a2 b2
+                                  BaseTypes.DKK -> GHC.Types.False
+                                  BaseTypes.USD -> GHC.Types.False
+                                  BaseTypes.JPY -> GHC.Types.False
+                                  BaseTypes.CHF -> GHC.Types.False }
+                             BaseTypes.DKK
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> GHC.Types.True
+                                  BaseTypes.DKK -> BaseTypes.$fOrdAsset_$c> a2 b2
+                                  BaseTypes.USD -> GHC.Types.False
+                                  BaseTypes.JPY -> GHC.Types.False
+                                  BaseTypes.CHF -> GHC.Types.False }
+                             BaseTypes.USD
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.USD -> BaseTypes.$fOrdAsset_$c> a2 b2
+                                  BaseTypes.JPY -> GHC.Types.False
+                                  BaseTypes.CHF -> GHC.Types.False }
+                             BaseTypes.JPY
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.JPY -> BaseTypes.$fOrdAsset_$c> a2 b2
+                                  BaseTypes.CHF -> GHC.Types.False }
+                             BaseTypes.CHF
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.CHF -> BaseTypes.$fOrdAsset_$c> a2 b2 } } }
+                   BaseTypes.Stock a1
+                   -> case b of wild1 {
+                        BaseTypes.FX ds ds1 -> GHC.Types.True
+                        BaseTypes.Stock b1 -> GHC.Classes.$fOrd[]_$s$c>1 a1 b1
+                        BaseTypes.Clock -> GHC.Types.False }
+                   BaseTypes.Clock
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.True
+                        BaseTypes.Clock -> GHC.Types.False } }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fOrdRealObs_$c>= ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.RealObs b :: BaseTypes.RealObs ->
+                 case a of wild {
+                   BaseTypes.FX a1 a2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.False
+                        BaseTypes.FX b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.EUR
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> BaseTypes.$fOrdAsset_$c>= a2 b2
+                                  BaseTypes.DKK -> GHC.Types.False
+                                  BaseTypes.USD -> GHC.Types.False
+                                  BaseTypes.JPY -> GHC.Types.False
+                                  BaseTypes.CHF -> GHC.Types.False }
+                             BaseTypes.DKK
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> GHC.Types.True
+                                  BaseTypes.DKK -> BaseTypes.$fOrdAsset_$c>= a2 b2
+                                  BaseTypes.USD -> GHC.Types.False
+                                  BaseTypes.JPY -> GHC.Types.False
+                                  BaseTypes.CHF -> GHC.Types.False }
+                             BaseTypes.USD
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.USD -> BaseTypes.$fOrdAsset_$c>= a2 b2
+                                  BaseTypes.JPY -> GHC.Types.False
+                                  BaseTypes.CHF -> GHC.Types.False }
+                             BaseTypes.JPY
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.JPY -> BaseTypes.$fOrdAsset_$c>= a2 b2
+                                  BaseTypes.CHF -> GHC.Types.False }
+                             BaseTypes.CHF
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.True
+                                  BaseTypes.CHF -> BaseTypes.$fOrdAsset_$c>= a2 b2 } } }
+                   BaseTypes.Stock a1
+                   -> case b of wild1 {
+                        BaseTypes.FX ds ds1 -> GHC.Types.True
+                        BaseTypes.Stock b1 -> GHC.Classes.$fOrd[]_$s$c>=1 a1 b1
+                        BaseTypes.Clock -> GHC.Types.False }
+                   BaseTypes.Clock
+                   -> case b of wild1 { DEFAULT -> GHC.Types.True } }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fOrdRealObs_$ccompare ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> GHC.Types.Ordering
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U><S,1*U>,
+     Unfolding: (\ a :: BaseTypes.RealObs b :: BaseTypes.RealObs ->
+                 case a of wild {
+                   BaseTypes.FX a1 a2
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.LT
+                        BaseTypes.FX b1 b2
+                        -> case a1 of wild2 {
+                             BaseTypes.EUR
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> BaseTypes.$fOrdAsset_$ccompare a2 b2
+                                  BaseTypes.DKK -> GHC.Types.LT
+                                  BaseTypes.USD -> GHC.Types.LT
+                                  BaseTypes.JPY -> GHC.Types.LT
+                                  BaseTypes.CHF -> GHC.Types.LT }
+                             BaseTypes.DKK
+                             -> case b1 of wild3 {
+                                  BaseTypes.EUR -> GHC.Types.GT
+                                  BaseTypes.DKK -> BaseTypes.$fOrdAsset_$ccompare a2 b2
+                                  BaseTypes.USD -> GHC.Types.LT
+                                  BaseTypes.JPY -> GHC.Types.LT
+                                  BaseTypes.CHF -> GHC.Types.LT }
+                             BaseTypes.USD
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.GT
+                                  BaseTypes.USD -> BaseTypes.$fOrdAsset_$ccompare a2 b2
+                                  BaseTypes.JPY -> GHC.Types.LT
+                                  BaseTypes.CHF -> GHC.Types.LT }
+                             BaseTypes.JPY
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.GT
+                                  BaseTypes.JPY -> BaseTypes.$fOrdAsset_$ccompare a2 b2
+                                  BaseTypes.CHF -> GHC.Types.LT }
+                             BaseTypes.CHF
+                             -> case b1 of wild3 {
+                                  DEFAULT -> GHC.Types.GT
+                                  BaseTypes.CHF -> BaseTypes.$fOrdAsset_$ccompare a2 b2 } } }
+                   BaseTypes.Stock a1
+                   -> case b of wild1 {
+                        BaseTypes.FX ds ds1 -> GHC.Types.GT
+                        BaseTypes.Stock b1 -> GHC.Classes.$fOrd[]_$s$ccompare1 a1 b1
+                        BaseTypes.Clock -> GHC.Types.LT }
+                   BaseTypes.Clock
+                   -> case b of wild1 {
+                        DEFAULT -> GHC.Types.GT BaseTypes.Clock -> GHC.Types.EQ } }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fOrdRealObs_$cmax ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> BaseTypes.RealObs
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,U><S,U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ x :: BaseTypes.RealObs y :: BaseTypes.RealObs ->
+                 case BaseTypes.$fOrdRealObs_$c<= x y of wild {
+                   GHC.Types.False -> x GHC.Types.True -> y }) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fOrdRealObs_$cmin ::
+    BaseTypes.RealObs -> BaseTypes.RealObs -> BaseTypes.RealObs
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,U><S,U>,
+     Unfolding: InlineRule (2, True, False)
+                (\ x :: BaseTypes.RealObs y :: BaseTypes.RealObs ->
+                 case BaseTypes.$fOrdRealObs_$c<= x y of wild {
+                   GHC.Types.False -> y GHC.Types.True -> x }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fShowAsset :: GHC.Show.Show BaseTypes.Asset
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.Asset
+                  BaseTypes.$fShowAsset_$cshowsPrec
+                  BaseTypes.$fShowAsset_$cshow
+                  BaseTypes.$fShowAsset_$cshowList -}
+d7d12277f2d209b41f9c0dc589cc1882
+  $fShowAsset1 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "CHF"#) -}
+f27399fce9fc6d47de9e522dff7d2eed
+  $fShowAsset2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "JPY"#) -}
+f509e1b4a5c1a2c7db96712968bca742
+  $fShowAsset3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "USD"#) -}
+a521dd400d36390b6185239b3b2127bb
+  $fShowAsset4 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "DKK"#) -}
+25c551e434288b1bf93764899d027070
+  $fShowAsset5 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "EUR"#) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fShowAsset_$cshow :: BaseTypes.Asset -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: BaseTypes.Asset ->
+                 BaseTypes.$fShowAsset_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fShowAsset_$cshowList :: [BaseTypes.Asset] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ BaseTypes.Asset
+                   BaseTypes.$w$cshowsPrec) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $fShowAsset_$cshowsPrec ::
+    GHC.Types.Int -> BaseTypes.Asset -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <L,A><S,1*U><L,1*U>, Inline: INLINE[0],
+     Unfolding: InlineRule (3, True, True)
+                (\ w :: GHC.Types.Int
+                   w1 :: BaseTypes.Asset
+                   w2 :: GHC.Base.String ->
+                 BaseTypes.$w$cshowsPrec w1 w2) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fShowBoolObs :: GHC.Show.Show BaseTypes.BoolObs
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.BoolObs
+                  BaseTypes.$fShowBoolObs_$cshowsPrec
+                  BaseTypes.$fShowBoolObs_$cshow
+                  BaseTypes.$fShowBoolObs_$cshowList -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fShowBoolObs1 :: BaseTypes.BoolObs -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (\ w :: BaseTypes.BoolObs w1 :: GHC.Base.String ->
+                 BaseTypes.$w$cshowsPrec1 0 w w1) -}
+02c7b64f1657560621b053fe71208d67
+  $fShowBoolObs2 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "Default "#) -}
+5c20ec985ca207e4468dcfb7a130025f
+  $fShowBoolObs3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "P3"#) -}
+7ef71bdcd31e368b7554e8a9f8e792d8
+  $fShowBoolObs4 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "P2"#) -}
+d8c8501f42b18b402ab40219dae0b7c8
+  $fShowBoolObs5 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "P1"#) -}
+ba1198000303ad83a6d1ed31fdb598a8
+  $fShowBoolObs6 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "Z"#) -}
+65869a6b46bfb63eee02a249a162663c
+  $fShowBoolObs7 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "Y"#) -}
+f2c37f7ea99036fc27844975b74bc645
+  $fShowBoolObs8 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "X"#) -}
+d1f3d3540c84ab6f07e421c33796c02e
+  $fShowBoolObs9 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "Decision "#) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fShowBoolObs_$cshow :: BaseTypes.BoolObs -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: BaseTypes.BoolObs ->
+                 BaseTypes.$fShowBoolObs_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fShowBoolObs_$cshowList :: [BaseTypes.BoolObs] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ BaseTypes.BoolObs
+                   BaseTypes.$fShowBoolObs1) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $fShowBoolObs_$cshowsPrec ::
+    GHC.Types.Int -> BaseTypes.BoolObs -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <S,1*U(U)><S,1*U><L,U>, Inline: INLINE[0],
+     Unfolding: InlineRule (3, True, False)
+                (\ w :: GHC.Types.Int
+                   w1 :: BaseTypes.BoolObs
+                   w2 :: GHC.Base.String ->
+                 case w of ww { GHC.Types.I# ww1 ->
+                 BaseTypes.$w$cshowsPrec1 ww1 w1 w2 }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fShowParty :: GHC.Show.Show BaseTypes.Party
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.Party
+                  BaseTypes.$fShowParty_$cshowsPrec
+                  BaseTypes.$fShowParty_$cshow
+                  BaseTypes.$fShowParty_$cshowList -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fShowParty_$cshow :: BaseTypes.Party -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: BaseTypes.Party ->
+                 BaseTypes.$fShowParty_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fShowParty_$cshowList :: [BaseTypes.Party] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ BaseTypes.Party
+                   BaseTypes.$w$cshowsPrec2) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $fShowParty_$cshowsPrec ::
+    GHC.Types.Int -> BaseTypes.Party -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <L,A><S,1*U><L,1*U>, Inline: INLINE[0],
+     Unfolding: InlineRule (3, True, True)
+                (\ w :: GHC.Types.Int
+                   w1 :: BaseTypes.Party
+                   w2 :: GHC.Base.String ->
+                 BaseTypes.$w$cshowsPrec2 w1 w2) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fShowRealObs :: GHC.Show.Show BaseTypes.RealObs
+  DFunId[0]
+  {- Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ BaseTypes.RealObs
+                  BaseTypes.$fShowRealObs_$cshowsPrec
+                  BaseTypes.$fShowRealObs_$cshow
+                  BaseTypes.$fShowRealObs_$cshowList -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fShowRealObs1 :: BaseTypes.RealObs -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (BaseTypes.$fShowRealObs_$cshowsPrec
+                   BaseTypes.$fShowRealObs2) -}
+bc16611030fe229afa8f516b39210c51
+  $fShowRealObs2 :: GHC.Types.Int
+  {- HasNoCafRefs, Strictness: m, Unfolding: (GHC.Types.I# 0) -}
+7633dcf151b16e6358e6d05e4586ff32
+  $fShowRealObs3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "Clock"#) -}
+868b26db94badf2abb14ed5d01c78f94
+  $fShowRealObs4 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "Stock "#) -}
+e800716800363b49c4a1c5cab02a564c
+  $fShowRealObs5 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "FX "#) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fShowRealObs_$cshow :: BaseTypes.RealObs -> GHC.Base.String
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: InlineRule (1, True, False)
+                (\ x :: BaseTypes.RealObs ->
+                 BaseTypes.$fShowRealObs_$cshowsPrec
+                   GHC.Show.shows18
+                   x
+                   (GHC.Types.[] @ GHC.Types.Char)) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fShowRealObs_$cshowList :: [BaseTypes.RealObs] -> GHC.Show.ShowS
+  {- Arity: 2,
+     Unfolding: (GHC.Show.showList__
+                   @ BaseTypes.RealObs
+                   BaseTypes.$fShowRealObs1) -}
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  $fShowRealObs_$cshowsPrec ::
+    GHC.Types.Int -> BaseTypes.RealObs -> GHC.Show.ShowS
+  {- Arity: 3, Strictness: <L,1*U(U)><S,1*U><L,U>,
+     Unfolding: (\ a :: GHC.Types.Int
+                   ds :: BaseTypes.RealObs
+                   eta :: GHC.Base.String ->
+                 case ds of wild {
+                   BaseTypes.FX b1 b2
+                   -> case a of wild1 { GHC.Types.I# x ->
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# x 11) of wild2 {
+                        GHC.Types.False
+                        -> GHC.Base.++
+                             @ GHC.Types.Char
+                             BaseTypes.$fShowRealObs5
+                             (BaseTypes.$w$cshowsPrec
+                                b1
+                                (GHC.Types.:
+                                   @ GHC.Types.Char
+                                   GHC.Show.showSpace1
+                                   (BaseTypes.$w$cshowsPrec b2 eta)))
+                        GHC.Types.True
+                        -> GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (GHC.Base.++
+                                @ GHC.Types.Char
+                                BaseTypes.$fShowRealObs5
+                                (BaseTypes.$w$cshowsPrec
+                                   b1
+                                   (GHC.Types.:
+                                      @ GHC.Types.Char
+                                      GHC.Show.showSpace1
+                                      (BaseTypes.$w$cshowsPrec
+                                         b2
+                                         (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 eta))))) } }
+                   BaseTypes.Stock b1
+                   -> case a of wild1 { GHC.Types.I# x ->
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# x 11) of wild2 {
+                        GHC.Types.False
+                        -> GHC.Base.++
+                             @ GHC.Types.Char
+                             BaseTypes.$fShowRealObs4
+                             (GHC.Types.:
+                                @ GHC.Types.Char
+                                GHC.Show.shows6
+                                (GHC.Show.showLitString
+                                   b1
+                                   (GHC.Types.: @ GHC.Types.Char GHC.Show.shows6 eta)))
+                        GHC.Types.True
+                        -> GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (GHC.Base.++
+                                @ GHC.Types.Char
+                                BaseTypes.$fShowRealObs4
+                                (GHC.Types.:
+                                   @ GHC.Types.Char
+                                   GHC.Show.shows6
+                                   (GHC.Show.showLitString
+                                      b1
+                                      (GHC.Types.:
+                                         @ GHC.Types.Char
+                                         GHC.Show.shows6
+                                         (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 eta))))) } }
+                   BaseTypes.Clock
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowRealObs3 eta }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  $w$cshowsPrec ::
+    BaseTypes.Asset -> GHC.Base.String -> GHC.Base.String
+  {- Arity: 2, Strictness: <S,1*U><L,1*U>, Inline: [0],
+     Unfolding: (\ w :: BaseTypes.Asset w1 :: GHC.Base.String ->
+                 case w of wild {
+                   BaseTypes.EUR
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowAsset5 w1
+                   BaseTypes.DKK
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowAsset4 w1
+                   BaseTypes.USD
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowAsset3 w1
+                   BaseTypes.JPY
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowAsset2 w1
+                   BaseTypes.CHF
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowAsset1 w1 }) -}
+dae79b8c6797ec9ef37d391a1e745c55
+  $w$cshowsPrec1 ::
+    GHC.Prim.Int#
+    -> BaseTypes.BoolObs -> GHC.Base.String -> GHC.Base.String
+  {- Arity: 3, Strictness: <L,U><S,1*U><L,U>, Inline: [0],
+     Unfolding: (\ ww :: GHC.Prim.Int#
+                   w :: BaseTypes.BoolObs
+                   w1 :: GHC.Base.String ->
+                 case w of wild {
+                   BaseTypes.Decision b1 b2
+                   -> let {
+                        p :: GHC.Show.ShowS {- Arity: 1, Strictness: <L,U> -}
+                        = \ x :: GHC.Base.String[OneShot] ->
+                          GHC.Base.++
+                            @ GHC.Types.Char
+                            BaseTypes.$fShowBoolObs9
+                            (BaseTypes.$w$cshowsPrec2
+                               b1
+                               (GHC.Types.:
+                                  @ GHC.Types.Char
+                                  GHC.Show.showSpace1
+                                  (GHC.Types.:
+                                     @ GHC.Types.Char
+                                     GHC.Show.shows6
+                                     (GHC.Show.showLitString
+                                        b2
+                                        (GHC.Types.: @ GHC.Types.Char GHC.Show.shows6 x)))))
+                      } in
+                      case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False -> p w1
+                        GHC.Types.True
+                        -> GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (p (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 w1)) }
+                   BaseTypes.Default b1
+                   -> case GHC.Prim.tagToEnum#
+                             @ GHC.Types.Bool
+                             (GHC.Prim.>=# ww 11) of wild1 {
+                        GHC.Types.False
+                        -> GHC.Base.++
+                             @ GHC.Types.Char
+                             BaseTypes.$fShowBoolObs2
+                             (BaseTypes.$w$cshowsPrec2 b1 w1)
+                        GHC.Types.True
+                        -> GHC.Types.:
+                             @ GHC.Types.Char
+                             GHC.Show.shows9
+                             (GHC.Base.++
+                                @ GHC.Types.Char
+                                BaseTypes.$fShowBoolObs2
+                                (BaseTypes.$w$cshowsPrec2
+                                   b1
+                                   (GHC.Types.: @ GHC.Types.Char GHC.Show.shows8 w1))) } }) -}
+dfcc89f4500c3c01e7f357657e35e437
+  $w$cshowsPrec2 ::
+    BaseTypes.Party -> GHC.Base.String -> GHC.Base.String
+  {- Arity: 2, Strictness: <S,1*U><L,1*U>, Inline: [0],
+     Unfolding: (\ w :: BaseTypes.Party w1 :: GHC.Base.String ->
+                 case w of wild {
+                   BaseTypes.X
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowBoolObs8 w1
+                   BaseTypes.Y
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowBoolObs7 w1
+                   BaseTypes.Z
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowBoolObs6 w1
+                   BaseTypes.P1
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowBoolObs5 w1
+                   BaseTypes.P2
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowBoolObs4 w1
+                   BaseTypes.P3
+                   -> GHC.Base.++ @ GHC.Types.Char BaseTypes.$fShowBoolObs3 w1 }) -}
+cb66f9f4d11d7a383a10bbc8a156e568
+  data Asset = EUR | DKK | USD | JPY | CHF
+    Promotable
+dae79b8c6797ec9ef37d391a1e745c55
+  data BoolObs
+    = Decision BaseTypes.Party GHC.Base.String
+    | Default BaseTypes.Party
+dfcc89f4500c3c01e7f357657e35e437
+  data Party = X | Y | Z | P1 | P2 | P3
+    Promotable
+7ca671cc5c62c89221d4c2a2ec67ae6e
+  data RealObs
+    = FX BaseTypes.Asset BaseTypes.Asset
+    | Stock GHC.Base.String
+    | Clock
+d45411a9ca27f2054bce703984df44fb
+  type TVar = GHC.Base.String
+instance GHC.Classes.Eq [BaseTypes.Asset] = BaseTypes.$fEqAsset
+instance GHC.Classes.Eq [BaseTypes.BoolObs] = BaseTypes.$fEqBoolObs
+instance GHC.Classes.Eq [BaseTypes.Party] = BaseTypes.$fEqParty
+instance GHC.Classes.Eq [BaseTypes.RealObs] = BaseTypes.$fEqRealObs
+instance GHC.Classes.Ord [BaseTypes.Asset] = BaseTypes.$fOrdAsset
+instance GHC.Classes.Ord [BaseTypes.BoolObs]
+  = BaseTypes.$fOrdBoolObs
+instance GHC.Classes.Ord [BaseTypes.Party] = BaseTypes.$fOrdParty
+instance GHC.Classes.Ord [BaseTypes.RealObs]
+  = BaseTypes.$fOrdRealObs
+instance GHC.Show.Show [BaseTypes.Asset] = BaseTypes.$fShowAsset
+instance GHC.Show.Show [BaseTypes.BoolObs]
+  = BaseTypes.$fShowBoolObs
+instance GHC.Show.Show [BaseTypes.Party] = BaseTypes.$fShowParty
+instance GHC.Show.Show [BaseTypes.RealObs]
+  = BaseTypes.$fShowRealObs
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: safe
+require own pkg trusted: False
+

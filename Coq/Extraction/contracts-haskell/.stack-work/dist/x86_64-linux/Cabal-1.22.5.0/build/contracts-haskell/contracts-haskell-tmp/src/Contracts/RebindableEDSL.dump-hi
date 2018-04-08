@@ -1,0 +1,549 @@
+
+==================== FINAL INTERFACE ====================
+2018-04-08 09:58:11.909234 UTC
+
+interface main@main:RebindableEDSL 7103
+  interface hash: bb28552428a076ad90ecc7ab1d56002e
+  ABI hash: 1f05f6deb5408b4f1cddcc8c5c740823
+  export-list hash: 5974c7b2497ba37caa197c494e2ec138
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: 14470f91a616b786348e461ce1ac6e58
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  GHC.Base.otherwise
+  EDSL.advance
+  EDSL.hasType
+  EDSL.horizon
+  EDSL.mkExtEnvP
+  EDSL.printContr
+  EDSL.showContr
+  EDSL.specialise
+  HOAS.!
+  HOAS.!&!
+  HOAS.!/=!
+  HOAS.!<!
+  HOAS.!<=!
+  HOAS.!=!
+  HOAS.!>!
+  HOAS.!>=!
+  HOAS.!|!
+  HOAS.#
+  HOAS.&
+  HOAS.bNot
+  HOAS.bObs
+  HOAS.false
+  HOAS.iff
+  HOAS.rLit
+  HOAS.rObs
+  HOAS.true
+  RebindableEDSL.>>
+  RebindableEDSL.>>=
+  RebindableEDSL.wait
+  RebindableEDSL.waitT
+  RebindableEDSL.within
+  RebindableEDSL.withinT
+  GHC.Err.error
+  GHC.Base.Monad|{GHC.Base.fail GHC.Base.return}
+  GHC.Num.Num{GHC.Num.* GHC.Num.+ GHC.Num.- GHC.Num.abs GHC.Num.fromInteger GHC.Num.negate GHC.Num.signum}
+  GHC.Real.Fractional{GHC.Real./ GHC.Real.fromRational GHC.Real.recip}
+  GHC.Show.Show{GHC.Show.show GHC.Show.showList GHC.Show.showsPrec}
+  GHC.Integer.Type.Integer
+  BaseTypes.Asset{BaseTypes.CHF BaseTypes.DKK BaseTypes.EUR BaseTypes.JPY BaseTypes.USD}
+  BaseTypes.BoolObs{BaseTypes.Decision BaseTypes.Default}
+  BaseTypes.Party{BaseTypes.P1 BaseTypes.P2 BaseTypes.P3 BaseTypes.X BaseTypes.Y BaseTypes.Z}
+  BaseTypes.RealObs{BaseTypes.Clock BaseTypes.FX BaseTypes.Stock}
+  BaseTypes.TVar
+  Contract.ExtEnvP
+  Contract.FMap
+  Contract.ObsLabel{Contract.LabB Contract.LabR}
+  Contract.TExpr
+  HOAS.B
+  HOAS.BExp
+  HOAS.Contr
+  HOAS.ContrHoas{HOAS.both HOAS.ifWithin HOAS.ifWithinT HOAS.letc HOAS.scale HOAS.transfer HOAS.translate HOAS.translateT HOAS.zero}
+  HOAS.Exp
+  HOAS.ExpHoas
+  HOAS.ExpHoas'|{HOAS.acc HOAS.ife}
+  HOAS.R
+  HOAS.RExp
+  RebindableEDSL.Boolean|{RebindableEDSL.&& RebindableEDSL.not RebindableEDSL.||}
+  RebindableEDSL.Eq|{RebindableEDSL./= RebindableEDSL.==}
+  RebindableEDSL.IfThenElse|{RebindableEDSL.ifThenElse}
+  RebindableEDSL.Max|{RebindableEDSL.max RebindableEDSL.min}
+  RebindableEDSL.Ord|{RebindableEDSL.< RebindableEDSL.<= RebindableEDSL.> RebindableEDSL.>=}
+  GHC.Types.Bool{GHC.Types.False GHC.Types.True}
+  GHC.Types.Int
+module dependencies: BaseTypes Contract EDSL HOAS PrettyPrinting
+package dependencies: array-0.5.1.0@array_67iodizgJQIIxYVTp4emlA
+                      base-4.8.2.0 containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU
+                      deepseq-1.4.1.1@deeps_6vMKxt5sPFR0XsbRWvvq59 ghc-prim-0.4.0.0
+                      integer-gmp-1.0.0.0
+orphans: base-4.8.2.0:GHC.Base base-4.8.2.0:GHC.Float
+         main@main:HOAS main@main:PrettyPrinting
+family instance modules: base-4.8.2.0:Control.Applicative
+                         base-4.8.2.0:Data.Either base-4.8.2.0:Data.Functor.Identity
+                         base-4.8.2.0:Data.Monoid base-4.8.2.0:Data.Type.Equality
+                         base-4.8.2.0:Data.Void base-4.8.2.0:GHC.Exts
+                         base-4.8.2.0:GHC.Generics
+                         containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Map.Base
+                         containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Set.Base
+import  -/  base-4.8.2.0:GHC.Base 1db77db5dae73d8c424c85b09fbadb89
+import  -/  base-4.8.2.0:GHC.Num 9f42750c866f5832ca565146bd660c60
+import  -/  base-4.8.2.0:GHC.Real 1281efa9baf803bc7859d7efb89a38b3
+import  -/  base-4.8.2.0:GHC.Show 0e1d8380a8fb0cfb07ebeda3b70cbf38
+import  -/  base-4.8.2.0:Prelude 694dcaf039efe62df1c44834e2dbd2fb
+import  -/  ghc-prim-0.4.0.0:GHC.Classes e1f4ff80f7b5262008a595d29986fb18
+import  -/  integer-gmp-1.0.0.0:GHC.Integer.Type 371e90fe753f08ddedf0d2657a9ef5c4
+import  -/  BaseTypes 65c5f953f1981ab087685c5da86fba76
+  Asset cb66f9f4d11d7a383a10bbc8a156e568
+  BoolObs dae79b8c6797ec9ef37d391a1e745c55
+  CHF b307b8be91a336f44368e185f5cac541
+  Clock 9b975b3621618abbdc70ef014c2e6a4c
+  DKK 704943acbdd4ca583eab9a9df637dffb
+  Decision a5d5909fcd5fd9ed49d3a280eadec207
+  Default 27ea4e91b7f2a85c7c1e49aa8518371f
+  EUR f5e7aafdef4ba43fb11832949e03491f
+  FX ff896b187dafc0596774425edbf8c85a
+  JPY 997c40e7f627a86681775c517dd2e4b4
+  P1 b85d5e84981f7c1f627dfc545fde4a8f
+  P2 57925e8bcc2206627a0593b1fe017236
+  P3 6dc88e13aa0aeb7703c9da742c38b859
+  Party dfcc89f4500c3c01e7f357657e35e437
+  RealObs 7ca671cc5c62c89221d4c2a2ec67ae6e
+  Stock 072d1222ca60b7277ef5aee0921b438d
+  TVar d45411a9ca27f2054bce703984df44fb
+  USD 423d75c170ae52515d504bd068003b8f
+  X d0fa2e26fd9bb1d70762cd30ecc77def
+  Y d2b554c47d69c971910282357174aac8
+  Z b4c4164fcd5d277fa37a83a8c34cb6b8
+import  -/  Contract a001d2d1dcba9b7dbff93220b44302c9
+  ExtEnvP a0cff53ce1a33876a957716e00d9398b
+  FMap 6e856864eb0603bd83f936fe4b42c773
+  LabB 8d7b6ec21f78a7809518abcda9224011
+  LabR 7cb28ffb686b74dbb1694a608e78429e
+  ObsLabel 9eaec7e0150a3d9437c71b1eb0741d47
+  TExpr b6d3d122a20c7bad1349187712a593b3
+import  -/  EDSL eb30536764a08a94649694935286a5a9
+  exports: 76b05b5ed21f7c54f0406700965e5762
+  advance e7268ffe9f11b54aba56981b8d211f2f
+  hasType 98500890884d901605314508bb49080a
+  horizon fa790f0e267718edab356219018659e8
+  mkExtEnvP 4b07a4e27dbc9de591556e3bff97c1cc
+  printContr 6cda5674c839ce4e9592bec04d2a6667
+  showContr 2bb606c78385600092ef810a0549f67d
+  specialise fc7a615af7754857d6057129ddb7697c
+import  -/  HOAS 30142d8132ad9fdb45a0c9d1ca0fdc65
+  ! d9840583a6ff9b5e2d7c0e4ab767dd22
+  !&! 88bea997b59b08ae272a2f9dd43e698d
+  !/=! 37965007e1d5bc601bd88a68ce018606
+  !<! a852fea87142a06cb5b162136adf8fe5
+  !<=! cdb72c1c6a861f17ae9bdf70ed0ee9aa
+  !=! 93b48586259f43b1115bb7e39da46999
+  !>! ac79c8ca209bb97c7c7bb543c99755a5
+  !>=! cfde0927ad8a0d7968c133beb9be81b9
+  !|! 6120d46e453f223c26cec00d0440c665
+  # 3c9ad694a72b4837af3e4a766a2be99c
+  & 38736f5544e5a01891f7467caa07da3e
+  B b7009fef581143a0e28439b7ff2069dc
+  BExp 320f98e163787e5ebe8eaace00550a27
+  Contr 41b09272fc4d23d4addccdd83f150c68
+  ContrHoas 70b39d36af0ed9c7fc3ff750be42ca48
+  Exp 1ebe07472ebc532623f889fc374dcdee
+  ExpHoas 8681f28c922d9f67b0f5084de64fbc99
+  R ea70e4d138d72a601a60132767fc950b
+  RExp 29079cf3ff64b0117289796aa6826fe2
+  acc ba15c9837a4d4c135161254a794a4376
+  bNot b5d8c994efa616eb237daee1f2f2e07b
+  bObs efc2256f9dd82feb8906496e95f87ecb
+  both 348ee766f3de36e743b1ae4390a198e3
+  false 9da62d3c63c8195f2bb561209d99115f
+  ifWithin d5302b53a7795afedfeea747a4c75e78
+  ifWithinT 3bc5f3ac363360a8b850d9b59c5f5ddf
+  ife b63dea38f3e14925003a2cdc283c16e8
+  iff 3e8b17a3bae40e3308028390ad23b98f
+  letc 857caed89d9c1baf4f03c1f3b939b16a
+  rLit a986cc284bf875ba3593d179a97f78f4
+  rObs 33ca9c674a79874ed3e3e422529c808a
+  scale 0d3659bf4922f82de92e7bfd2b95b3ec
+  transfer 754343aba24b3e57921527c9140d584f
+  translate 3455c1e457d6ab99cbc58f619f067d2b
+  translateT b1bfd22cb2153a801bb82dad59459fef
+  true a5c7fd19f1d915410c3aef0d439e5663
+  zero f1220e1a462c5917830fd140860efa27
+fixities infixr 3 &&, infixr 2 ||, infix 4 <, infix 4 >=,
+         infix 4 >, infix 4 <=, infix 4 ==, infix 4 /=, infix 1 within
+f6ae3cd22d90f63f6fbca7d8dee9e9f1
+  $fBooleanBool :: RebindableEDSL.Boolean GHC.Types.Bool
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ GHC.Types.Bool GHC.Classes.&& GHC.Classes.|| GHC.Classes.not -}
+f6ae3cd22d90f63f6fbca7d8dee9e9f1
+  $fBooleanexp ::
+    HOAS.ExpHoas exp => RebindableEDSL.Boolean (exp HOAS.B)
+  DFunId[0]
+  {- Arity: 1, HasNoCafRefs,
+     Strictness: <L,U(A,A,U(A,C(C1(U)),A,A))>m,
+     Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun: @ (exp :: * -> *) $dExpHoas :: HOAS.ExpHoas exp.
+                  @ (exp HOAS.B)
+                  (HOAS.!&! @ exp $dExpHoas)
+                  (HOAS.!|! @ exp $dExpHoas)
+                  (HOAS.bNot @ exp $dExpHoas) -}
+104cd3f8edb607e87fc2062f82c8a689
+  $fEqIntBool :: RebindableEDSL.Eq GHC.Types.Int GHC.Types.Bool
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ GHC.Types.Int
+                  @ GHC.Types.Bool
+                  RebindableEDSL.$fEqIntBool_$c==
+                  RebindableEDSL.$fEqIntBool_$c/= -}
+09e0b580c6dad05919c1f3c10ce7674b
+  $fEqIntBool_$c/= ::
+    GHC.Types.Int -> GHC.Types.Int -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U(U)><S,1*U(U)>,
+     Unfolding: InlineRule (0, True, True) GHC.Classes.neInt -}
+5008cbaee0d42d9f4592502c8915c9f5
+  $fEqIntBool_$c== ::
+    GHC.Types.Int -> GHC.Types.Int -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U(U)><S,1*U(U)>,
+     Unfolding: InlineRule (0, True, True) GHC.Classes.eqInt -}
+104cd3f8edb607e87fc2062f82c8a689
+  $fEqexpexp ::
+    HOAS.ExpHoas exp => RebindableEDSL.Eq (exp HOAS.R) (exp HOAS.B)
+  DFunId[0]
+  {- Arity: 1, HasNoCafRefs,
+     Strictness: <L,U(A,A,U(A,C(C1(U)),A,A))>m,
+     Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun: @ (exp :: * -> *) $dExpHoas :: HOAS.ExpHoas exp.
+                  @ (exp HOAS.R)
+                  @ (exp HOAS.B)
+                  (HOAS.!=! @ exp $dExpHoas)
+                  (HOAS.!/=! @ exp $dExpHoas) -}
+939a131d9af012d883d23116bb5c7531
+  $fIfThenElseBoola :: RebindableEDSL.IfThenElse GHC.Types.Bool a
+  DFunId[0]
+  {- Arity: 3, HasNoCafRefs, Strictness: <S,1*U><L,1*U><L,1*U>,
+     Inline: INLINE (sat-args=0),
+     Unfolding: InlineRule (0, False, True)
+                RebindableEDSL.$fIfThenElseBoola_$cifThenElse
+                  `cast`
+                (forall a.
+                 Sym (RebindableEDSL.NTCo:IfThenElse[0]
+                          <GHC.Types.Bool>_N <a>_N)) -}
+6eee7587a9a358fb46601bf83959234c
+  $fIfThenElseBoola_$cifThenElse :: GHC.Types.Bool -> a -> a -> a
+  {- Arity: 3, HasNoCafRefs, Strictness: <S,1*U><L,1*U><L,1*U>,
+     Unfolding: InlineRule (3, True, False)
+                (\ @ a ds :: GHC.Types.Bool x :: a ds1 :: a ->
+                 case ds of wild { GHC.Types.False -> ds1 GHC.Types.True -> x }) -}
+939a131d9af012d883d23116bb5c7531
+  $fIfThenElseWithincontr ::
+    HOAS.ContrHoas exp contr =>
+    RebindableEDSL.IfThenElse (RebindableEDSL.Within exp) contr
+  DFunId[0]
+  {- Arity: 2, HasNoCafRefs,
+     Strictness: <S,1*U(A,A,A,A,A,A,A,A,1*C1(C1(U)),1*C1(C1(U)),A)><S,1*U>,
+     Inline: INLINE (sat-args=0),
+     Unfolding: InlineRule (0, False, True)
+                RebindableEDSL.$fIfThenElseWithincontr_$cifThenElse
+                  `cast`
+                (forall (exp :: * -> *) contr.
+                 <HOAS.ContrHoas exp contr>_R
+                 ->_R Sym (RebindableEDSL.NTCo:IfThenElse[0]
+                               <RebindableEDSL.Within exp>_N <contr>_N)) -}
+b131f8dcb7cdfe90926f574e55a73c96
+  $fIfThenElseWithincontr_$cifThenElse ::
+    HOAS.ContrHoas exp contr =>
+    RebindableEDSL.Within exp -> contr -> contr -> contr
+  {- Arity: 2, HasNoCafRefs,
+     Strictness: <S,1*U(A,A,A,A,A,A,A,A,1*C1(C1(U)),1*C1(C1(U)),A)><S,1*U>,
+     Unfolding: (\ @ (exp :: * -> *)
+                   @ contr
+                   $dContrHoas :: HOAS.ContrHoas exp contr
+                   ds :: RebindableEDSL.Within exp ->
+                 case ds of wild {
+                   RebindableEDSL.Within b l
+                   -> HOAS.ifWithin @ exp @ contr $dContrHoas b l
+                   RebindableEDSL.WithinT b l
+                   -> HOAS.ifWithinT @ exp @ contr $dContrHoas b l }) -}
+939a131d9af012d883d23116bb5c7531
+  $fIfThenElseexpcontr ::
+    HOAS.ContrHoas exp contr =>
+    RebindableEDSL.IfThenElse (exp HOAS.B) contr
+  DFunId[0]
+  {- Arity: 2, HasNoCafRefs,
+     Strictness: <S(LLLLLLLLC(C(S))LL),1*U(A,A,A,A,A,A,A,A,1*C1(C1(U)),A,A)><L,U>,
+     Inline: INLINE (sat-args=0),
+     Unfolding: InlineRule (0, False, True)
+                HOAS.iff
+                  `cast`
+                (forall (exp :: * -> *) contr.
+                 <HOAS.ContrHoas exp contr>_R
+                 ->_R Sym (RebindableEDSL.NTCo:IfThenElse[0]
+                               <exp HOAS.B>_N <contr>_N)) -}
+939a131d9af012d883d23116bb5c7531
+  $fIfThenElseexpexp ::
+    HOAS.ExpHoas exp => RebindableEDSL.IfThenElse (exp HOAS.B) (exp t)
+  DFunId[0]
+  {- Arity: 1, HasNoCafRefs,
+     Strictness: <S(LLS(SLLL)),1*U(A,A,1*U(1*U,A,A,A))>,
+     Inline: INLINE (sat-args=0),
+     Unfolding: InlineRule (0, False, True)
+                RebindableEDSL.$fIfThenElseexpexp_$cifThenElse
+                  `cast`
+                (forall (exp :: * -> *) t.
+                 <HOAS.ExpHoas exp>_R
+                 ->_R Sym (RebindableEDSL.NTCo:IfThenElse[0]
+                               <exp HOAS.B>_N <exp t>_N)) -}
+fb22a71382b3e2a9a847631ddddb9f66
+  $fIfThenElseexpexp_$cifThenElse ::
+    HOAS.ExpHoas exp => exp HOAS.B -> exp t -> exp t -> exp t
+  {- Arity: 1, HasNoCafRefs,
+     Strictness: <S(LLS(SLLL)),1*U(A,A,1*U(1*U,A,A,A))>,
+     Unfolding: InlineRule (1, True, False)
+                (\ @ (exp :: * -> *) @ t $dExpHoas :: HOAS.ExpHoas exp ->
+                 HOAS.ife @ exp (HOAS.$p3ExpHoas @ exp $dExpHoas) @ t) -}
+61d0a4ce5e05fa9d7e262200b66f0661
+  $fMaxa :: GHC.Classes.Ord a => RebindableEDSL.Max a
+  DFunId[0]
+  {- Arity: 1, HasNoCafRefs, Strictness: <L,U(A,A,A,A,A,A,1*U,1*U)>m,
+     Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun: @ a $dOrd :: GHC.Classes.Ord a.
+                  @ a (GHC.Classes.max @ a $dOrd) (GHC.Classes.min @ a $dOrd) -}
+61d0a4ce5e05fa9d7e262200b66f0661
+  $fMaxexp :: HOAS.ExpHoas exp => RebindableEDSL.Max (exp HOAS.R)
+  DFunId[0]
+  {- Arity: 1, HasNoCafRefs,
+     Strictness: <L,U(A,A,U(C(C1(C1(U))),C(C1(U)),A,A))>m,
+     Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun: @ (exp :: * -> *) $dExpHoas :: HOAS.ExpHoas exp.
+                  @ (exp HOAS.R)
+                  (RebindableEDSL.$fMaxexp_$cmax @ exp $dExpHoas)
+                  (RebindableEDSL.$fMaxexp_$cmax @ exp $dExpHoas) -}
+bdacc5f5487362c16db3ddbaa5a0c96c
+  $fMaxexp_$cmax ::
+    HOAS.ExpHoas exp => exp HOAS.R -> exp HOAS.R -> exp HOAS.R
+  {- Arity: 3, HasNoCafRefs,
+     Strictness: <S(LLS(C(C(C(S)))LLL)),U(A,A,U(1*C1(C1(C1(U))),1*C1(C1(U)),A,A))><L,U><L,U>,
+     Unfolding: (\ @ (exp :: * -> *)
+                   $dExpHoas :: HOAS.ExpHoas exp
+                   eta :: exp HOAS.R
+                   eta1 :: exp HOAS.R ->
+                 HOAS.ife
+                   @ exp
+                   (HOAS.$p3ExpHoas @ exp $dExpHoas)
+                   @ HOAS.R
+                   (HOAS.opE
+                      @ exp
+                      (HOAS.$p3ExpHoas @ exp $dExpHoas)
+                      @ HOAS.R
+                      @ HOAS.B
+                      Contract.Less
+                      (GHC.Types.:
+                         @ (exp HOAS.R)
+                         eta
+                         (GHC.Types.: @ (exp HOAS.R) eta1 (GHC.Types.[] @ (exp HOAS.R)))))
+                   eta1
+                   eta) -}
+646ab3e8852ecfcb4b3e6d97e34c02f9
+  $fOrdIntBool :: RebindableEDSL.Ord GHC.Types.Int GHC.Types.Bool
+  DFunId[0]
+  {- HasNoCafRefs, Strictness: m, Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun:.
+                  @ GHC.Types.Int
+                  @ GHC.Types.Bool
+                  RebindableEDSL.$fEqIntBool
+                  RebindableEDSL.$fOrdIntBool_$c<
+                  RebindableEDSL.$fOrdIntBool_$c>=
+                  RebindableEDSL.$fOrdIntBool_$c>
+                  RebindableEDSL.$fOrdIntBool_$c<= -}
+9bf9c48f820139312f42f73c14f504f7
+  $fOrdIntBool_$c< ::
+    GHC.Types.Int -> GHC.Types.Int -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U(U)><S,1*U(U)>,
+     Unfolding: InlineRule (0, True, True) GHC.Classes.ltInt -}
+813b400098cd4acd49ca8d860bb4d7ab
+  $fOrdIntBool_$c<= ::
+    GHC.Types.Int -> GHC.Types.Int -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U(U)><S,1*U(U)>,
+     Unfolding: InlineRule (0, True, True) GHC.Classes.leInt -}
+e3d2bcd578e0c4b893d5bd1a05a51497
+  $fOrdIntBool_$c> ::
+    GHC.Types.Int -> GHC.Types.Int -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U(U)><S,1*U(U)>,
+     Unfolding: InlineRule (0, True, True) GHC.Classes.gtInt -}
+464e22056e7abd85aa878e2acbb1ba72
+  $fOrdIntBool_$c>= ::
+    GHC.Types.Int -> GHC.Types.Int -> GHC.Types.Bool
+  {- Arity: 2, HasNoCafRefs, Strictness: <S,1*U(U)><S,1*U(U)>,
+     Unfolding: InlineRule (0, True, True) GHC.Classes.geInt -}
+646ab3e8852ecfcb4b3e6d97e34c02f9
+  $fOrdexpexp ::
+    (RebindableEDSL.Eq (exp HOAS.R) (exp HOAS.B), HOAS.ExpHoas exp) =>
+    RebindableEDSL.Ord (exp HOAS.R) (exp HOAS.B)
+  DFunId[1]
+  {- Arity: 2, HasNoCafRefs,
+     Strictness: <L,U><L,U(A,A,U(A,C(C1(U)),A,A))>m,
+     Inline: [ALWAYS] CONLIKE,
+     Unfolding: DFun: @ (exp :: * -> *)
+                      $dEq :: RebindableEDSL.Eq (exp HOAS.R) (exp HOAS.B)
+                      $dExpHoas :: HOAS.ExpHoas exp.
+                  @ (exp HOAS.R)
+                  @ (exp HOAS.B)
+                  $dEq
+                  (RebindableEDSL.$fOrdexpexp_$c> @ exp $dEq $dExpHoas)
+                  (RebindableEDSL.$fOrdexpexp_$c<= @ exp $dEq $dExpHoas)
+                  (RebindableEDSL.$fOrdexpexp_$c> @ exp $dEq $dExpHoas)
+                  (RebindableEDSL.$fOrdexpexp_$c<= @ exp $dEq $dExpHoas) -}
+67789cb25d44fcf083a9cf2eb4827923
+  $fOrdexpexp_$c<= ::
+    (RebindableEDSL.Eq (exp HOAS.R) (exp HOAS.B), HOAS.ExpHoas exp) =>
+    exp HOAS.R -> exp HOAS.R -> exp HOAS.B
+  {- Arity: 4, HasNoCafRefs,
+     Strictness: <L,A><L,U(A,A,U(A,C(C1(U)),A,A))>,
+     Unfolding: InlineRule (2, True, True)
+                (\ @ (exp :: * -> *)
+                   $dEq :: RebindableEDSL.Eq (exp HOAS.R) (exp HOAS.B)
+                   $dExpHoas :: HOAS.ExpHoas exp
+                   eta :: exp HOAS.R
+                   eta1 :: exp HOAS.R ->
+                 HOAS.!<=! @ exp $dExpHoas eta eta1) -}
+a35012b70d6c47584212849f47573da8
+  $fOrdexpexp_$c> ::
+    (RebindableEDSL.Eq (exp HOAS.R) (exp HOAS.B), HOAS.ExpHoas exp) =>
+    exp HOAS.R -> exp HOAS.R -> exp HOAS.B
+  {- Arity: 4, HasNoCafRefs,
+     Strictness: <L,A><L,U(A,A,U(A,C(C1(U)),A,A))>,
+     Unfolding: InlineRule (2, True, True)
+                (\ @ (exp :: * -> *)
+                   $dEq :: RebindableEDSL.Eq (exp HOAS.R) (exp HOAS.B)
+                   $dExpHoas :: HOAS.ExpHoas exp
+                   eta :: exp HOAS.R
+                   eta1 :: exp HOAS.R ->
+                 HOAS.!<! @ exp $dExpHoas eta eta1) -}
+67853a8568e5d5c24c80ab1a4ce3ee75
+  (>>) ::
+    HOAS.ContrHoas exp contr => RebindableEDSL.Wait -> contr -> contr
+  {- Arity: 3,
+     Strictness: <S(LLLLLLC(C(S))LLLL),1*U(A,A,A,A,A,A,1*C1(C1(U)),A,A,A,A)><S,1*U><L,U>,
+     Unfolding: InlineRule (3, True, False)
+                (\ @ contr
+                   @ (exp :: * -> *)
+                   $dContrHoas :: HOAS.ContrHoas exp contr
+                   ds :: RebindableEDSL.Wait
+                   c :: contr ->
+                 case ds of wild {
+                   RebindableEDSL.Wait n
+                   -> HOAS.translate @ exp @ contr $dContrHoas n c
+                   RebindableEDSL.WaitT ipv -> RebindableEDSL.>>1 @ contr }) -}
+f5f68a1f80cf1b9ae15cac63f3c023a0
+  >>1 :: contr
+  {- Strictness: b -}
+a0aca40f7fa07595f9e71c94273c8ab4
+  (>>=) ::
+    HOAS.ContrHoas exp contr => exp t -> (exp t -> contr) -> contr
+  {- Arity: 1, HasNoCafRefs,
+     Strictness: <S(LLSLLLLLLLL),1*U(A,A,1*U,A,A,A,A,A,A,A,A)>,
+     Unfolding: InlineRule (1, True, True)
+                (\ @ (exp :: * -> *)
+                   @ t
+                   @ contr
+                   $dContrHoas :: HOAS.ContrHoas exp contr ->
+                 HOAS.letc @ exp @ contr $dContrHoas @ t) -}
+f6ae3cd22d90f63f6fbca7d8dee9e9f1
+  class Boolean b where
+    (&&) :: b -> b -> b
+    (||) :: b -> b -> b
+    not :: b -> b
+104cd3f8edb607e87fc2062f82c8a689
+  class Eq a b | a -> b where
+    (==) :: a -> a -> b
+    (/=) :: a -> a -> b
+939a131d9af012d883d23116bb5c7531
+  class IfThenElse b c where
+    ifThenElse :: b -> c -> c -> c
+61d0a4ce5e05fa9d7e262200b66f0661
+  class Max a where
+    max :: a -> a -> a
+    min :: a -> a -> a
+646ab3e8852ecfcb4b3e6d97e34c02f9
+  class RebindableEDSL.Eq a b => Ord a b | a -> b where
+    (<) :: a -> a -> b
+    (>=) :: a -> a -> b
+    (>) :: a -> a -> b
+    (<=) :: a -> a -> b
+af60ee42f140770e4941a04f45c5d93b
+  data Wait = Wait GHC.Types.Int | WaitT Contract.TExpr
+d05d2700d12a460a3f710c749ff6f79c
+  data Within (exp :: * -> *)
+    = Within (exp HOAS.B) GHC.Types.Int
+    | WithinT (exp HOAS.B) Contract.TExpr
+02b1326684f7daca4d50cdac5aa3aa31
+  wait :: GHC.Types.Int -> RebindableEDSL.Wait
+  {- Arity: 1, HasNoCafRefs, Strictness: <L,U>m1,
+     Unfolding: InlineRule (0, True, True) RebindableEDSL.Wait -}
+be5da49b8d2ec7dafbc057c665e4a028
+  waitT :: Contract.TExpr -> RebindableEDSL.Wait
+  {- Arity: 1, HasNoCafRefs, Strictness: <L,U>m2,
+     Unfolding: InlineRule (0, True, True) RebindableEDSL.WaitT -}
+2da8309a99d7f6796069593f217391b7
+  within ::
+    HOAS.ExpHoas exp =>
+    exp HOAS.B -> GHC.Types.Int -> RebindableEDSL.Within exp
+  {- Arity: 3, HasNoCafRefs, Strictness: <L,A>,
+     Unfolding: InlineRule (1, True, True)
+                (\ @ (exp :: * -> *)
+                   $dExpHoas :: HOAS.ExpHoas exp
+                   eta :: exp HOAS.B
+                   eta1 :: GHC.Types.Int ->
+                 RebindableEDSL.Within @ exp eta eta1) -}
+68be0334606360cb12223fa7de1a6037
+  withinT ::
+    HOAS.ExpHoas exp =>
+    exp HOAS.B -> Contract.TExpr -> RebindableEDSL.Within exp
+  {- Arity: 3, HasNoCafRefs, Strictness: <L,A>,
+     Unfolding: InlineRule (1, True, True)
+                (\ @ (exp :: * -> *)
+                   $dExpHoas :: HOAS.ExpHoas exp
+                   eta :: exp HOAS.B
+                   eta1 :: Contract.TExpr ->
+                 RebindableEDSL.WithinT @ exp eta eta1) -}
+instance [incoherent] RebindableEDSL.Boolean [GHC.Types.Bool]
+  = RebindableEDSL.$fBooleanBool
+instance [incoherent] RebindableEDSL.Boolean [.]
+  = RebindableEDSL.$fBooleanexp
+instance [incoherent] RebindableEDSL.Eq [GHC.Types.Int,
+                                         GHC.Types.Bool]
+  = RebindableEDSL.$fEqIntBool
+instance [incoherent] RebindableEDSL.Eq [., .]
+  = RebindableEDSL.$fEqexpexp
+instance [incoherent] RebindableEDSL.IfThenElse [GHC.Types.Bool, .]
+  = RebindableEDSL.$fIfThenElseBoola
+instance [incoherent] RebindableEDSL.IfThenElse [RebindableEDSL.Within,
+                                                 .]
+  = RebindableEDSL.$fIfThenElseWithincontr
+instance [incoherent] RebindableEDSL.IfThenElse [., .]
+  = RebindableEDSL.$fIfThenElseexpcontr
+instance [incoherent] RebindableEDSL.IfThenElse [., .]
+  = RebindableEDSL.$fIfThenElseexpexp
+instance [incoherent] RebindableEDSL.Max [.]
+  = RebindableEDSL.$fMaxa
+instance [incoherent] RebindableEDSL.Max [.]
+  = RebindableEDSL.$fMaxexp
+instance [incoherent] RebindableEDSL.Ord [GHC.Types.Int,
+                                          GHC.Types.Bool]
+  = RebindableEDSL.$fOrdIntBool
+instance [incoherent] RebindableEDSL.Ord [., .]
+  = RebindableEDSL.$fOrdexpexp
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: none
+require own pkg trusted: False
+

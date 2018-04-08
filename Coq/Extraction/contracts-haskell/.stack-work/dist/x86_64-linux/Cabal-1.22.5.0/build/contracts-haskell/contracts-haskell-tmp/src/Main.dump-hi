@@ -1,0 +1,139 @@
+
+==================== FINAL INTERFACE ====================
+2018-04-08 09:58:12.47058 UTC
+
+interface main@main:Main 7103
+  interface hash: 2310a6c0c353628467d3a7d319d693a4
+  ABI hash: 13e1dcd9b626843afd0eb0847a1561a4
+  export-list hash: 221bc7ac2c9ecf9113e29e4e6ae26132
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: a047622fa5a3e7d00d6ed8ce1bc7f4f2
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  Main.main
+module dependencies: BaseTypes Contract ContractTranslation EDSL
+                     Examples.PayoffToHaskell Examples.SampleContracts
+                     Examples.TranslationExample HOAS PrettyPrinting RebindableEDSL
+package dependencies: array-0.5.1.0@array_67iodizgJQIIxYVTp4emlA
+                      base-4.8.2.0 containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU
+                      deepseq-1.4.1.1@deeps_6vMKxt5sPFR0XsbRWvvq59 ghc-prim-0.4.0.0
+                      integer-gmp-1.0.0.0 time-1.5.0.1@time_FTheb6LSxyX1UABIbBXRfn
+orphans: base-4.8.2.0:GHC.Base base-4.8.2.0:GHC.Float
+         main@main:Examples.TranslationExample main@main:HOAS
+         main@main:PrettyPrinting
+         time-1.5.0.1@time_FTheb6LSxyX1UABIbBXRfn:Data.Time.Calendar.Gregorian
+         time-1.5.0.1@time_FTheb6LSxyX1UABIbBXRfn:Data.Time.Format.Parse
+         time-1.5.0.1@time_FTheb6LSxyX1UABIbBXRfn:Data.Time.LocalTime.LocalTime
+family instance modules: base-4.8.2.0:Control.Applicative
+                         base-4.8.2.0:Data.Either base-4.8.2.0:Data.Functor.Identity
+                         base-4.8.2.0:Data.Monoid base-4.8.2.0:Data.Type.Equality
+                         base-4.8.2.0:Data.Void base-4.8.2.0:GHC.Exts
+                         base-4.8.2.0:GHC.Generics
+                         containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Map.Base
+                         containers-0.5.6.2@conta_2C3ZI8RgPO2LBMidXKTvIU:Data.Set.Base
+import  -/  base-4.8.2.0:GHC.Show 0e1d8380a8fb0cfb07ebeda3b70cbf38
+import  -/  base-4.8.2.0:Prelude 694dcaf039efe62df1c44834e2dbd2fb
+import  -/  base-4.8.2.0:System.IO 0248c1e850b7ea124cf7a2e1669ebf67
+import  -/  ghc-prim-0.4.0.0:GHC.Types 6b27fb3fdbd0e3f0925a4496c66513bb
+import  -/  Examples.SampleContracts 75848cacf0c2b730f50c109f867fa9d3
+  exports: 28ea68b9e87e56fb41601c99e7379f01
+  european 541474eb0c98dd145a4d3569f33260e4
+import  -/  Examples.TranslationExample 887c97e4d4ca37ad9bd29c14aa60eb8f
+  exports: 4af761385a80eba289ddb92056ad04da
+  translateEuropean adda374958e1616702736288f37361bf
+import  -/  HOAS 30142d8132ad9fdb45a0c9d1ca0fdc65
+  exports: 30836575c2ad86bf46bf191ea76e57ac
+  fromHoas 24c82b570e4ffd5b958cbfeaa2ce5e4f
+import  -/  PrettyPrinting 5ffccb64e48b3cd654647d2ec0df3241
+  exports: d0fedbf2cb7709f3cb2b36b1eb2beca0
+a41eed562bee38d3685134a0a600450c
+  main :: GHC.Types.IO ()
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: InlineRule (0, True, True)
+                Main.main1 `cast` (Sym (GHC.Types.NTCo:IO[0] <()>_R)) -}
+94c23eabc2f71d54e0877488363c6b14
+  main1 ::
+    GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
+  {- Arity: 1, Strictness: <L,U>,
+     Unfolding: (\ s :: GHC.Prim.State# GHC.Prim.RealWorld[OneShot] ->
+                 case GHC.IO.Handle.Text.hPutStr2
+                        GHC.IO.Handle.FD.stdout
+                        Main.main7
+                        GHC.Types.True
+                        s of ds1 { (#,#) ipv ipv1 ->
+                 case GHC.IO.Handle.Text.hPutStr2
+                        GHC.IO.Handle.FD.stdout
+                        Main.main5
+                        GHC.Types.True
+                        ipv of ds2 { (#,#) ipv2 ipv3 ->
+                 case GHC.IO.Handle.Text.hPutStr2
+                        GHC.IO.Handle.FD.stdout
+                        Main.main4
+                        GHC.Types.True
+                        ipv2 of ds3 { (#,#) ipv4 ipv5 ->
+                 case GHC.IO.Handle.Text.hPutStr2
+                        GHC.IO.Handle.FD.stdout
+                        Main.main3
+                        GHC.Types.True
+                        ipv4 of ds4 { (#,#) ipv6 ipv7 ->
+                 GHC.IO.Handle.Text.hPutStr2
+                   GHC.IO.Handle.FD.stdout
+                   Main.main2
+                   GHC.Types.True
+                   ipv6 } } } }) -}
+37781e3e79a92bdc011114c4d3ff95d6
+  main2 :: GHC.Base.String
+  {- Unfolding: (case Examples.TranslationExample.translateEuropean of wild {
+                   GHC.Base.Nothing -> GHC.Show.$fShowMaybe3
+                   GHC.Base.Just b1
+                   -> GHC.Base.++
+                        @ GHC.Types.Char
+                        GHC.Show.$fShowMaybe1
+                        (Examples.TranslationExample.$fShowILExpr_$cshowsPrec
+                           GHC.Show.appPrec1
+                           b1
+                           (GHC.Types.[] @ GHC.Types.Char)) }) -}
+fb5bb37a3eff261db2c202efa89c30d0
+  main3 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString#
+                   "Corresponding payoff expression:"#) -}
+5e719a71b462e9afa3cadf068d1b0efa
+  main4 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "-----------------"#) -}
+1cd2f5ba24ef4774cd945e3c49842188
+  main5 :: GHC.Base.String
+  {- Unfolding: (PrettyPrinting.ppContr
+                   HOAS.$fShowContr2
+                   (GHC.Types.[] @ GHC.Types.Int)
+                   Main.main6) -}
+e25ca9504ac3469222ac091e75865335
+  main6 :: Contract.Contr
+  {- Unfolding: ((Examples.SampleContracts.european
+                    @ HOAS.DB
+                    @ HOAS.CDB
+                    HOAS.$fContrHoasDBCDB)
+                   `cast`
+                 (HOAS.NTCo:CDB[0])
+                   HOAS.$fShowContr2) -}
+628a41dc1db4538a747b5580b74e379c
+  main7 :: [GHC.Types.Char]
+  {- Unfolding: (GHC.CString.unpackCString# "European option:"#) -}
+6e7dfb40b381ef9d5c10d2260cd5ce62
+  main8 ::
+    GHC.Prim.State# GHC.Prim.RealWorld
+    -> (# GHC.Prim.State# GHC.Prim.RealWorld, () #)
+  {- Arity: 1,
+     Unfolding: (GHC.TopHandler.runMainIO1
+                   @ ()
+                   Main.main1 `cast` (Sym (GHC.Types.NTCo:IO[0] <()>_R))) -}
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: none
+require own pkg trusted: False
+
