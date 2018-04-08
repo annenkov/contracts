@@ -6,3 +6,4 @@
 *.bak
 Makefile.coq
 Makefile.conf
+.stack-work
