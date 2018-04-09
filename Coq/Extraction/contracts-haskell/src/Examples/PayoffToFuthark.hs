@@ -115,8 +115,9 @@ paramIndex :: String -> [String] -> Int
 paramIndex p =  maybe err id . findIndex (\x -> x == p)
   where err = error $ "Could not find parameter: " ++ p
 
-compileAndWrite params exp =
+compileAndWrite path params exp =
+  let path' = if null path then "./" else path in
   do
     let out = header ++ ppFutharkCode params exp
-    writeFile "./Examples/PayoffFunction.fut" out
+    writeFile (path ++ "PayoffFunction.fut") out
 

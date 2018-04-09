@@ -8,4 +8,5 @@ Makefile.coq
 Makefile.conf
 .stack-work
 Coq/Extraction/contracts-haskell/src/Examples/Futhark/*.c
+Coq/Extraction/contracts-haskell/src/Examples/Futhark/PayoffFunction.*
 Coq/Extraction/contracts-haskell/src/Examples/Futhark/contracts

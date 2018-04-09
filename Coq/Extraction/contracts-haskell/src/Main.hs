@@ -18,12 +18,14 @@ main = do
   putStrLn "Corresponding payoff expression:"
   putStrLn $ show $ translateEuropean
 
--- generation Futhark code for the barrer oprion
+-- generating Futhark code for the simple barrer contract
 
 tenv = ["maturity"]
 
 barrierInFuthark = putStrLn $ F.ppFutharkCode tenv $ transC (fromHoas barrier)
 barrierInFutharkCutPayoff = putStrLn $ F.ppFutharkCode tenv $ CT.cutPayoff $ transC (fromHoas barrier)
+
+writeBarrierCode = F.compileAndWrite "./src/Examples/Futhark/" tenv (CT.cutPayoff $ transC (fromHoas barrier))
 
 compositeInFutharkCutPayoff = putStrLn $ F.ppFutharkCode tenv $ CT.cutPayoff $ transC (fromHoas composite)
 
