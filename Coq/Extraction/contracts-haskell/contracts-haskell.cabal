@@ -20,6 +20,9 @@ executable contracts-haskell
   build-depends:       base >= 4.6 && < 5
                      , time
                      , containers
+                     , bytestring
+                     , text
+                     , template == 0.2.0.10
 
  other-modules: BaseTypes
                 Contract

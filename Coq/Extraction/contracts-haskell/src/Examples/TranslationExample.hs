@@ -10,6 +10,7 @@ import qualified RebindableEDSL as R
 import EDSL
 import ContractTranslation
 import Examples.PayoffToHaskell
+import qualified Examples.PayoffToFuthark as F
 import Data.Maybe
 import qualified Data.Map as Map
 
