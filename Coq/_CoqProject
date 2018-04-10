@@ -29,4 +29,5 @@ Utils.v
 ./Payoff/ILEquivalence.v
 ./Payoff/CutPayoff.v
 ./Payoff/CutPayoffN.v
+./Payoff/Simplify.v
 ./Extraction/Extraction.v

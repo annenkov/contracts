@@ -79,6 +79,47 @@ fromPayoff params e = case e of
                    -- inParens (ifThenElse (show p1' ++ "== p1 && " ++ show p2' ++ "== p2") "1"
                    --                                              (ifThenElse (show p1' ++ "== p2 && " ++ show p2' ++ "== p1") "-1" "0"))
 
+-- | Two index translation functions
+data IndexTrans = IndT {obsT :: Int -> Int, payoffT :: Int -> Int}
+
+empty_tenv = (\_ -> error "Empty template env")
+
+-- | Translation of time scale to indices.
+-- | Ideally, this should be done in Coq with corresponding proofs.
+-- | Reindex actually does a bit more: it evaluates template expression in the empty template environment.
+-- | For that reason it works only for template-closed expressions.
+reindex :: IndexTrans -> ILExpr -> ILExpr
+reindex indT e =
+  case e of
+    ILIf e' e1 e2 -> ILIf (reindex indT e') (reindex indT e1) (reindex indT e2)
+    ILFloat v -> ILFloat v
+    ILNat n -> ILNat n
+    ILBool b -> ILBool b
+    ILtexpr e -> let n = iLTexprSem e empty_tenv in ILtexpr (ILTexpr (Tnum ((obsT indT) n)))
+    ILNow -> ILNow
+    ILModel (LabR (Stock l)) t -> let n = iLTexprSemZ t empty_tenv in
+      ILModel (LabR (Stock l)) (ILTnumZ ((obsT indT) n))
+    ILUnExpr op e -> ILUnExpr op (reindex indT e)
+    ILBinExpr op e1 e2 -> ILBinExpr op (reindex indT e1) (reindex indT e2)
+    ILLoopIf e e1 e2 t -> ILLoopIf (reindex indT e) (reindex indT e1)
+                                   (reindex indT e2) t
+    ILPayoff t p1 p2 -> let n = iLTexprSem t empty_tenv in
+      ILPayoff (ILTexpr (Tnum ((payoffT indT) n))) p1 p2
+
+reindexTexpr :: (Int -> Int) -> TExpr -> TExpr
+reindexTexpr rf e = case e of
+                Tnum n -> Tnum (rf n)
+                Tvar s -> Tvar s
+
+reindexILTexpr rf e = case e of
+                  ILTplus e1 e2 -> ILTplus (reindexILTexpr rf e1)  (reindexILTexpr rf e2)
+                  ILTexpr e -> ILTexpr (reindexTexpr rf e)
+
+reindexILTexprZ rf e = case e of
+                   ILTplusZ e1 e2 -> ILTplusZ (reindexILTexprZ rf e1) (reindexILTexprZ rf e2)
+                   ILTexprZ e -> ILTexprZ (reindexILTexpr rf e)
+                   ILTnumZ n -> ILTnumZ (rf n)
+
 -- some helpers for pretty-printing
 inParens s = "(" ++ s ++ ")"
 inCurlBr s = "{" ++ s ++ "}"
@@ -96,8 +137,8 @@ lambda v e = "(\\" ++ v ++ "->" ++ e ++ ")"
 header = ""
 
 payoffInternalDec params e =
-  dec internalFuncName "ext : []f64, tenv : []i32, disc : []f64, t0 : i32, t_now : i32" "f64" (fromPayoff params e)
-payoffDec = dec funcName  "ext : []f64, tenv : []i32, disc : []f64, t_now : i32" "f64"
+  dec internalFuncName "ext : []f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32" "f32" (fromPayoff params e)
+payoffDec = dec funcName  "ext : []f32, tenv : []i32, disc : []f32, t_now : i32" "f32"
                           (fcall internalFuncName  ["ext", "tenv", "disc", "0", "t_now"])
 ppFutharkCode params e = payoffInternalDec params e ++ newLn payoffDec
 

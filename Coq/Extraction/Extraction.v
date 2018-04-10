@@ -7,8 +7,10 @@ Require Import TimedTyping.
 Require Import ILTranslation.
 Require Import ILSemantics.
 Require Import CutPayoff.
+Require Import Simplify.
 Require Import Nat.
-
+Require Import Days.
+Require Import Misc.
 
 
 Extraction Language Haskell.
@@ -23,6 +25,10 @@ Extract Inlined Constant compose => "(.)".
 Extract Inductive list => "List" [ "[]" "(:)" ].
 Extract Inlined Constant map => "P.map".
 Extract Inlined Constant fold_right => "foldr".
+Extract Inlined Constant concat => "concat".
+Extract Inlined Constant concatMap => "concatMap".
+Extract Inlined Constant flat_map => "concatMap".
+Extract Inlined Constant app => "(++)".
 
 Extract Inductive nat => "Int" ["0" "succ"] "(\fO fS n -> if n==0 then fO () else fS (n-1))".
 Extract Inductive Z => "Int" ["0" "id" "negate"].
@@ -66,6 +72,7 @@ Extract Inlined Constant minus => "(-)".
 Extract Inlined Constant max => "max".
 Extract Inlined Constant Z.of_nat => "id".
 Extract Inlined Constant Z.to_nat => "id".
+Extract Inlined Constant Nat.eqb => "(==)".
 
 Extract Inductive option => "Maybe" [ "Just" "Nothing" ].
 Extract Constant option_rect => "flip maybe".
@@ -110,18 +117,22 @@ Extract Inlined Constant compare => "compare".
 
 Extract Inductive comparison => "Ordering" [ "EQ" "LT" "GT"].
 
-Extraction "Extraction/contracts-haskell/src/Contracts/ContractExtracted.hs" 
+Extraction "Extraction/contracts-haskell/src/Contracts/ContractExtracted.hs"
+  transfDays
+  obsDays
   lookupEnv
   Contr
   horizon
   redfun
   specialise
   has_type
-  inst_contr.
+  inst_contr
+  flat_map.
 
 Extraction "Extraction/contracts-haskell/src/Contracts/ContractTranslationExtracted.hs"
            fromExp
            fromContr
            fromExtEnv
            cutPayoff
-           ILsem.
+           ILsem
+           simp_loopif.
