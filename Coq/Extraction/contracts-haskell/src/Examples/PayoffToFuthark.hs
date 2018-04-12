@@ -12,7 +12,11 @@ import qualified Data.Text as T
 import qualified Data.Text.Lazy as E
 
 internalFuncName = "payoffInternal"
-funcName = "payoff"
+funcName = "payoffFun"
+
+-- | Two lists: labels of observables and names of template variables.
+-- | These lists used to translate labels and names to indices.
+data Params = Params {obsP :: [String], templateP :: [String]}
 
 fromBinOp op = case op of
                  ILAdd -> "+"
@@ -32,7 +36,7 @@ fromUnOp op = case op of
 
 fromTexpr params e = case e of
                 Tnum n -> show n
-                Tvar s -> inParens ("tenv[" ++ show (paramIndex s params) ++ "]")
+                Tvar s -> inParens ("tenv[" ++ show (paramIndex s (templateP params)) ++ "]")
 
 fromILTexpr params e = case e of
                   ILTplus e1 e2 -> fromILTexpr params e1 ++ " + " ++ fromILTexpr params e2
@@ -54,30 +58,30 @@ loopif cond e1 e2 t =
 -- | Pretty-printing Futhark code.
 -- | Assumptions:
 -- | the external environment is an array which is indexed with discrete time, i.e. if contact horizon is [n] then the environment should contain n values for an observable;
--- | payoff expression contains only one observable;
 -- | there are only two parties in a payoff exression and payoff(p1,p2) is always traslated as positive discounted value disc[t+t0].
-fromPayoff params e = case e of
-                 ILIf e' e1 e2 -> inParens ("if " ++ inParens (fromPayoff params e') ++
-                                            "then " ++ inParens (fromPayoff params e1) ++
-                                            "else " ++ inParens (fromPayoff params e2))
-                 ILFloat v -> show v
-                 ILNat n -> show n
-                 ILBool b -> show b
-                 ILtexpr e -> inParens (fromILTexpr params e) ++ " + t0"
-                 ILNow -> "t_now"
-                 ILModel (LabR (Stock l)) t ->
-                   -- we simplify the lookup procedure to just indexing in the environment
-                     inParens ("ext[" ++ (fromILTexprZ params t ++ "+ t0") ++ "]")
-                 ILUnExpr op e -> fromUnOp op ++ " " ++ fromPayoff params e
-                 ILBinExpr op e1 e2 -> inParens (inParens (fromPayoff params e1) ++ spaced (fromBinOp op) ++ inParens (fromPayoff params e2))
-                 ILLoopIf e e1 e2 t -> loopif (fromPayoff params e)
-                                              (fromPayoff params e1)
-                                              (fromPayoff params e2)
-                                              (fromTexpr params t)
-                 -- this is also a simplifying assumption:
-                 ILPayoff t p1' p2' -> "disc" ++ inSqBr (fromILTexpr params t ++ "+ t0")
-                   -- inParens (ifThenElse (show p1' ++ "== p1 && " ++ show p2' ++ "== p2") "1"
-                   --                                              (ifThenElse (show p1' ++ "== p2 && " ++ show p2' ++ "== p1") "-1" "0"))
+fromPayoff params e =
+  case e of
+    ILIf e' e1 e2 -> inParens ("if " ++ inParens (fromPayoff params e') ++
+                                "then " ++ inParens (fromPayoff params e1) ++
+                                "else " ++ inParens (fromPayoff params e2))
+    ILFloat v -> show v
+    ILNat n -> show n
+    ILBool b -> show b
+    ILtexpr e -> inParens (fromILTexpr params e) ++ " + t0"
+    ILNow -> "t_now"
+    ILModel (LabR (Stock l)) t ->
+      -- we simplify the lookup procedure to just indexing in the environment
+        inParens ("ext[" ++ (fromILTexprZ params t ++ "+ t0") ++ "," ++ show (paramIndex l (obsP params)) ++ "]")
+    ILUnExpr op e -> fromUnOp op ++ " " ++ fromPayoff params e
+    ILBinExpr op e1 e2 -> inParens (inParens (fromPayoff params e1) ++ spaced (fromBinOp op) ++ inParens (fromPayoff params e2))
+    ILLoopIf e e1 e2 t -> loopif (fromPayoff params e)
+                                 (fromPayoff params e1)
+                                 (fromPayoff params e2)
+                                 (fromTexpr params t)
+    -- this is also a simplifying assumption:
+    ILPayoff t p1' p2' -> "disc" ++ inSqBr (fromILTexpr params t ++ "+ t0")
+      -- inParens (ifThenElse (show p1' ++ "== p1 && " ++ show p2' ++ "== p2") "1"
+      --                                              (ifThenElse (show p1' ++ "== p2 && " ++ show p2' ++ "== p1") "-1" "0"))
 
 -- | Two index translation functions
 data IndexTrans = IndT {obsT :: Int -> Int, payoffT :: Int -> Int}
@@ -137,8 +141,8 @@ lambda v e = "(\\" ++ v ++ "->" ++ e ++ ")"
 header = ""
 
 payoffInternalDec params e =
-  dec internalFuncName "ext : []f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32" "f32" (fromPayoff params e)
-payoffDec = dec funcName  "ext : []f32, tenv : []i32, disc : []f32, t_now : i32" "f32"
+  dec internalFuncName "ext : [][]f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32" "f32" (fromPayoff params e)
+payoffDec = dec funcName  "ext : [][]f32, tenv : []i32, disc : []f32, t_now : i32" "f32"
                           (fcall internalFuncName  ["ext", "tenv", "disc", "0", "t_now"])
 ppFutharkCode params e = payoffInternalDec params e ++ newLn payoffDec
 
@@ -155,6 +159,15 @@ substTempl ctx tmpl = E.unpack $ render tmpl ctx
 paramIndex :: String -> [String] -> Int
 paramIndex p =  maybe err id . findIndex (\x -> x == p)
   where err = error $ "Could not find parameter: " ++ p
+
+
+wrapInModule modName code = substTempl (context ctx) modTempl
+  where
+    ctx = Data.List.map (\(a1,a2) -> (T.pack a1, T.pack a2))
+           [("code", code),
+            ("modName", modName),
+            ("fcall", fcall funcName ["ext", "[]", "disc", "0"])]
+    modTempl = template $ T.pack "module $modName = { $code \n\n let payoff disc _ ext = $fcall }"
 
 compileAndWrite path params exp =
   let path' = if null path then "./" else path in

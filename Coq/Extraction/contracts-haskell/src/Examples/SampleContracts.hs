@@ -22,7 +22,7 @@ barrier = if (theObs <= barrier) `withinT` maturity
           barrier = 4000
           payment = 2000
           maturity = C.Tvar "maturity"
-        
+
 european :: Contr
 european = translate 365 
             ((max 0 (theObs - strike)) # (transfer X Y EUR))
@@ -38,8 +38,20 @@ european' = translate 365
               theObs = rObs (Stock "DJ_Eurostoxx_50") 0
               strike   = 4000
 
+european'' :: Contr
+european'' = translate 100 
+            (if strike < theObs
+             then (theObs - strike) # (transfer X Y EUR)
+             else zero)
+            where
+              theObs = rObs (Stock "AAPL") 0
+              strike   = 3000
+
 composite :: Contr
 composite = european' & (366 ! simple)
+
+twoOptions :: Contr
+twoOptions = european' & european''
 
 -- example of a contract template from Danil's thesis
 templateEx :: Contr
