@@ -1,7 +1,7 @@
 -- Generic pricing
 -- ==
--- compiled input @ OptionPricing-data/new.in
--- output @ OptionPricing-data/new.out
+-- compiled input @ OptionPricing-data/new1.in
+-- output @ OptionPricing-data/new1.out
 
 import "/futlib/math"
 import "/futlib/array"
