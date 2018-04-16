@@ -22,7 +22,7 @@ Fixpoint oDays (c : Contr) (t : nat) (tenv : TEnv) : list nat :=
     | Zero           => []
     | Let e c        => oDaysE e t ++ oDays c t tenv
     | Transfer _ _ _ => []
-    | Translate t c  => oDays c (TexprSem t tenv) tenv
+    | Translate t' c  => oDays c (t + TexprSem t' tenv) tenv
     | Both c1 c2     => oDays c1 t tenv ++ oDays c2 t tenv
     | If e i c1 c2   => concatMap (oDaysE e) (listFromTo t (t + TexprSem i tenv)) ++ oDays c1 t tenv ++ oDays c2 (t + TexprSem i tenv) tenv
   end.
