@@ -66,7 +66,7 @@ instance ExpHoas exp => Ord (exp R) (exp B) where
 
 instance ExpHoas exp => Max (exp R) where
     max x y = if x !<! y then y else x
-    min x y = if x !<! y then y else x
+    min x y = if x !<! y then x else y
 
 instance Ord Int Bool where
     (<) = (Prelude.<)
