@@ -42,9 +42,21 @@ lookInd t = maybe err id . findIndex (\x -> x == t)
 reindexEo = F.IndT (\t -> lookInd t obsDays) (\t -> lookInd t transDays)
 
 europeanOptInFuthark = putStrLn $ F.ppFutharkCode paramEnv $ CT.cutPayoff $ CT.simp_loopif $ transC (fromHoas european')
-reindexedEuropeanOptInFuthark = putStrLn $ F.ppFutharkCode paramEnv $ CT.cutPayoff $
-  F.reindex reindexEo $ CT.simp_loopif $ transC (fromHoas european')
 
+reindexedEuropeanOptInFuthark cut modName = (putStrLn . F.wrapInModule modName . F.ppFutharkCode paramEnv .
+  (if cut then CT.cutPayoff else id) . F.reindex reindexEo . CT.simp_loopif . transC) (fromHoas european')
+
+-- a contract example from the PPDP paper
+
+reindexEx = F.IndT (\t -> lookInd t od) (\t -> lookInd t td)
+  where
+    c = fromHoas templateEx
+    od = C.obsDays c F.empty_tenv
+    td = C.transfDays c F.empty_tenv
+
+paramEnv' = F.Params ["AAPL"] ["t0", "t1"]
+templateExInFuthark = putStrLn $ F.ppFutharkCode paramEnv $ CT.cutPayoff $
+  F.reindex reindexEx $ CT.simp_loopif $ transC (fromHoas european')
 
 -- twoOptions is a contract consisting of two european options on different observables and with different maturity
 
@@ -66,6 +78,14 @@ reindexedTwoOptInFuthark = F.ppFutharkCode paramEnv2 $
 -- wrapping the whole thing to the module
 asFutharkModule = F.wrapInModule "PayoffLang" reindexedTwoOptInFuthark
 
--- just testing how it works for bigger contracts
-paramEnv3 = F.Params [ "DJ_Eurostoxx_50", "Nikkei_225", "SP_500" ] []
-worstOffInFuthark = F.ppFutharkCode paramEnv3 $ transC (fromHoas worstOff)
+-- just testing how it works the Medium contract (FinPar)
+paramEnv3 = F.Params ["DJ_Eurostoxx_50", "Nikkei_225", "SP_500"] []
+
+reindexWo = F.IndT (\t -> lookInd t od) (\t -> lookInd t td)
+  where
+    c = fromHoas worstOff
+    od = C.obsDays c F.empty_tenv
+    td = C.transfDays c F.empty_tenv
+
+worstOffInFuthark cut modName = (putStrLn . F.wrapInModule modName . F.ppFutharkCode paramEnv3 .
+  (if cut then CT.cutPayoff else id) . F.reindex reindexWo . CT.simp_loopif . transC) (fromHoas worstOff)

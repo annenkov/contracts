@@ -58,7 +58,7 @@ Fixpoint listFromNasc (n count : nat) : list nat :=
   match count with
     | O => []
     | S n' => n :: listFromNasc (S n) n'
-end.
+  end.
 
 Example list_from_2_to_5 : listFromTo 2 5 = [2;3;4;5].
 Proof.

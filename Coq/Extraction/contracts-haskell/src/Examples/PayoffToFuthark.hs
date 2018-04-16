@@ -17,6 +17,7 @@ funcName = "payoffFun"
 -- | Two lists: labels of observables and names of template variables.
 -- | These lists used to translate labels and names to indices.
 data Params = Params {obsP :: [String], templateP :: [String]}
+  deriving (Show)
 
 fromBinOp op = case op of
                  ILAdd -> "+"
@@ -64,7 +65,7 @@ fromPayoff params e =
     ILIf e' e1 e2 -> inParens ("if " ++ inParens (fromPayoff params e') ++
                                 "then " ++ inParens (fromPayoff params e1) ++
                                 "else " ++ inParens (fromPayoff params e2))
-    ILFloat v -> show v
+    ILFloat v -> show v ++ "f32"
     ILNat n -> show n
     ILBool b -> show b
     ILtexpr e -> inParens (fromILTexpr params e) ++ " + t0"
@@ -72,7 +73,7 @@ fromPayoff params e =
     ILModel (LabR (Stock l)) t ->
       -- we simplify the lookup procedure to just indexing in the environment
         inParens ("ext[" ++ (fromILTexprZ params t ++ "+ t0") ++ "," ++ show (paramIndex l (obsP params)) ++ "]")
-    ILUnExpr op e -> fromUnOp op ++ " " ++ fromPayoff params e
+    ILUnExpr op e -> inParens (fromUnOp op  ++ fromPayoff params e)
     ILBinExpr op e1 e2 -> inParens (inParens (fromPayoff params e1) ++ spaced (fromBinOp op) ++ inParens (fromPayoff params e2))
     ILLoopIf e e1 e2 t -> loopif (fromPayoff params e)
                                  (fromPayoff params e1)
