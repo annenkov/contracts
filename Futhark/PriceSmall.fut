@@ -7,19 +7,28 @@ import "/futlib/math"
 import "/futlib/array"
 import "Price"
 
-default(f32)
+module Payoff1 =
+{
+let payoffInternal(ext : [][]f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32): f32 =
+    (if (((4000.0f32) < ((ext[0+ t0,0]))))then ((((((ext[0+ t0,0])) - (4000.0f32))) * (disc[0+ t0])))else (0.0f32))
 
-let trajInner(amount: f32, ind: i32, disc: []f32): f32 = amount * unsafe disc[ind]
+let payoffFun(ext : [][]f32, tenv : []i32, disc : []f32, t_now : i32): f32 = payoffInternal(ext, tenv, disc, 0, t_now)
 
-let payoff1(md_disct: []f32, md_detval: []f32, xss: [1][1]f32): f32 =
-  let detval = unsafe md_detval[0]
-  let amount = ( xss[0,0] - 4000.0 ) * detval
-  let amount0= if (0.0 < amount) then amount else 0.0
-  in  trajInner(amount0, 0, md_disct)
+let payoff disc _ ext = payoffFun(ext, [], disc, 0)
+}
 
-module Payoff1 = { let payoff x y z = payoff1(x, y, z) }
+-- after cutPayoff
+module Payoff2 =
+{
+let payoffInternal(ext : [][]f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32): f32 =
+  (if (((4000.0f32) < ((ext[0+ t0,0]))))then ((((((ext[0+ t0,0])) - (4000.0f32))) * ((if ((((0) + t0) < (t_now)))then (0.0f32)else (disc[0+ t0])))))else (0.0f32))
+let payoffFun(ext : [][]f32, tenv : []i32, disc : []f32, t_now : i32): f32 = payoffInternal(ext, tenv, disc, 0, t_now)
+
+let payoff disc _ ext = payoffFun(ext, [], disc, 0)
+}
 
 module P1 = Price Payoff1
+module P2 = Price Payoff2
 
 -- Entry point
 let main [num_bits][num_models][num_und][num_dates]
@@ -36,5 +45,5 @@ let main [num_bits][num_models][num_und][num_dates]
          bb_data: [3][num_dates]f32)
          : []f32 =
   let r = {num_mc_it,dir_vs,md_cs,md_vols,md_drifts,md_sts,md_detvals,md_discts,bb_inds,bb_data}
-  in if contract_number == 1 then P1.price r
-     else []
+  in if false then P1.price r
+     else P2.price r
