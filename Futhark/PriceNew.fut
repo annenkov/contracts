@@ -11,7 +11,7 @@ default(f32)
 
 module Payoff1 = {
 
-  let payoffInternal(ext : [][]f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32): f32 =
+  let payoffInternal(ext : [][]f32, _tenv : []i32, disc : []f32, t0 : i32, _t_now : i32): f32 =
     unsafe
     (((if (((4000.0) < ((ext[1+ t0,0])))) then
              ((((((ext[1+ t0,0])) - (4000.0))) * (disc[1+ t0])))
@@ -28,7 +28,7 @@ module Payoff1 = {
 
 module Payoff2 = {
 
-  let payoffInternal(ext : [][]f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32): f32 =
+  let payoffInternal(ext : [][]f32, _tenv : []i32, disc : []f32, t0 : i32, t_now : i32): f32 =
     unsafe
     (((if (((4000.0) < ((ext[1+ t0,0])))) then
           ((((((ext[1+ t0,0])) - (4000.0))) *
@@ -50,7 +50,7 @@ module P2 = Price Payoff2
 
 -- Entry point
 let main [num_bits][num_models][num_und][num_dates]
-        (contract_number: i32,
+        (_contract_number: i32,
          num_mc_it: i32,
          dir_vs: [][num_bits]i32,
          md_cs: [num_models][num_und][num_und]f32,
