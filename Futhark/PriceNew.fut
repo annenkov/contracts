@@ -1,5 +1,8 @@
 -- Generic pricing
 -- ==
+-- compiled input @ OptionPricing-data/new0.in
+-- output @ OptionPricing-data/new0.out
+--
 -- compiled input @ OptionPricing-data/new1.in
 -- output @ OptionPricing-data/new1.out
 
@@ -50,7 +53,7 @@ module P2 = Price Payoff2
 
 -- Entry point
 let main [num_bits][num_models][num_und][num_dates]
-        (_contract_number: i32,
+        (contract_number: i32,
          num_mc_it: i32,
          dir_vs: [][num_bits]i32,
          md_cs: [num_models][num_und][num_und]f32,
@@ -63,5 +66,6 @@ let main [num_bits][num_models][num_und][num_dates]
          bb_data: [3][num_dates]f32)
          : []f32 =
   let r = {num_mc_it,dir_vs,md_cs,md_vols,md_drifts,md_sts,md_detvals,md_discts,bb_inds,bb_data}
-  in if false then P1.price r
-     else P2.price r
+  let cutpayoff = contract_number > 0i32
+  in if cutpayoff then P2.price r
+     else P1.price r
