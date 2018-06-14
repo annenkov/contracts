@@ -1,7 +1,10 @@
 -- Generic pricing
 -- ==
--- compiled input @ OptionPricing-data/small.in
--- output @ OptionPricing-data/small.out
+-- compiled input @ OptionPricing-data/small0.in
+-- output @ OptionPricing-data/small0.out
+--
+-- compiled input @ OptionPricing-data/small1.in
+-- output @ OptionPricing-data/small1.out
 
 import "/futlib/math"
 import "/futlib/array"
@@ -10,6 +13,7 @@ import "Price"
 module Payoff1 =
 {
 let payoffInternal(ext : [][]f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32): f32 =
+  unsafe
     (if (((4000.0f32) < ((ext[0+ t0,0]))))then ((((((ext[0+ t0,0])) - (4000.0f32))) * (disc[0+ t0])))else (0.0f32))
 
 let payoffFun(ext : [][]f32, tenv : []i32, disc : []f32, t_now : i32): f32 = payoffInternal(ext, tenv, disc, 0, t_now)
@@ -21,6 +25,7 @@ let payoff disc _ ext = payoffFun(ext, [], disc, 0)
 module Payoff2 =
 {
 let payoffInternal(ext : [][]f32, tenv : []i32, disc : []f32, t0 : i32, t_now : i32): f32 =
+  unsafe
   (if (((4000.0f32) < ((ext[0+ t0,0]))))then ((((((ext[0+ t0,0])) - (4000.0f32))) * ((if ((((0) + t0) < (t_now)))then (0.0f32)else (disc[0+ t0])))))else (0.0f32))
 let payoffFun(ext : [][]f32, tenv : []i32, disc : []f32, t_now : i32): f32 = payoffInternal(ext, tenv, disc, 0, t_now)
 
@@ -45,5 +50,6 @@ let main [num_bits][num_models][num_und][num_dates]
          bb_data: [3][num_dates]f32)
          : []f32 =
   let r = {num_mc_it,dir_vs,md_cs,md_vols,md_drifts,md_sts,md_detvals,md_discts,bb_inds,bb_data}
-  in if false then P1.price r
-     else P2.price r
+  let cutpayoff = contract_number > 0i32
+  in if cutpayoff then P2.price r
+     else P1.price r

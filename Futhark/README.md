@@ -49,3 +49,44 @@ bash-3.2$ cat OptionPricing-data/new1.in | ./PriceNew.opencl.exe -t /dev/stderr 
 12334
 [83.560692f32]
 ````
+
+Runs of the small benchmark:
+````
+bash-3.2$ cat OptionPricing-data/small.in | ./PriceSmall.opencl.exe -t /dev/stderr -r 5 -d AMD
+18105
+21645
+21878
+21526
+21809
+[167.092163f32]
+bash-3.2$ cat OptionPricing-data/small.out
+[166.942581f32]
+bash-3.2$ cat OptionPricing-data/small.in | ./PriceSmall.exe -t /dev/stderr -r 5
+6870166
+6825292
+6872328
+6914983
+6841350
+[166.979080f32]
+bash-3.2$
+````
+
+Runs of the medium benchmark:
+````
+bash-3.2$ cat OptionPricing-data/medium.in | ./PriceMedium.opencl.exe -t /dev/stderr -r 5
+86468
+72425
+62417
+57318
+51417
+[937.391602f32]
+bash-3.2$ cat OptionPricing-data/medium.out
+[937.795776f32]
+bash-3.2$ cat OptionPricing-data/medium.in | ./PriceMedium.exe -t /dev/stderr -r 5
+1498892
+1521918
+1502770
+1516822
+1498040
+[937.795776f32]
+````
