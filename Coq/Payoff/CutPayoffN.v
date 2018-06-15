@@ -21,7 +21,7 @@ induction step we use cutPayoff_sound_step.
  Note, that cutPayoff_sound is formulated in more "semantic" style and avoids speaking about
  n-step reduction directly. Instead we formulate the soundness in terms of traces, and this
  point of view directly corresponds to the traces produced by the reduction semantics
- (see lemmas [red_sound1] and [red_sound1] in  ../Reduction.v)*)
+ (see lemmas [red_sound1] and [red_sound2] in  ../Reduction.v)*)
 
 Require Import Tactics.
 Require Import ILSyntax.
@@ -205,8 +205,7 @@ Proof.
 (** The important observation for proving the [Translate] case in the
     n-step soundness theorem is that
 
-    [IL[|cutPayoff il_e|] n = disc(n) * trace(n) + [IL[|cutPayoff
-    il_e|] (1+n)]
+    [IL[|cutPayoff il_e|] n = disc(n) * trace(n) + [IL[|cutPayoff il_e|] (1+n)]
 
     That is, cutting payoffs before [n] is exactly a discounted value
     of a contract trace at the point [n] plus the value we get by
