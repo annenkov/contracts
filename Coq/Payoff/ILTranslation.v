@@ -763,9 +763,9 @@ Definition consistent_ty : Ty -> ILVal -> Prop :=
 Definition toILExt (ext : ExtEnv) := (fun k t => (fromVal (ext k t)) ).
 
 (* TODO: use more proof automation to get rid of proof code duplication *)
-Theorem typed_exp_compile_sem_total e il p1 p2 ty G d ext tenv t0 t0':
+Theorem typed_exp_compile_sem_total e il p1 p2 ty G d ext tenv t0 t0' n:
   G |-E e ∶ ty -> TypeExt ext -> fromExp t0 e = Some il ->
-      exists v, IL[|il|] (toILExt ext) tenv t0' 0 d p1 p2 = Some v
+      exists v, IL[|il|] (toILExt ext) tenv t0' n d p1 p2 = Some v
                 /\ consistent_ty ty v.
 Proof.
   intros T Text C.

@@ -19,7 +19,7 @@ Module Asset.
   Proof.
     assert (p = p) as E by reflexivity. rewrite <- eqb_eq in E. auto.
   Qed.
-    
+
 End Asset.
 
 Module Party.
@@ -29,7 +29,7 @@ Module Party.
   Proof.
     assert (p = p) as E by reflexivity. rewrite <- eqb_eq in E. auto.
   Qed.
-    
+
 End Party.
 
 (* We also keep the types for Boolean and real observable labels
