@@ -273,9 +273,65 @@ Proof.
     some_inv. subst. ring.
   - (* If(e,n,c1,c2) *)
     simpl in *. option_inv_auto. inversion Hclosed. subst. simpl in *.
-    (* We proceed by case analysis on the return value of the conditional expression [e].
-       For the case [|e|]=True we use the induction hypothesis on [c1].
-       For the case [|e|]=False we perform a nested induction on [n] *)
+    generalize dependent n.
+    induction n1;intros.
+    * simpl in *.
+      option_inv_auto.
+      remember (E[| e|] envC (adv_ext (Z.of_nat n0) extC)) as cond.
+      remember (IL[| x1|] extIL tenv 0 (S n) disc p1 p2) as cond_il.
+      unfold bind,compose.
+      destruct cond;tryfalse.
+      destruct v;tryfalse.
+      destruct cond_il;tryfalse.
+      destruct x2;tryfalse. some_inv. subst.
+      (* case analysis on the outcome of the conditional expression evaluation *)
+      destruct b.
+      ** (* true *)
+         assert (fromVal (BVal true) = ILBVal b0).
+         { eapply Exp_translation_sound with (t0':=0);simpl;eauto.
+          simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring.
+          symmetry. eauto. }
+         erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
+         simpl. rewrite <- Heqcond_il.
+         inversion H. subst.
+         eapply IHc1;eauto.
+      ** (* false *)
+        assert (fromVal (BVal false) = ILBVal b0).
+         { eapply Exp_translation_sound with (t0':=0);simpl;eauto.
+          simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring.
+          symmetry. eauto. }
+         erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
+         simpl. rewrite <- Heqcond_il.
+         inversion H. subst.
+         eapply IHc2;eauto.
+    * simpl in *.
+      option_inv_auto.
+      remember (E[| e|] envC (adv_ext (Z.of_nat n0) extC)) as cond.
+      remember (IL[| x1|] extIL tenv 0 (S n) disc p1 p2) as cond_il.
+      unfold bind,compose.
+      destruct cond;tryfalse.
+      destruct v;tryfalse.
+      destruct cond_il;tryfalse.
+      destruct x2;tryfalse. some_inv. subst.
+      (* case analysis on the outcome of the conditional expression evaluation *)
+      destruct b.
+      ** (* true *)
+         assert (fromVal (BVal true) = ILBVal b0).
+         { eapply Exp_translation_sound with (t0':=0);simpl;eauto.
+          simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring.
+          symmetry. eauto. }
+         erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
+         simpl. rewrite <- Heqcond_il.
+         inversion H. subst.
+         eapply IHc1;eauto.
+      ** (* false *)
+        assert (fromVal (BVal false) = ILBVal b0).
+         { eapply Exp_translation_sound with (t0':=0);simpl;eauto.
+          simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring.
+          symmetry. eauto. }
+         erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
+         simpl. rewrite <- Heqcond_il.
+         inversion H. subst.
     admit.
   Admitted.
 
