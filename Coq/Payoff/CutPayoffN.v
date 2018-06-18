@@ -11,7 +11,8 @@ technical details):
 (e.g. [cp_Scale_inversion : ∀ e c n, cutPayoff_sound (Scale e c) n -> cutPayoff_sound c n])
 allowing to get required premisses for the induction hypotheses.
 We pay special attention to the case of [Tranlate] constructor: we use [cp_summ] to connect the
-output of the evaluation after [n] steps and [n+1] steps.
+output of the evaluation after [n] steps and [n+1] steps. We prove several important cases of
+[cp_summ] lemma.
 
 Then, we can prove the general statement for any [n] :
 [cutPayoff_sound_n_steps : ∀ c n, cutPayoff_sound c n]
@@ -200,7 +201,38 @@ Proof.
   - simpl. rewrite Hor. unfold plus0. destruct (horizon c tenv);try reflexivity. admit.
   - rewrite delay_trace_iter. replace (n + S t0) with (S n + t0) by omega. reflexivity.
   - replace (S n + t0) with (n + S t0) by omega. assumption.
- Admitted.
+Admitted.
+
+Lemma singleton_trans_self p a n : singleton_trans p p a n = empty_trans.
+Proof. cbv. rewrite Party.eqb_refl. reflexivity. Qed.
+
+Lemma singleton_trace_empty_trans : singleton_trace empty_trans = empty_trace.
+Proof.
+  apply functional_extensionality. intros n.
+  destruct n; reflexivity.
+Qed.
+
+Tactic Notation "omegab" := try rewrite eqb_neq in *;
+                        try rewrite eqb_eq in *;
+                        try rewrite ltb_lt in *;
+                        try rewrite leb_le in *;
+                        try rewrite ltb_ge in *;
+                        omega.
+
+Lemma delay_singleton_trace_neq t n trans :
+  eqb n t = false -> (delay_trace n (singleton_trace trans)) t = empty_trans.
+Proof.
+  intros. unfold delay_trace.
+  destruct (n <=? t) eqn:Hn;auto.
+  unfold singleton_trace. assert (H0 : t-n > 0) by omegab.
+  destruct (t-n). inversion H0. reflexivity.
+Qed.
+
+Lemma add_trace_apply tr1 tr2 t p1 p2 a :
+  (add_trace tr1 tr2) t p1 p2 a = (tr1 t p1 p2 a + tr2 t p1 p2 a)%R.
+Proof.
+  reflexivity.
+Qed.
 
 (** The important observation for proving the [Translate] case in the
     n-step soundness theorem is that
@@ -218,19 +250,67 @@ Proof.
     proving lemmas about function with the accumulator. *)
 Lemma cp_summ c n :
   forall envC extC (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
-         (v' : R) m n0 p1 p2 curr v v' trace (disc : nat -> R ) tenv,
+         (v' : R) n0 p1 p2 curr v' trace (disc : nat -> R ) tenv,
     (forall a a', Asset.eqb a a' = true) ->
     (forall l t, fromVal (extC l t) = extIL l t) ->
     IsClosedCT c ->
     fromContr c (ILTexpr (Tnum n0)) = Some il_e ->
     C[|c|] envC (adv_ext (Z.of_nat n0) extC) tenv = Some trace ->
-    m + n = horizon c tenv ->
-    sum_list (map (fun t => (disc t * trace t p1 p2 curr)%R)
-                  (seq (n+n0) m)) = v ->
     IL[|cutPayoff il_e|] extIL tenv 0 (1+n) disc p1 p2 = Some (ILRVal v') ->
     IL[|cutPayoff il_e|] extIL tenv 0 n disc p1 p2 =
     Some (ILRVal (disc n * delay_trace n0 trace n p1 p2 curr + v')%R).
 Proof.
+  revert n. induction c;intros until tenv; intros A Xeq Hclosed TC Cs ILs;tryfalse.
+  - (* Zero *)
+    simpl in *. some_inv. subst. simpl in *. some_inv.
+    rewrite delay_empty_trace. rewrite Rplus_0_r. cbv. replace (_ * 0)%R with 0%R by ring.
+    reflexivity.
+  - (* Transfer *)
+    simpl in *. some_inv. subst.
+    destruct (Party.eqb p p0) eqn:Heq.
+    * assert (p = p0).
+      { apply Party.eqb_eq;auto. }
+      simpl in *. some_inv. subst. rewrite singleton_trans_self.
+      rewrite singleton_trace_empty_trans. rewrite delay_empty_trace.
+      replace (empty_trace n p1 p2 curr) with 0%R by reflexivity.
+      replace (disc n * 0 + 0)%R with 0%R by ring. reflexivity.
+    * simpl in *. destruct (n0 <? S n) eqn:Hnle.
+      ** some_inv. subst. rewrite Rplus_0_r.
+         destruct (n0 <? n) eqn:Hn0le.
+         *** rewrite delay_singleton_trace_neq. cbv. repeat apply f_equal.
+             ring_simplify. reflexivity. omegab.
+         *** simpl. assert (n0 = n) by omegab. subst. rewrite delay_trace_at. cbv. rewrite Heq.
+             destruct (Party.eqb p p1); destruct (Party.eqb p0 p2);
+               destruct (Party.eqb p0 p1); destruct (Party.eqb p p2);
+                 try rewrite A; try (repeat f_equal; ring).
+      ** some_inv.
+         assert (H : ~ n0 < n) by omegab. rewrite <- ltb_nlt in *. rewrite H.
+         rewrite delay_singleton_trace_neq; try omegab.
+         unfold empty_trans. replace (_ * 0)%R with 0%R by ring. rewrite Rplus_0_l.
+         congruence.
+  - (* Scale *)
+    admit.
+  - (* Translate *)
+    simpl in *. option_inv_auto. inversion Hclosed. subst. simpl in *.
+    rewrite delay_trace_iter. rewrite adv_ext_iter in H0. rewrite <- Nat2Z.inj_add in H0.
+    replace (n0 + n1) with (n1 + n0) in H0 by omega.
+    eapply IHc with (n0:=n1 + n0);eauto.
+  - (* Both *)
+    simpl in *. option_inv_auto. inversion Hclosed. subst.
+    some_inv. subst. simpl in *. option_inv_auto. unfold bind,compose.
+    destruct x3,x4; tryfalse.
+    assert (HIL1 : IL[| cutPayoff x1|] extIL tenv 0 n disc p1 p2 =
+                   Some (ILRVal (disc n * delay_trace n0 x n p1 p2 curr + r))).
+    { eapply IHc1;eauto.  }
+
+    assert (HIL2 : IL[| cutPayoff x2|] extIL tenv 0 n disc p1 p2 =
+                   Some (ILRVal (disc n * delay_trace n0 x0 n p1 p2 curr + r0))).
+    { eapply IHc2;eauto. }
+    rewrite HIL1. rewrite HIL2.
+    f_equal. f_equal. rewrite delay_trace_add. rewrite add_trace_apply.
+    some_inv. subst. ring.
+  - (* If*)
+    admit.
   Admitted.
 
 Lemma ILRVal_plus v v' l: ILRVal (l + v) = ILRVal (l + v') -> ILRVal v = ILRVal v'.
@@ -308,9 +388,7 @@ Proof.
       ** simpl. destruct (horizon c tenv);tryfalse. omega.
       ** rewrite delay_trace_iter. rewrite add_0_r in *.
          simpl in *. subst q. reflexivity.
-      ** eapply cp_summ with (n0 :=1) (m:=m);eauto.
-         unfold plus0 in *. destruct (horizon c tenv);tryfalse;eauto.
-         omega.
+      ** eapply cp_summ with (n0 :=1);eauto.
   - (* Both*)
     (* We split values on two summands an apply induction hypothes
        Here we use an inversion principle for [both] (similar to [scale]) to
@@ -318,7 +396,7 @@ Proof.
     admit.
   - (* If (-within) *)
     (* We proceed by case analisys on the outcome of the contition evaluation.
-       We perform an inner induction on number of iteration for if-within construct *)
+       We perform a nested induction on the number of iterations for the if-within construct *)
     admit.
 Admitted.
 
