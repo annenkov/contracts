@@ -1,4 +1,4 @@
-(** Lemmas and sketch of the proof of the n-step reduction *)
+(** Lemmas and the proof of the n-step reduction *)
 
 (** ** Overview *)
 
@@ -10,9 +10,6 @@ technical details):
 
 The proof of [cutPayoff_sound_step] essentially boils down to the use of the lemma [cp_summ]:
 [cp_summ] to connects the output of the evaluation after [n] steps and [n+1] steps.
-
-We prove several important cases of [cp_summ] lemma.
-NOTE: currently, the only unproved case is the case for [If]
 
 Having the [cutPayoff_sound_step] lemma, we can prove the general statement for any [n] :
 [cutPayoff_sound_n_steps : ∀ c n, cutPayoff_sound c n]
@@ -150,10 +147,10 @@ Proof. reflexivity. Qed.
 
 (** Since payoff expressions,originated from for the contract expression sublanguage
     do not depend on [t_now] parameter, it can be arbitrary *)
-Lemma expr_tnow_irrel e e_il t0 extIL tenv t_now1 t_now2 disc p1 p2 :
+Lemma expr_tnow_irrel e e_il n0 t0 extIL tenv t_now1 t_now2 disc p1 p2 :
   fromExp t0 e = Some e_il ->
-  IL[| e_il|] extIL tenv 0 t_now1 disc p1 p2 =
-  IL[| e_il|] extIL tenv 0 t_now2 disc p1 p2.
+  IL[| e_il|] extIL tenv n0 t_now1 disc p1 p2 =
+  IL[| e_il|] extIL tenv n0 t_now2 disc p1 p2.
 Proof.
   generalize dependent t0. generalize dependent e_il.
   induction e using Exp_ind'; intros; tryfalse.
@@ -190,19 +187,19 @@ Qed.
     As usual in the statement of the lemma we generalize expressions
     to work for any "initial time" [n0]. This is a usual approach when
     proving lemmas about function with the accumulator. *)
-Lemma cp_summ c n :
+Lemma cp_summ c n t0:
   forall envC extC (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
          (v' : R) n0 p1 p2 curr v' trace (disc : nat -> R ) tenv,
     (forall a a', Asset.eqb a a' = true) ->
     (forall l t, fromVal (extC l t) = extIL l t) ->
     IsClosedCT c ->
     fromContr c (ILTexpr (Tnum n0)) = Some il_e ->
-    C[|c|] envC (adv_ext (Z.of_nat n0) extC) tenv = Some trace ->
-    IL[|cutPayoff il_e|] extIL tenv 0 (1+n) disc p1 p2 = Some (ILRVal v') ->
-    IL[|cutPayoff il_e|] extIL tenv 0 n disc p1 p2 =
-    Some (ILRVal (disc n * delay_trace n0 trace n p1 p2 curr + v')%R).
+    C[|c|] envC (adv_ext (Z.of_nat (n0+t0)) extC) tenv = Some trace ->
+    IL[|cutPayoff il_e|] extIL tenv t0 (1+n) disc p1 p2 = Some (ILRVal v') ->
+    IL[|cutPayoff il_e|] extIL tenv t0 n disc p1 p2 =
+    Some (ILRVal (disc n * delay_trace (n0+t0) trace n p1 p2 curr + v')%R).
 Proof.
-  revert n. induction c;intros until tenv; intros A Xeq Hclosed TC Cs ILs;tryfalse.
+  revert n. revert t0. induction c;intros until tenv; intros A Xeq Hclosed TC Cs ILs;tryfalse.
   - (* Zero *)
     simpl in *. some_inv. subst. simpl in *. some_inv.
     rewrite delay_empty_trace. rewrite Rplus_0_r. cbv. replace (_ * 0)%R with 0%R by ring.
@@ -216,17 +213,19 @@ Proof.
       rewrite singleton_trace_empty_trans. rewrite delay_empty_trace.
       replace (empty_trace n p1 p2 curr) with 0%R by reflexivity.
       replace (disc n * 0 + 0)%R with 0%R by ring. reflexivity.
-    * simpl in *. destruct (n0 <? S n) eqn:Hnle.
+    * simpl in *. destruct (t0+n0 <? S n) eqn:Hnle.
       ** some_inv. subst. rewrite Rplus_0_r.
-         destruct (n0 <? n) eqn:Hn0le.
+         destruct (t0+n0 <? n) eqn:Hn0le.
          *** rewrite delay_singleton_trace_neq. cbv. repeat apply f_equal.
              ring_simplify. reflexivity. omegab.
-         *** simpl. assert (n0 = n) by omegab. subst. rewrite delay_trace_at. cbv. rewrite Heq.
+         *** simpl. assert (t0+n0 = n) by omegab.
+             replace (n0+t0) with (t0+n0) by ring. rewrite H.
+             rewrite delay_trace_at. cbv. rewrite Heq.
              destruct (Party.eqb p p1); destruct (Party.eqb p0 p2);
                destruct (Party.eqb p0 p1); destruct (Party.eqb p p2);
                  try rewrite A; try (repeat f_equal; ring).
       ** some_inv.
-         assert (H : ~ n0 < n) by omegab. rewrite <- ltb_nlt in *. rewrite H.
+         assert (H : ~ t0+n0 < n) by omegab. rewrite <- ltb_nlt in *. rewrite H.
          rewrite delay_singleton_trace_neq; try omegab.
          unfold empty_trans. replace (_ * 0)%R with 0%R by ring. rewrite Rplus_0_l.
          congruence.
@@ -234,19 +233,19 @@ Proof.
     simpl in *. option_inv_auto. inversion Hclosed. subst. some_inv.
     simpl in *. subst. simpl in *. option_inv_auto. unfold bind,compose.
     destruct x4,x5; tryfalse. some_inv. subst.
-    assert (HIL1 : IL[| cutPayoff x2|] extIL tenv 0 n disc p1 p2 =
+    assert (HIL1 : IL[| cutPayoff x2|] extIL tenv t0 n disc p1 p2 =
                    Some (ILRVal r)).
     {erewrite <- cutPayoff_eq_compiled_expr;eauto.
      erewrite <- cutPayoff_eq_compiled_expr in H6;eauto.
      erewrite expr_tnow_irrel;eauto. }
-    assert (HIL2 : IL[| cutPayoff x3|] extIL tenv 0 n disc p1 p2 =
-                   Some (ILRVal (disc n * delay_trace n0 x0 n p1 p2 curr + r0))).
+    assert (HIL2 : IL[| cutPayoff x3|] extIL tenv t0 n disc p1 p2 =
+                   Some (ILRVal (disc n * delay_trace (n0+t0) x0 n p1 p2 curr + r0))).
     { eapply IHc;eauto. }
     rewrite HIL1. rewrite HIL2.
     destruct x1;tryfalse. simpl in *.  some_inv. subst.
     assert (Hr : fromVal (RVal x) = (ILRVal r)).
-    { eapply Exp_translation_sound with (e:=e) (il_e := x2) (t0':=0);eauto.
-      simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring. eauto.
+    { eapply Exp_translation_sound with (e:=e) (il_e := x2) (t0':=t0);eauto.
+      simpl. rewrite <- Nat2Z.inj_add. eauto.
       erewrite <- cutPayoff_eq_compiled_expr in H6;eauto. }
     inversion Hr.
     repeat apply f_equal.
@@ -254,31 +253,34 @@ Proof.
     ring.
   - (* Translate *)
     simpl in *. option_inv_auto. inversion Hclosed. subst. simpl in *.
-    rewrite delay_trace_iter. rewrite adv_ext_iter in H0. rewrite <- Nat2Z.inj_add in H0.
-    replace (n0 + n1) with (n1 + n0) in H0 by omega.
-    eapply IHc with (n0:=n1 + n0);eauto.
+    rewrite delay_trace_iter. rewrite adv_ext_iter in H0. repeat rewrite <- Nat2Z.inj_add in H0.
+    replace (n0 + t1 + n1) with (n1 + n0 + t1) in H0  by ring.
+    replace (n1 + (n0 + t1)) with (n1+n0+t1) by ring.
+    eapply IHc with (n0:=n1+n0) (t0:=t1);eauto.
   - (* Both *)
     simpl in *. option_inv_auto. inversion Hclosed. subst.
     some_inv. subst. simpl in *. option_inv_auto. unfold bind,compose.
     destruct x3,x4; tryfalse.
-    assert (HIL1 : IL[| cutPayoff x1|] extIL tenv 0 n disc p1 p2 =
-                   Some (ILRVal (disc n * delay_trace n0 x n p1 p2 curr + r))).
+    assert (HIL1 : IL[| cutPayoff x1|] extIL tenv t0 n disc p1 p2 =
+                   Some (ILRVal (disc n * delay_trace (n0+t0) x n p1 p2 curr + r))).
     { eapply IHc1;eauto.  }
 
-    assert (HIL2 : IL[| cutPayoff x2|] extIL tenv 0 n disc p1 p2 =
-                   Some (ILRVal (disc n * delay_trace n0 x0 n p1 p2 curr + r0))).
+    assert (HIL2 : IL[| cutPayoff x2|] extIL tenv t0 n disc p1 p2 =
+                   Some (ILRVal (disc n * delay_trace (n0+t0) x0 n p1 p2 curr + r0))).
     { eapply IHc2;eauto. }
     rewrite HIL1. rewrite HIL2.
     f_equal. f_equal. rewrite delay_trace_add. rewrite add_trace_at.
     some_inv. subst. ring.
   - (* If(e,n,c1,c2) *)
     simpl in *. option_inv_auto. inversion Hclosed. subst. simpl in *.
-    generalize dependent n.
+    clear Hclosed.
+    generalize dependent n. generalize dependent t1.
+    generalize dependent trace.
     induction n1;intros.
     * simpl in *.
       option_inv_auto.
-      remember (E[| e|] envC (adv_ext (Z.of_nat n0) extC)) as cond.
-      remember (IL[| x1|] extIL tenv 0 (S n) disc p1 p2) as cond_il.
+      remember (E[| e|] envC (adv_ext (Z.of_nat (n0 +t1)) extC)) as cond.
+      remember (IL[| x1|] extIL tenv t1 (S n) disc p1 p2) as cond_il.
       unfold bind,compose.
       destruct cond;tryfalse.
       destruct v;tryfalse.
@@ -288,8 +290,8 @@ Proof.
       destruct b.
       ** (* true *)
          assert (fromVal (BVal true) = ILBVal b0).
-         { eapply Exp_translation_sound with (t0':=0);simpl;eauto.
-          simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring.
+         { eapply Exp_translation_sound with (t0':=t1);simpl;eauto.
+           simpl. rewrite <- Nat2Z.inj_add.
           symmetry. eauto. }
          erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
          simpl. rewrite <- Heqcond_il.
@@ -297,17 +299,17 @@ Proof.
          eapply IHc1;eauto.
       ** (* false *)
         assert (fromVal (BVal false) = ILBVal b0).
-         { eapply Exp_translation_sound with (t0':=0);simpl;eauto.
-          simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring.
-          symmetry. eauto. }
+         { eapply Exp_translation_sound with (t0':=t1);simpl;eauto.
+           simpl. rewrite <- Nat2Z.inj_add.
+           symmetry. eauto. }
          erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
          simpl. rewrite <- Heqcond_il.
          inversion H. subst.
          eapply IHc2;eauto.
     * simpl in *.
       option_inv_auto.
-      remember (E[| e|] envC (adv_ext (Z.of_nat n0) extC)) as cond.
-      remember (IL[| x1|] extIL tenv 0 (S n) disc p1 p2) as cond_il.
+      remember (E[| e|] envC (adv_ext (Z.of_nat (n0+t1)) extC)) as cond.
+      remember (IL[| x1|] extIL tenv t1 (S n) disc p1 p2) as cond_il.
       unfold bind,compose.
       destruct cond;tryfalse.
       destruct v;tryfalse.
@@ -317,23 +319,32 @@ Proof.
       destruct b.
       ** (* true *)
          assert (fromVal (BVal true) = ILBVal b0).
-         { eapply Exp_translation_sound with (t0':=0);simpl;eauto.
-          simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring.
-          symmetry. eauto. }
+         { eapply Exp_translation_sound with (t0':=t1);simpl;eauto.
+           simpl. rewrite <- Nat2Z.inj_add.
+           symmetry. eauto. }
          erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
          simpl. rewrite <- Heqcond_il.
          inversion H. subst.
          eapply IHc1;eauto.
       ** (* false *)
+        option_inv_auto.
         assert (fromVal (BVal false) = ILBVal b0).
-         { eapply Exp_translation_sound with (t0':=0);simpl;eauto.
-          simpl. replace (Z.of_nat n0 + 0)%Z with (Z.of_nat n0) by ring.
-          symmetry. eauto. }
+         { eapply Exp_translation_sound with (t0':=t1);simpl;eauto.
+           simpl. rewrite <- Nat2Z.inj_add.
+           symmetry. eauto. }
          erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
          simpl. rewrite <- Heqcond_il.
          inversion H. subst.
-    admit.
-  Admitted.
+         erewrite IHn1 with (trace:=x2);eauto. rewrite delay_trace_iter.
+         replace (1 + (n0 + t1)) with (n0 + S t1) by ring.
+         reflexivity.
+         rewrite adv_ext_iter in H3.
+         replace (S t1) with (1 + t1) by ring.
+         repeat rewrite Nat2Z.inj_add in *.
+         replace (Z.of_nat n0 + (Z.of_nat 1 + Z.of_nat t1))%Z  with
+             (Z.of_nat n0 + Z.of_nat t1 + 1)%Z by ring.
+         assumption.
+Qed.
 
 Lemma cutPayoff_sound_step c n g :
   cutPayoff_sound c n g 0 -> cutPayoff_sound c (1 + n) g 0.
