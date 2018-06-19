@@ -2,24 +2,24 @@
 
 (** ** Overview *)
 
-(** We generalize one-step soundness proof and show by induction on
-the structure of contracts that if cutPayoff() is sound at step n,
-then it is sound at step n+1 (formulation up to omitting some
-technical details):
+(** We generalize one-step soundness proof and show that if cutPayoff() is sound at step n,
+then it is sound at step n+1 (formulation up to omitting some technical details):
+
 [cutPayoff_sound_step : ∀ (c : Contr) (n : nat), cutPayoff_sound c n -> cutPayoff_sound c (1 + n)]
 
 The proof of [cutPayoff_sound_step] essentially boils down to the use of the lemma [cp_summ]:
 [cp_summ] to connects the output of the evaluation after [n] steps and [n+1] steps.
+We prove [cp_summ] by induction on the syntax of contracts.
 
 Having the [cutPayoff_sound_step] lemma, we can prove the general statement for any [n] :
 [cutPayoff_sound_n_steps : ∀ c n, cutPayoff_sound c n]
 by induction on [n]. The base case is just the soundness of compilation theorem, and for the
 induction step we use [cutPayoff_sound_step].
 
- Note, that cutPayoff_sound is formulated in more "semantic" style and avoids speaking about
- n-step reduction directly. Instead, we formulate the soundness in terms of traces, and this
- point of view directly corresponds to the traces produced by the reduction semantics
- (see lemmas [red_sound1] and [red_sound2] in  ../Reduction.v)*)
+Note, that cutPayoff_sound is formulated in more "semantic" style and avoids speaking about
+n-step reduction directly. Instead, we formulate the soundness in terms of traces, and this
+point of view directly corresponds to the traces produced by the reduction semantics
+(see lemmas [red_sound1] and [red_sound2] in  ../Reduction.v)*)
 
 Require Import Tactics.
 Require Import ILSyntax.
@@ -61,12 +61,13 @@ Proof.
 Qed.
 
 (** Soundness of cutPayoff() fomlulated in terms of traces.
-    Notice that we use generalized formulation that works for arbitrary
-    initial value [n0].
+    Notice that we use a generalized formulation that works for arbitrary
+    initial value [n0]. This is often necessary to get general enough induction hypothesis.
+
     The intuition for this definition is that at the "current time" [n] we the outcome
-    of the compiled expression evaluation should be equal to the sum of values starting from the
-    point [n] (as opposed to 0 for the soundness of compilation). I.e. we consider only
-    a part of the trace and ignore all the trasfers before the point [n].
+    of the compiled expression evaluation should be equal to the sum of values (of the trace)
+    starting from the  point [n] (as opposed to 0 for the soundness of compilation).
+    I.e. we consider only a part of the trace and ignore all the trasfers before the point [n].
 *)
 Definition cutPayoff_sound c n g n0 :=
   forall envC extC (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
@@ -145,7 +146,7 @@ Lemma scale_trace_at t tr k p1 p2 a :
   (scale_trace k tr) t p1 p2 a = (tr t p1 p2 a * k)%R.
 Proof. reflexivity. Qed.
 
-(** Since payoff expressions,originated from for the contract expression sublanguage
+(** Since payoff expressions, originated from for the contract expression sublanguage
     do not depend on [t_now] parameter, it can be arbitrary *)
 Lemma expr_tnow_irrel e e_il n0 t0 extIL tenv t_now1 t_now2 disc p1 p2 :
   fromExp t0 e = Some e_il ->
@@ -178,15 +179,16 @@ Qed.
 
     [IL[|cutPayoff il_e|] n = disc(n) * trace(n) + [IL[|cutPayoff il_e|] (1+n)]
 
-    That is, cutting payoffs before [n] is exactly a discounted value
+    That is, cutting the payoffs before [n] is exactly a discounted value
     of a contract trace at the point [n] plus the value we get by
     cutting payoffs before [n+1]. Intuitively, [disc(n) * trace(n)] is
     the value that we throw away when we move "current time" from [n]
     to [n+1]
 
     As usual in the statement of the lemma we generalize expressions
-    to work for any "initial time" [n0]. This is a usual approach when
-    proving lemmas about function with the accumulator. *)
+    to work for any "initial time" [n0]. For that reason we also have to add
+    [delay_trace (n0+t0)] and [(adv_ext (Z.of_nat (n0+t0)) extC)] in appropriate places.
+    This is a usual approach when proving lemmas about functions with the accumulator. *)
 Lemma cp_summ c n t0:
   forall envC extC (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
          (v' : R) n0 p1 p2 curr v' trace (disc : nat -> R ) tenv,
@@ -271,13 +273,16 @@ Proof.
     rewrite HIL1. rewrite HIL2.
     f_equal. f_equal. rewrite delay_trace_add. rewrite add_trace_at.
     some_inv. subst. ring.
-  - (* If(e,n,c1,c2) *)
+  - (* If(e,n1,c1,c2) *)
     simpl in *. option_inv_auto. inversion Hclosed. subst. simpl in *.
     clear Hclosed.
     generalize dependent n. generalize dependent t1.
     generalize dependent trace.
-    induction n1;intros.
-    * simpl in *.
+    (* We start with induction on [n1], this allows to simplify the
+       [within_sem] and do case analisys on the outcome of the evaluation of [e] *)
+    induction n1 as [|m];intros.
+    * (* n1 = 0 *)
+      simpl in *.
       option_inv_auto.
       remember (E[| e|] envC (adv_ext (Z.of_nat (n0 +t1)) extC)) as cond.
       remember (IL[| x1|] extIL tenv t1 (S n) disc p1 p2) as cond_il.
@@ -306,7 +311,8 @@ Proof.
          simpl. rewrite <- Heqcond_il.
          inversion H. subst.
          eapply IHc2;eauto.
-    * simpl in *.
+    * (* n1 = S m *)
+      simpl in *.
       option_inv_auto.
       remember (E[| e|] envC (adv_ext (Z.of_nat (n0+t1)) extC)) as cond.
       remember (IL[| x1|] extIL tenv t1 (S n) disc p1 p2) as cond_il.
@@ -335,7 +341,7 @@ Proof.
          erewrite expr_tnow_irrel with (t_now2:=1+n);eauto.
          simpl. rewrite <- Heqcond_il.
          inversion H. subst.
-         erewrite IHn1 with (trace:=x2);eauto. rewrite delay_trace_iter.
+         erewrite IHm with (trace:=x2);eauto. rewrite delay_trace_iter.
          replace (1 + (n0 + t1)) with (n0 + S t1) by ring.
          reflexivity.
          rewrite adv_ext_iter in H3.
