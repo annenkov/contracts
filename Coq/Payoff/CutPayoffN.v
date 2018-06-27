@@ -71,7 +71,7 @@ Qed.
 *)
 Definition cutPayoff_sound c n g n0 :=
   forall envC extC (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
-         (v' : R) m p1 p2 curr v trace (disc : nat -> R ) tenv,
+         (v' : R) m k p1 p2 curr v trace (disc : nat -> R ) tenv,
   (forall a a', Asset.eqb a a' = true) ->
   (forall l t, fromVal (extC l t) = extIL l t) ->
   TypeExt extC ->
@@ -80,7 +80,7 @@ Definition cutPayoff_sound c n g n0 :=
   IsClosedCT c ->
   fromContr c (ILTexpr (Tnum n0)) = Some il_e ->
   C[|Translate (Tnum n0) c|] envC extC tenv = Some trace ->
-  n + m = horizon c tenv ->
+  n + m = k + (horizon c tenv) ->
   sum_list (map (fun t => (disc t * trace t p1 p2 curr)%R)
                 (seq (n+n0) m)) = v ->
   IL[|cutPayoff il_e|] extIL tenv 0 (n+n0) disc p1 p2 = Some (ILRVal v')->
@@ -92,10 +92,21 @@ Hint Resolve delay_empty_trace.
 Lemma cutPayoff_sound_base c g t0 : cutPayoff_sound c 0 g t0.
 Proof.
   unfold cutPayoff_sound. intros.
-  eapply Contr_translation_sound with (tenv:=tenv) (envC:=envC) (disc:=disc); eauto;
-  try rewrite plus_0_r in *; try rewrite plus_0_l in *; subst; try eassumption; try reflexivity.
-  erewrite ILexpr_eq_cutPayoff_at_n with (c:=c) (t0:=(ILTexpr (Tnum t0))); try eassumption. reflexivity.
-  simpl. apply not_true_is_false. intro. apply Nat.ltb_lt in H7. omega.
+  eapply Contr_translation_sound
+    with (tenv:=tenv) (envC:=envC) (disc:=disc) (p1:=p1) (p2:=p2) (curr:=curr); eauto;
+    try rewrite plus_0_r in *; try rewrite plus_0_l in *; subst; try eassumption; try reflexivity.
+  (* - destruct (horizon c tenv) eqn: Hhor_c. *)
+  (*   + reflexivity. *)
+  (* + unfold plus0. *)
+    remember (horizon c tenv) as n.
+    replace (k + n) with (n + k) by ring.
+    erewrite <- sum_before_after_horizon' with (m:=n);eauto. simpl.
+    destruct n.
+    rewrite <- Heqn. simpl. omega.
+    rewrite <- Heqn. simpl. omega.
+    erewrite ILexpr_eq_cutPayoff_at_n with (c:=c) (t0:=(ILTexpr (Tnum t0)));
+      try eassumption. reflexivity.
+    simpl. apply not_true_is_false. intro. apply Nat.ltb_lt in H7. omega.
 Qed.
 
 Lemma ILRVal_plus v v' l : ILRVal (l + v) = ILRVal (l + v') -> ILRVal v = ILRVal v'.
@@ -359,7 +370,7 @@ Proof.
   intros until tenv; intros A Xeq TyExt TyEnv TyC Hclosed TC Cs Hor Sum ILs.
   apply ILRVal_plus with (l:= (disc n * delay_trace 0 trace n p1 p2 curr)%R).
   eapply H with (p1:=p1) (p2:=p2) (curr:=curr) (disc:=disc) (m:=1+m);eauto.
-  omega.
+  rewrite <- Hor. omega.
   simpl. subst. repeat rewrite add_0_r. rewrite delay_trace_0.
   reflexivity.
   erewrite cp_summ;eauto. rewrite add_0_r. reflexivity.
@@ -374,4 +385,51 @@ Proof.
   induction n.
   - apply cutPayoff_sound_base.
   - apply cutPayoff_sound_step; apply IHn;auto.
+Qed.
+
+Theorem cutPayoff_sound_one_step' c c' (envC := nil) extC :
+  forall (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
+         v' p1 p2 curr v trace (disc : nat -> R ) tenv tr (g := nil),
+  (forall a a', Asset.eqb a a' = true) ->
+  (forall l t, fromVal (extC l t) = extIL l t) ->
+  fromContr c (ILTexpr (Tnum 0)) = Some il_e ->
+  IsClosedCT c ->
+  Red c envP extP c' tr ->
+  C[|c'|] envC (adv_ext 1 extC) tenv = Some trace ->
+  horizon c' tenv <= horizon c tenv ->
+  sum_list (map (fun t => (disc (1+t)%nat * trace t p1 p2 curr)%R)
+                (seq 0 (horizon c' tenv))) = v ->
+  IL[|cutPayoff il_e|] extIL tenv 0 1 disc p1 p2 = Some (ILRVal v') ->
+  TypeExt extC ->
+  TypeEnv g envC ->
+  g |-C c ->
+  ext_inst extP extC ->
+  env_inst envP envC ->
+  fromVal (RVal v) = (ILRVal v').
+Proof.
+  simpl.
+  intros until tr; intros A Xeq TC R Cs S ILs Tx Te T J I TyExt EnvInst.
+  assert (Hc_exists : exists trace0, C[|c|] envC extC tenv = Some trace0).
+  { apply Csem_typed_total with (g:=nil);auto. }
+  destruct Hc_exists as [trace0 Hc].
+  assert (Hf : (fun t0 : nat => (disc (1+t0)%nat * trace t0 p1 p2 curr)%R) =
+                 (fun t0 : nat => (disc (1+t0)%nat * trace0 (1+t0)%nat p1 p2 curr)%R)).
+    { apply functional_extensionality.
+      intros i.
+      erewrite <- Soundness.red_sound2 with (c:=c) (c':=c') (t2:=trace)
+                                            (extp:=extP)(ext:=extC);eauto. }
+    simpl in *.
+    (* rewrite Hf in H6. *)
+    eapply cutPayoff_sound_n_steps with (n:=1) (g:=nil) (c:=c)
+                                        (m:=horizon c tenv) (k:=1);simpl;eauto.
+    simpl. unfold liftM,bind,compose. rewrite adv_ext_0. rewrite Hc.
+    apply f_equal. rewrite delay_trace_0. reflexivity.
+    rewrite <- sum_delay_plus.
+    erewrite <- Hf.
+    assert (Hk : exists k, horizon c tenv = k + horizon c' tenv /\ 0 <= k) by
+        (apply Nat.le_exists_sub;omega).
+    destruct Hk as [k Hk']. destruct Hk' as [Hhor_eq ?].
+    rewrite Hhor_eq.
+    replace (k + horizon c' tenv) with (horizon c' tenv + k) by ring.
+    erewrite <- sum_before_after_horizon';eauto; try omega.
 Qed.

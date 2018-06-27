@@ -319,6 +319,20 @@ Proof.
     apply IHn. omega. rewrite <- plus_Sn_m. omega.
 Qed.
 
+
+(* ------------------------------------------------------------------- *)
+(* Various lemmas about moving around initial index of the trace's sum *)
+(* ------------------------------------------------------------------- *)
+
+Lemma sum_delay_plus n (trace0 : Trace) p1 p2 disc (a : Asset) : forall m,
+  sum_list (map (fun t0 : nat => (disc (S t0) * trace0 (S t0) p1 p2 a))%R (seq m n)%nat)%R =
+  sum_list (map (fun t0 : nat => (disc t0 * trace0 t0 p1 p2 a)%R) (seq (1+m) n)).
+Proof.
+  induction n.
+  - reflexivity.
+  - intros m. simpl in *. rewrite IHn with (m:= S m). reflexivity.
+Qed.
+
 Lemma sum_delay t0 t n tr p1 p2 curr f:
   sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq t0 (n + t))) =
   sum_list (map (fun t => (f t * (delay_trace (n + t0) tr) t p1 p2 curr)%R) (seq (n + t0) t)).
@@ -365,6 +379,11 @@ Proof.
       * rewrite <- IHn1. simpl. rewrite plus_comm. simpl. reflexivity.
 Qed.
 
+
+(* -------------------------------------------------- *)
+(* Lemmas about traces of contracts with zero horizon *)
+(* -------------------------------------------------- *)
+
 Lemma zero_horizon_empty_trans c t trace env ext tenv:
   horizon c tenv = 0 ->
   C[|c|] env ext tenv = Some trace ->
@@ -404,8 +423,16 @@ Proof.
     eassumption. eassumption. eassumption. eassumption.
 Qed.
 
+
+(* ------------------------------------------------------------------ *)
+(* Various lemmas about summing up values in traces. Quite often we   *)
+(* use the fact that the traces geneated by contracts are finitely    *)
+(* supported. The notion of horizon allows us to delimit where        *)
+(* non-zero part of the trace ends.                                   *)
+(* ------------------------------------------------------------------ *)
+
 Lemma sum_after_horizon_zero : forall n t0 c trace p1 p2 curr ext env tenv,
-  C[|c|] env ext tenv = Some trace ->                               
+  C[|c|] env ext tenv = Some trace ->
   sum_list (map (fun t => trace t p1 p2 curr) (seq (t0 + horizon c tenv) n)) = 0%R.
 Proof.
   intros n.
@@ -418,7 +445,7 @@ Qed.
 
 Lemma sum_delay_after_horizon_zero : forall n m t0 t1 c trace p1 p2 curr ext env f tenv,
   m <= t0 ->
-  C[|c|] env ext tenv= Some trace ->                               
+  C[|c|] env ext tenv= Some trace ->
   sum_list (map (fun t => (f t * delay_trace m trace (t1 + t)%nat p1 p2 curr)%R) (seq (t0 + horizon c tenv) n)) = 0%R.
 Proof.
   intros n.
@@ -447,7 +474,30 @@ Proof.
   intros. rewrite seq_split. rewrite map_app. rewrite sum_split.
   replace (S t0 + (horizon c tenv - 1)) with (t0 + horizon c tenv) by omega.
   erewrite sum_delay_after_horizon_zero. ring.
-  omega. eassumption. 
+  omega. eassumption.
+Qed.
+
+Lemma sum_after_horizon_zero' : forall n c f trace p1 p2 curr ext env tenv m,
+    C[|c|] env ext tenv = Some trace ->
+    horizon c tenv <= m ->
+    sum_list (map (fun t => f t * trace t p1 p2 curr)%R (seq m n)) = 0%R.
+Proof.
+  intros n.
+  induction n.
+  + intros. reflexivity.
+  + intros. simpl. erewrite horizon_sound. unfold empty_trans.
+    erewrite IHn;eauto. ring. eauto. eauto.
+Qed.
+
+
+Lemma sum_before_after_horizon' t0 c trace p1 p2 curr ext env f tenv m n:
+  C[|c|] env ext tenv = Some trace ->
+  m+t0 >= horizon c tenv ->
+  sum_list (map (fun t => (f t * trace t p1 p2 curr))%R (seq t0 m)) =
+  sum_list (map (fun t => (f t * trace t p1 p2 curr))%R (seq t0 (m+n))).
+Proof.
+  intros. rewrite seq_split. rewrite map_app. rewrite sum_split.
+  erewrite sum_after_horizon_zero' with (m:=t0+m) (n:=n). ring. eauto. omega.
 Qed.
 
 Lemma delay_add_trace n tr1 tr2:
