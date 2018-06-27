@@ -88,7 +88,7 @@ Proof.
     apply S2.
 Qed.
 
-(** Soundness of cutPayoff() fomlulated in terms of traces.
+(** Soundness of cutPayoff() formulated in terms of traces.
     Notice that we use a generalized formulation that works for arbitrary
     initial value [n0]. This is often necessary to get general enough induction hypothesis.
 
@@ -461,4 +461,67 @@ Proof.
     erewrite <- sum_before_after_horizon';eauto; try omega.
     replace (n+0) with n by ring.
     assumption.
+Qed.
+
+Theorem diagram_commutes_N c c' (envC :=nil) extC:
+  forall (il_e il_e' : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
+         p1 p2 (disc : nat -> R ) tenv (g :=nil) r r' n (a : Asset),
+    (forall a a' : Asset, Asset.eqb a a' = true) ->
+    (forall l t, fromVal (extC l t) = extIL l t) ->
+    IsClosedCT c ->
+    fromContr c (ILTexpr (Tnum 0)) = Some il_e ->
+    TypeExt extC ->
+    TypeEnv g envC ->
+    g |-C c ->
+    g |-C c' ->
+    horizon c' tenv <= horizon c tenv ->
+    IsClosedCT c' ->
+    ext_inst extP extC ->
+    env_inst envP envC ->
+    RedN n c envP extP c' ->
+    fromContr c' (ILTexpr (Tnum 0)) = Some il_e' ->
+    IL[|cutPayoff il_e|] extIL tenv 0 n disc p1 p2 = Some (ILRVal r) ->
+    IL[|il_e'|] (adv_ext (Z.of_nat n) extIL) tenv 0 0 (adv_disc n disc) p1 p2 = Some (ILRVal r') ->
+    fromVal (RVal r) = ILRVal r'.
+Proof.
+  simpl.
+  intros.
+  assert (Hc_exists : exists trace, C[|c|] envC extC tenv = Some trace).
+  { apply Csem_typed_total with (g:=nil);auto. }
+    assert (Hc'_exists : exists trace', C[|c'|] envC (adv_ext (Z.of_nat n) extC) tenv = Some trace').
+  { apply Csem_typed_total with (g:=nil);auto. }
+  destruct Hc_exists as [tr Hc]. destruct Hc'_exists as [tr' Hc'].
+  assert (Hpath1 :
+            ILRVal (sum_list (map (fun t => (disc t * tr t p1 p2 a)%R) (seq n (horizon c tenv))))
+            = ILRVal r).
+  { eapply cutPayoff_sound_n_steps with (n:=n) (c:=c);eauto;replace (n+0) with n by ring.
+    simpl. unfold liftM,compose,bind. rewrite adv_ext_0. rewrite Hc;reflexivity.
+    rewrite delay_trace_0. reflexivity.
+    assumption. }
+  assert (Hpath2 :
+            ILRVal (sum_list (map (fun t => (disc (n+t)%nat * tr' t p1 p2 a)%R) (seq 0 (horizon c' tenv))))
+            = ILRVal r').
+  { eapply Contr_translation_sound
+      with (t0':=0)
+           (extC:=(adv_ext (Z.of_nat n) extC))
+           (disc:=(adv_disc n disc));eauto.
+    - eauto.
+    - simpl. unfold liftM,compose,bind. rewrite adv_ext_0.
+      rewrite Hc'. rewrite delay_trace_0. reflexivity. }
+    replace (n) with (n+0) in Hpath1  by ring.
+    assert (Hf : (fun t0 : nat => (disc (n+t0)%nat * tr' t0 p1 p2 a)%R) =
+               (fun t0 : nat => (disc (n+t0)%nat * tr (n+t0)%nat p1 p2 a)%R)).
+    { apply functional_extensionality.
+      intros i.
+      erewrite RedN_sound with (n:=n)(c:=c) (c':=c')
+                                  (extp:=extP)(ext:=extC);eauto. }
+    erewrite <- sum_delay_plus' in Hpath1.
+    rewrite  <- Hf in Hpath1.
+    assert (Hk : exists k, horizon c tenv = k + horizon c' tenv /\ 0 <= k) by
+        (apply Nat.le_exists_sub;omega).
+    destruct Hk as [k Hk']. destruct Hk' as [Hhor_eq ?].
+    rewrite Hhor_eq in Hpath1.
+    replace (k + horizon c' tenv) with (horizon c' tenv + k) in Hpath1 by ring.
+    erewrite <- sum_before_after_horizon' in Hpath1;eauto; try omega.
+    congruence.
 Qed.
