@@ -229,7 +229,7 @@ Proof.
   - spec. option_inv_auto. rewrite delay_trace_S. rewrite delay_trace_0. simpl in S2.
     rewrite H1 in S2. inversion S2. reflexivity.
   - spec. eapply IHR;eauto. destruct (TexprSem n tenv); simpl in S1; rewrite H in S1; assumption.
-    Qed.
+Qed.
 
 End Soundness.
 Import Soundness.

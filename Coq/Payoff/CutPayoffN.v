@@ -19,7 +19,11 @@ induction step we use [cutPayoff_sound_step].
 Note, that cutPayoff_sound is formulated in more "semantic" style and avoids speaking about
 n-step reduction directly. Instead, we formulate the soundness in terms of traces, and this
 point of view directly corresponds to the traces produced by the reduction semantics
-(see lemmas [red_sound1] and [red_sound2] in  ../Reduction.v)*)
+(see lemmas [red_sound1] and [red_sound2] in  ../Reduction.v)
+
+We define n-step reduction relation [RedN] as an iterated one-step reduction and prove its soundness.
+We use [cutPayoff_sound_n_steps] and [RedN_sound] to prove soundness of [cutPayoff()] wrt. [RedN]
+ *)
 
 Require Import Tactics.
 Require Import ILSyntax.
@@ -46,18 +50,42 @@ Import Nat.
 (* N step contract reduction *)
 Inductive RedN : nat -> Contr -> EnvP -> ExtEnvP -> Contr ->  Prop :=
     red_refl c envp extp : RedN O c envp extp c
-  | red_step c c' c'' n envp extp tr : RedN n c envp extp c'' -> Red c'' envp extp c' tr ->
-                             RedN (S n) c envp extp c'.
+  | red_step c c' c'' n envp extp tr :
+      Red c envp extp c' tr -> RedN n c' envp (adv_ext 1 extp) c'' ->
+      RedN (S n) c envp extp c''.
 
 Hint Constructors RedN Red.
 
 Example RedN_ex1 : forall envp extp cur p1 p2,
                      RedN 3 (Translate (Tnum 2) (Transfer cur p1 p2)) envp extp Zero.
 Proof.
-  intros. econstructor. econstructor. econstructor. econstructor. econstructor.
-  reflexivity. reflexivity. econstructor.
-  reflexivity. reflexivity.
-  econstructor. econstructor. econstructor. reflexivity.
+  intros. repeat econstructor.
+Qed.
+
+Lemma RedN_sound  c c'  env ext envp extp t1 t2 i g tenv n :
+  RedN n c envp extp c' ->
+  g |-C c ->
+  TypeEnv g env -> TypeExt ext ->
+  ext_inst extp ext ->
+  env_inst envp env ->
+  C[|c|]env ext tenv = Some t1 ->
+  C[|c'|] env (adv_ext (Z.of_nat n) ext) tenv = Some t2
+  -> t1 (n + i) = t2 i.
+Proof.
+  intros R E X T I J S1 S2.
+  generalize dependent t1. generalize dependent t2. generalize dependent env.
+  generalize dependent ext. generalize dependent g.
+  induction R.
+  - intros. simpl. rewrite adv_ext_0 in S2. congruence.
+  - intros. simpl.
+    assert (H_c'_typed : g |-C c') by (eapply Preservation.red_typed;eauto).
+    assert (Htrace_c' : exists tr, C[| c'|] env (adv_ext 1 ext) tenv = Some tr)
+      by (apply Csem_typed_total with (g:=g);auto).
+    destruct Htrace_c'.
+    erewrite Soundness.red_sound2 with (c:=c) (c':=c');eauto.
+    eapply IHR with (ext:=adv_ext 1 ext);eauto.
+    rewrite adv_ext_iter. rewrite succ_of_nat with (t:=0%Z). simpl in *.
+    apply S2.
 Qed.
 
 (** Soundness of cutPayoff() fomlulated in terms of traces.
@@ -387,19 +415,19 @@ Proof.
   - apply cutPayoff_sound_step; apply IHn;auto.
 Qed.
 
-Theorem cutPayoff_sound_one_step' c c' (envC := nil) extC :
+Theorem cutPayoff_sound_RedN c c' (envC := nil) extC :
   forall (il_e : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
-         v' p1 p2 curr v trace (disc : nat -> R ) tenv tr (g := nil),
+         v' p1 p2 curr v trace (disc : nat -> R ) tenv (g := nil) n,
   (forall a a', Asset.eqb a a' = true) ->
   (forall l t, fromVal (extC l t) = extIL l t) ->
   fromContr c (ILTexpr (Tnum 0)) = Some il_e ->
   IsClosedCT c ->
-  Red c envP extP c' tr ->
-  C[|c'|] envC (adv_ext 1 extC) tenv = Some trace ->
+  RedN n c envP extP c' ->
+  C[|c'|] envC (adv_ext (Z.of_nat n) extC) tenv = Some trace ->
   horizon c' tenv <= horizon c tenv ->
-  sum_list (map (fun t => (disc (1+t)%nat * trace t p1 p2 curr)%R)
+  sum_list (map (fun t => (disc (n+t)%nat * trace t p1 p2 curr)%R)
                 (seq 0 (horizon c' tenv))) = v ->
-  IL[|cutPayoff il_e|] extIL tenv 0 1 disc p1 p2 = Some (ILRVal v') ->
+  IL[|cutPayoff il_e|] extIL tenv 0 n disc p1 p2 = Some (ILRVal v') ->
   TypeExt extC ->
   TypeEnv g envC ->
   g |-C c ->
@@ -408,23 +436,22 @@ Theorem cutPayoff_sound_one_step' c c' (envC := nil) extC :
   fromVal (RVal v) = (ILRVal v').
 Proof.
   simpl.
-  intros until tr; intros A Xeq TC R Cs S ILs Tx Te T J I TyExt EnvInst.
+  intros until n; intros A Xeq TC R Cs S1 ILs Tx Te T J I TyExt EnvInst.
   assert (Hc_exists : exists trace0, C[|c|] envC extC tenv = Some trace0).
   { apply Csem_typed_total with (g:=nil);auto. }
   destruct Hc_exists as [trace0 Hc].
-  assert (Hf : (fun t0 : nat => (disc (1+t0)%nat * trace t0 p1 p2 curr)%R) =
-                 (fun t0 : nat => (disc (1+t0)%nat * trace0 (1+t0)%nat p1 p2 curr)%R)).
+  assert (Hf : (fun t0 : nat => (disc (n+t0)%nat * trace t0 p1 p2 curr)%R) =
+                 (fun t0 : nat => (disc (n+t0)%nat * trace0 (n+t0)%nat p1 p2 curr)%R)).
     { apply functional_extensionality.
       intros i.
-      erewrite <- Soundness.red_sound2 with (c:=c) (c':=c') (t2:=trace)
-                                            (extp:=extP)(ext:=extC);eauto. }
+      erewrite <- RedN_sound with (n:=n)(c:=c) (c':=c') (t2:=trace)
+                                  (extp:=extP)(ext:=extC);eauto. }
     simpl in *.
-    (* rewrite Hf in H6. *)
-    eapply cutPayoff_sound_n_steps with (n:=1) (g:=nil) (c:=c)
-                                        (m:=horizon c tenv) (k:=1);simpl;eauto.
+    eapply cutPayoff_sound_n_steps with (n:=n) (g:=nil) (c:=c)
+                                        (m:=horizon c tenv) (k:=n);simpl;eauto.
     simpl. unfold liftM,bind,compose. rewrite adv_ext_0. rewrite Hc.
     apply f_equal. rewrite delay_trace_0. reflexivity.
-    rewrite <- sum_delay_plus.
+    rewrite <- sum_delay_plus'.
     erewrite <- Hf.
     assert (Hk : exists k, horizon c tenv = k + horizon c' tenv /\ 0 <= k) by
         (apply Nat.le_exists_sub;omega).
@@ -432,4 +459,6 @@ Proof.
     rewrite Hhor_eq.
     replace (k + horizon c' tenv) with (horizon c' tenv + k) by ring.
     erewrite <- sum_before_after_horizon';eauto; try omega.
+    replace (n+0) with n by ring.
+    assumption.
 Qed.

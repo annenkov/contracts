@@ -325,12 +325,23 @@ Qed.
 (* ------------------------------------------------------------------- *)
 
 Lemma sum_delay_plus n (trace0 : Trace) p1 p2 disc (a : Asset) : forall m,
-  sum_list (map (fun t0 : nat => (disc (S t0) * trace0 (S t0) p1 p2 a))%R (seq m n)%nat)%R =
+  sum_list (map (fun t0 : nat => (disc (1 + t0)%nat * trace0 (1 + t0)%nat p1 p2 a))%R (seq m n)%nat)%R =
   sum_list (map (fun t0 : nat => (disc t0 * trace0 t0 p1 p2 a)%R) (seq (1+m) n)).
 Proof.
   induction n.
   - reflexivity.
-  - intros m. simpl in *. rewrite IHn with (m:= S m). reflexivity.
+  - intros m. simpl in *. rewrite IHn with (m:= S m).
+    reflexivity.
+Qed.
+
+Lemma sum_delay_plus' n (trace0 : Trace) p1 p2 disc (a : Asset) : forall m t,
+  sum_list (map (fun t0 : nat => (disc (t + t0)%nat * trace0 (t + t0)%nat p1 p2 a))%R (seq m n)%nat)%R =
+  sum_list (map (fun t0 : nat => (disc t0 * trace0 t0 p1 p2 a)%R) (seq (t+m) n)).
+Proof.
+  induction n.
+  - reflexivity.
+  - intros m t. simpl in *. rewrite IHn with (m:= S m) (t:=t).
+    replace (t + S m) with (S (t + m)) by ring. reflexivity.
 Qed.
 
 Lemma sum_delay t0 t n tr p1 p2 curr f:
