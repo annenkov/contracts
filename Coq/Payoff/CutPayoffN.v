@@ -88,6 +88,19 @@ Proof.
     apply S2.
 Qed.
 
+(** Proof of type preservation by RedN *)
+
+Lemma red_typed_n n : forall c c' envp extp g,
+  TypeEnvP g envp -> TypeExtP extp ->
+  g |-C c -> RedN n c envp extp c' ->  g |-C c'.
+Proof.
+  induction n;intros until g;intros TyEnvP TyExtP TyC Rn.
+  - inversion Rn;subst;auto.
+  - inversion Rn;subst.
+    assert (g |-C c'0). eapply Preservation.red_typed;eauto.
+    eapply IHn with (c:=c'0) (c':=c') (extp:=(adv_ext 1 extp));eauto.
+Qed.
+
 (** Soundness of cutPayoff() formulated in terms of traces.
     Notice that we use a generalized formulation that works for arbitrary
     initial value [n0]. This is often necessary to get general enough induction hypothesis.
@@ -463,29 +476,30 @@ Proof.
     assumption.
 Qed.
 
+
 Theorem diagram_commutes_N c c' (envC :=nil) extC:
-  forall (il_e il_e' : ILExpr) (extIL : ExtEnv' ILVal) (envP : EnvP) (extP : ExtEnvP)
+  forall (il_e il_e' : ILExpr) (extIL : ExtEnv' ILVal) (envP := nil : EnvP) (extP : ExtEnvP)
          p1 p2 (disc : nat -> R ) tenv (g :=nil) r r' n (a : Asset),
     (forall a a' : Asset, Asset.eqb a a' = true) ->
     (forall l t, fromVal (extC l t) = extIL l t) ->
     IsClosedCT c ->
     fromContr c (ILTexpr (Tnum 0)) = Some il_e ->
+    (* ---- Typing ---- *)
     TypeExt extC ->
     TypeEnv g envC ->
     g |-C c ->
-    g |-C c' ->
-    horizon c' tenv <= horizon c tenv ->
-    IsClosedCT c' ->
+    (* --- The partial environment are aligned the total external environment --- *)
     ext_inst extP extC ->
-    env_inst envP envC ->
+    (* c ==>ⁿ c' *)
     RedN n c envP extP c' ->
+    horizon c' tenv <= horizon c tenv -> (* this assumtion can be made a lemma *)
     fromContr c' (ILTexpr (Tnum 0)) = Some il_e' ->
     IL[|cutPayoff il_e|] extIL tenv 0 n disc p1 p2 = Some (ILRVal r) ->
     IL[|il_e'|] (adv_ext (Z.of_nat n) extIL) tenv 0 0 (adv_disc n disc) p1 p2 = Some (ILRVal r') ->
     fromVal (RVal r) = ILRVal r'.
 Proof.
-  simpl.
-  intros.
+  intros until n. intros a A Xeq Hclosed TC TyExt TyEnv TyC I Rn Hor_leq TC' Hil Hil'.
+  assert (nil |-C c'). eapply red_typed_n with (envp:=nil);eauto.
   assert (Hc_exists : exists trace, C[|c|] envC extC tenv = Some trace).
   { apply Csem_typed_total with (g:=nil);auto. }
     assert (Hc'_exists : exists trace', C[|c'|] envC (adv_ext (Z.of_nat n) extC) tenv = Some trace').
@@ -514,7 +528,7 @@ Proof.
     { apply functional_extensionality.
       intros i.
       erewrite RedN_sound with (n:=n)(c:=c) (c':=c')
-                                  (extp:=extP)(ext:=extC);eauto. }
+                                  (extp:=extP)(ext:=extC); subst envC; subst envP; eauto. }
     erewrite <- sum_delay_plus' in Hpath1.
     rewrite  <- Hf in Hpath1.
     assert (Hk : exists k, horizon c tenv = k + horizon c' tenv /\ 0 <= k) by
@@ -522,6 +536,6 @@ Proof.
     destruct Hk as [k Hk']. destruct Hk' as [Hhor_eq ?].
     rewrite Hhor_eq in Hpath1.
     replace (k + horizon c' tenv) with (horizon c' tenv + k) in Hpath1 by ring.
-    erewrite <- sum_before_after_horizon' in Hpath1;eauto; try omega.
+    erewrite <- sum_before_after_horizon' in Hpath1;eauto; try omega. simpl.
     congruence.
 Qed.
