@@ -13,6 +13,9 @@ The [NWPT'16 abstract](http://dannenkov.me/papers/NWPTPayoffLang.pdf) and
 presentation slides([slides 1](http://dannenkov.me/papers/NWPT16Slides.pdf),
 [slides 2](http://dannenkov.me/papers/HIPERFIT_Workshop_2016.pdf))
 outlining the ideas and motivation for the payoff expression language (PEL).
+See [PPDP'18 paper](http://dannenkov.me/papers/annenkov-elsman-ppdp18.pdf)
+for detailed description of the compilation procedure, soundess proofs 
+and Futhark code generation.
 
 The Coq-based certified implementation of the language is
 found in the [Coq](Coq) subdirectory. The [Coq/Payoff](Coq/Payoff) subdirectory
